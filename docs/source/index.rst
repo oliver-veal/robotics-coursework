@@ -21,6 +21,8 @@ Indices and tables
 
 Make Memes Great Again
 
+Water Scooter
+
 .. code-block:: python
 
     class RobotKineClass():
