@@ -23,6 +23,8 @@ Oscar was here
 
 Make Memes Great Again
 
+Water Scooter
+
 .. code-block:: python
 
     class RobotKineClass():
