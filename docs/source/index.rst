@@ -19,6 +19,13 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
+.. image:: img/diagram.png
+   :height: 200
+   :width: 200
+   :alt: Robot Diagram
+
+
 Oscar was here
 
 Make Memes Great Again
