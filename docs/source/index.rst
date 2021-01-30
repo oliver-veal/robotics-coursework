@@ -19,6 +19,8 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Oscar was here
+
 Make Memes Great Again
 
 .. code-block:: python
