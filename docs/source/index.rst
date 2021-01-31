@@ -13,11 +13,20 @@ Welcome to DE3 Robotics Group 1 Coursework Documentation
 
 We are the BROBOTICISTS and this is our journey.
 
+.. warning::
+
+    For best UI experience, please use the web_ version of the documentation as opposed to the PDF version.
+
+.. _web: https://robotics-coursework-de3.readthedocs.io/en/latest/#
+
 ============
 Introduction
 ============
 
-Intro text here
+Login for VM machine: deniro123
+Open Terminator to input commands, shortcuts for opening new instances:
+‘Ctrl+Shift+o’ - split horizontally
+‘Ctrl+Shift+e’ - split vertically
 
 ================================================
 Starting the Virtual Machine and Troubleshooting
@@ -33,7 +42,9 @@ Forward Kinematics
 Task A: Computing the D-H Table
 -------------------------------
 
-text
+This task initialises the Denavit-Hartenberg, D-H, table. The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other. As the robot moves, the D-H table is updated. The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+
+The numpy array, self.DH_tab, in line 230 of kinematics.py is the live D-H table for the robot. It’s initial state is entered, with link lengths stored in self.links[n], where n is link number. This refers to a list self.links created in line 225. The list is based on the link_lengths variable which is passed into the function. This function is the __init__ of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run. The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
 
 ----------------------------
 Task B: Coding the D-H Table
