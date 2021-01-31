@@ -71,6 +71,8 @@ The numpy array, self.DH_tab, in line 230 of kinematics.py is the live D-H table
 Derivation
 ----------------------------
 
+a
+
 Insert images showing derivation
 
 ----------------------------
@@ -145,4 +147,3 @@ test image
    :width: 200
    :alt: Robot Diagram
 
-   
