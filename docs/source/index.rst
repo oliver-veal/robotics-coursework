@@ -25,10 +25,18 @@ We have decided to create a Readthedocs page for our coursework submissions inst
 Introduction
 ============
 
-Login for VM machine: deniro123
-Open Terminator to input commands, shortcuts for opening new instances:
-‘Ctrl+Shift+o’ - split horizontally
-‘Ctrl+Shift+e’ - split vertically
+**Login for VM machine**
+
+Password: deniro123
+
+
+Open Terminator to input commands to run different services or files
+
+.. note::
+   Top Tip! The shortcut for opening new terminal instances:
+
+   - ‘Ctrl+Shift+o’ - split horizontally
+   - ‘Ctrl+Shift+e’ - split vertically
 
 ================================================
 Starting the Virtual Machine and Troubleshooting
@@ -88,13 +96,13 @@ Insert images showing derivation
 +-------+--------+--------+--------+--------+
 | link  | d      | theta  | a      | alpha  |
 +=======+========+========+========+========+
-| 1     | l0     | theta1 | 0      |        |
+| 1     | l0     | theta1 | 0      | 0      |
 +-------+--------+--------+--------+--------+
 | 2     | 0      | theta2 | 0      | pi/2   |
 +-------+--------+--------+--------+--------+
-| 3     | 0      | theta3 | l1     |        |
+| 3     | 0      | theta3 | l1     | 0      |
 +-------+--------+--------+--------+--------+
-| 4     | 0      | 0      | l2     |        |
+| 4     | 0      | 0      | l2     | 0      |
 +-------+--------+--------+--------+--------+
 
 The function getFK(self,q) accesses the DH_tab a row at a time and copies the ith row to DH_params to compute the transformation matrix from one frame to the next.
