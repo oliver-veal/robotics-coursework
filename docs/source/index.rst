@@ -7,6 +7,12 @@
    :maxdepth: 2
    :caption: Contents:
 
+========================================================
+Welcome to DE3 Robotics Group 1 Coursework Documentation
+========================================================
+
+We are the BROBOTICISTS and this is our journey.
+
 ============
 Introduction
 ============
@@ -34,6 +40,7 @@ Task B: Coding the D-H Table
 ----------------------------
 
 text
+.. code-block:: python
 
 ------------------------------------
 Task C: Computing Forward Kinematics
