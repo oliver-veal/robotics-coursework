@@ -77,26 +77,183 @@ a
 
 Insert images showing derivation
 
-+--------+--------+--------+
-| d      | theta  | a      |
-+========+========+========+
-| l0     | theta2 | 0      |
-+--------+--------+--------+
-| 0      | theta1 | 0      |
-+--------+--------+--------+
+.. image:: img/task_a_robot.png
+   :width: 500
+   :alt: Robot Diagram
+
+*Diagram of robot with reference axes [1]*
+
+*Table 1: D-H Table based on derivation*
+
++-------+--------+--------+--------+--------+
+| link  | d      | theta  | a      | alpha  |
++=======+========+========+========+========+
+| 1     | l0     | theta1 | 0      |        |
++-------+--------+--------+--------+--------+
+| 2     | 0      | theta2 | 0      | pi/2   |
++-------+--------+--------+--------+--------+
+| 3     | 0      | theta3 | l1     |        |
++-------+--------+--------+--------+--------+
+| 4     | 0      | 0      | l2     |        |
++-------+--------+--------+--------+--------+
+
+The function getFK(self,q) accesses the DH_tab a row at a time and copies the ith row to DH_params to compute the transformation matrix from one frame to the next.
+A list q of current joint angles (theta) is passed in, and added to the base-state DH_params, in order to compute the current transformation matrix.
+This is how the DH table is “updated” with changing theta.
+
+.. code-block:: python
+   :linenos:
+
+   def getFK(self,q):
+
+   T_0_i_1 = np.identity(4)
+   for i in range(self.nj):
+
+      DH_params = np.copy(self.DH_tab[i,:])
+      #print('q',q)
+      #print(DH_params)
+      if self.joint_types[i] == 'r':
+            DH_params[1] = DH_params[1]+q[i]
+      elif self.joint_types[i] == 'p':
+            DH_params[0] = DH_params[0]+q[i]
+
+Therefore, since theta in the D-H table is updated by iteration at each step rather than updating a variable, theta1, theta2, and theta3 are set to 0.
+This is because the base configuration of the robot is such that the ith joints are in line with each other which results in the angles being set to 0.
+These results are entered into the D-H table defined in the code.
+
+.. code-block:: python
+   :linenos:
+
+   self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
+                        [0., 0., 0., pi/2.],
+                        [0., 0., self.links[1], 0.],
+                        [0., 0., self.links[2], 0.]])
 
 ----------------------------
 Task B: Coding the D-H Table
 ----------------------------
 
-text
+The numpy array, DH_matrix, in line 211 represents the transformation matrix from frame i-1 to frame i.
+As such, the transformation matrices of each joint can be multiplied in a chain to transform coordinates from the end effector frame to the base frame.
+This is taken care of in the next section, this function DH_matrix() only creates the i-1 to i matrix.
+The definition for this is shown below, and simply written in Python
+
+.. image:: img/transform.png
+   :width: 500
+   :alt: i-1 to i transformation matrix
+
 .. code-block:: python
+   :linenos:
+   :emphasize-lines: 9-12
+   
+   def DH_matrix(DH_params):
+      d = DH_params[0]
+      theta = DH_params[1]
+      a = DH_params[2]
+      alpha = DH_params[3]
+      
+      ################################################ TASK 2
+      DH_matrix = np.array(
+      [[cos(theta) , -sin(theta), 0, a],                     
+      [sin(theta)*cos(alpha), cos(theta)*cos(alpha), -sin(alpha), -sin(alpha)*d],
+      [sin(theta)*sin(alpha) ,cos(theta)*sin(alpha), cos(alpha), cos(alpha)*d],
+      [0., 0., 0., 1.]])
 
 ------------------------------------
 Task C: Computing Forward Kinematics
 ------------------------------------
 
-text
+This function gets the forward kinematics, FK, of the robot as any given instance.
+It involves multiplying each on the link transformation matrices together to make the compound transformation matrix.
+This is done iteratively in a for loop, beginning line 4. The matrix is updated in line 17.
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 4, 17
+
+   def getFK(self,q):
+
+         T_0_i_1 = np.identity(4)
+         for i in range(self.nj):
+
+               DH_params = np.copy(self.DH_tab[i,:])
+               #print('q',q)
+               #print(DH_params)
+               if self.joint_types[i] == 'r':
+                  DH_params[1] = DH_params[1]+q[i]
+               elif self.joint_types[i] == 'p':
+                  DH_params[0] = DH_params[0]+q[i]
+               
+               T_i_1_i = DH_matrix(DH_params) #Pose of joint i wrt i-1
+               
+               ################################################ TASK 3 (replace np.eye(4) with the correct matrices)
+               # np.matmul operation here # #Pose of joint i wrt base
+
+               T_0_i_1 = T_0_i
+         T_0_n_1 = T_0_i
+         DH_params = np.copy(self.DH_tab[self.nj, :])
+         T_n_1_n = DH_matrix(DH_params)
+         T_0_n = np.matmul(T_0_n_1, T_n_1_n)
+
+The following equation shows how the pose of the end effector can be calculated with respect to the base frame; by multiplying together the transformation matrices of each joint.
+
+.. image:: img/task_c_eq1.png
+   :width: 414
+   :alt: Task C equation 1
+
+To do this iteratively, premultiply the transformation matrix of the ith frame by the matrix of the i-1th frame, for each frame.
+
+.. image:: img/task_c_eq2.png
+   :width: 286
+   :alt: Task C equation 2
+
+The following line of code implements this equation inside the loop that iterates over each joint.
+Np.matmul is a numpy function that multiplies two matrices together. T_0_i is  the matrix giving the ith joint wrt the base frame and is updated at each iteration.
+T_0_i_1 is the matrix from the base frame to the i-1th frame, and T_i_1_i is the matrix from the i-1th frame to the ith frame.
+The code iteratively calls the previous function DH_matrix() to get the i-1 to i transformation matrix, T_i_1_i.
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 17
+
+   def getFK(self,q):
+
+        T_0_i_1 = np.identity(4)
+        for i in range(self.nj):
+
+            DH_params = np.copy(self.DH_tab[i,:])
+            #print('q',q)
+            #print(DH_params)
+            if self.joint_types[i] == 'r':
+                DH_params[1] = DH_params[1]+q[i]
+            elif self.joint_types[i] == 'p':
+                DH_params[0] = DH_params[0]+q[i]
+            
+            T_i_1_i = DH_matrix(DH_params) #Pose of joint i wrt i-1
+            
+            ################################################ TASK 3 (replace np.eye(4) with the correct matrices)
+            T_0_i = np.matmul(T_0_i_1, T_i_1_i) #Pose of joint i wrt base
+
+            T_0_i_1 = T_0_i
+        T_0_n_1 = T_0_i
+        DH_params = np.copy(self.DH_tab[self.nj, :])
+        T_n_1_n = DH_matrix(DH_params)
+        T_0_n = np.matmul(T_0_n_1, T_n_1_n)
+
+To test the code, open a new terminal and run
+
+.. code-block:: python
+   :linenos:
+
+   cd Desktop/DE3Robotics/src/coursework_1/src
+   python3 kinematics.py fk 
+
+The FK model runs successfully if the following message appears:
+
+.. code-block:: python
+   :linenos:
+   
+   "Forward Kinematics calculations are correct, well done!"
 
 ==================
 Inverse Kinematics
