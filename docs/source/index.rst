@@ -3,15 +3,75 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to DE3 Robotics Coursework's documentation!
-===================================================
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+============
+Introduction
+============
 
+Intro text here
 
+================================================
+Starting the Virtual Machine and Troubleshooting
+================================================
+
+Troubleshooting notes here
+
+==================
+Forward Kinematics
+==================
+
+-------------------------------
+Task A: Computing the D-H Table
+-------------------------------
+
+text
+
+----------------------------
+Task B: Coding the D-H Table
+----------------------------
+
+text
+
+------------------------------------
+Task C: Computing Forward Kinematics
+------------------------------------
+
+text
+
+==================
+Inverse Kinematics
+==================
+
+-----------------------------------------------
+Task D: Checking if a point is in the workspace
+-----------------------------------------------
+
+text
+
+----------------------------
+Task B: Coding the D-H Table
+----------------------------
+
+text
+
+------------------------------------
+Task C: Computing Forward Kinematics
+------------------------------------
+
+text
+
+=======================
+Differential Kinematics
+=======================
+
+=============
+Robot Control
+=============
+
+==================
 Indices and tables
 ==================
 
@@ -24,13 +84,6 @@ Indices and tables
    :height: 200
    :width: 200
    :alt: Robot Diagram
-
-
-Oscar was here
-
-Make Memes Great Again
-
-Water Scooter
 
 .. code-block:: python
 
