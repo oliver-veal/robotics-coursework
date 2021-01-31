@@ -71,10 +71,6 @@ Differential Kinematics
 Robot Control
 =============
 
-==================
-Indices and tables
-==================
-
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
