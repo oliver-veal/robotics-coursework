@@ -51,15 +51,15 @@ Task D: Checking if a point is in the workspace
 
 text
 
-----------------------------
-Task B: Coding the D-H Table
-----------------------------
+--------------------------------------
+Task E: Calculating Inverse Kinematics
+--------------------------------------
 
 text
 
-------------------------------------
-Task C: Computing Forward Kinematics
-------------------------------------
+---------------------------------
+Task F: Coding Inverse Kinematics
+---------------------------------
 
 text
 
@@ -67,19 +67,40 @@ text
 Differential Kinematics
 =======================
 
+-------------------------------
+Task G: Computing the Jacobian
+-------------------------------
+
 =============
 Robot Control
 =============
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+-----------------------------------------------
+Task H: Tuning Controller Gains
+-----------------------------------------------
 
+text
+
+------------------------------
+Task I: Adapting the Robot Arm
+------------------------------
+
+text
+
+---------------------------------
+Task J: Adapting Controller Gains
+---------------------------------
+
+text
+
+test image
 
 .. image:: img/diagram.png
    :height: 200
    :width: 200
    :alt: Robot Diagram
+
+test code block
 
 .. code-block:: python
 
