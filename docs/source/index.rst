@@ -11,7 +11,8 @@
 Welcome to DE3 Robotics Group 1 Coursework Documentation
 ========================================================
 
-We are the BROBOTICISTS and this is our journey.
+We are the **BROBOTICISTS** and this is our journey.
+
 We have decided to create a Readthedocs page for our coursework submissions instead of a Google Drive document. This way this documentation can be used for teaching ROS at any point in the future, as well as integrated code blocks and interactive videos.
 
 .. warning::
