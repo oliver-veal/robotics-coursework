@@ -49,6 +49,8 @@ This task initialises the Denavit-Hartenberg, D-H, table. The table contains all
 The numpy array, self.DH_tab, in line 230 of kinematics.py is the live D-H table for the robot. It’s initial state is entered, with link lengths stored in self.links[n], where n is link number. This refers to a list self.links created in line 225. The list is based on the link_lengths variable which is passed into the function. This function is the __init__ of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run. The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
 
 .. code-block:: python
+   :linenos:
+   :emphasize-lines: 13-16
 
     class RobotKineClass():
 
@@ -74,6 +76,14 @@ Derivation
 a
 
 Insert images showing derivation
+
++--------+--------+--------+
+| d      | theta  | a      |
++========+========+========+
+| l0     | theta2 | 0      |
++--------+--------+--------+
+| 0      | theta1 | 0      |
++--------+--------+--------+
 
 ----------------------------
 Task B: Coding the D-H Table
