@@ -48,6 +48,31 @@ This task initialises the Denavit-Hartenberg, D-H, table. The table contains all
 
 The numpy array, self.DH_tab, in line 230 of kinematics.py is the live D-H table for the robot. It’s initial state is entered, with link lengths stored in self.links[n], where n is link number. This refers to a list self.links created in line 225. The list is based on the link_lengths variable which is passed into the function. This function is the __init__ of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run. The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
 
+.. code-block:: python
+
+    class RobotKineClass():
+
+    def __init__(self,link_lengths):
+
+        self.ROSPublishers = set_joint_publisher()
+
+        self.nj = 3    #number of joints
+        self.links = link_lengths    # length of links
+
+        ################################################ TASK 1
+        #Define DH table for each link. DH_tab in R^njx4
+        #d,theta,a,alpha
+        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
+                                [0., 0., 0., pi/2.],
+                                [0., 0., self.links[1], 0.],
+                                [0., 0., self.links[2], 0.]])
+        self.joint_types = 'rrr'	# three revolute joints
+
+Derivation
+----------------------------
+
+Insert images showing derivation
+
 ----------------------------
 Task B: Coding the D-H Table
 ----------------------------
@@ -120,24 +145,4 @@ test image
    :width: 200
    :alt: Robot Diagram
 
-test code block
-
-.. code-block:: python
-
-    class RobotKineClass():
-
-    def __init__(self,link_lengths):
-
-        self.ROSPublishers = set_joint_publisher()
-
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
-
-        ################################################ TASK 1
-        #Define DH table for each link. DH_tab in R^njx4
-        #d,theta,a,alpha
-        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
-                                [0., 0., 0., pi/2.],
-                                [0., 0., self.links[1], 0.],
-                                [0., 0., self.links[2], 0.]])
-        self.joint_types = 'rrr'	# three revolute joints
+   
