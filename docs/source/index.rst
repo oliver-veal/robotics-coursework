@@ -43,6 +43,8 @@ Now it is possible to add the robotic arm to the simulation. In a new terminal r
 The robotic arm should now be in Gazebo
 
 .. note::
+   Open Terminator to input commands to run different services or files
+   
    Top Tip! The shortcut for opening new terminal instances:
 
    - ‘Ctrl+Shift+o’ - split horizontally
