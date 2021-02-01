@@ -747,11 +747,39 @@ Final Results
 Task I: Adapting the Robot Arm
 ------------------------------
 
-The end effector mass is controlled in line _ of the robot_model_gazebo.xacro file, which contains all the physical model parameters. Changing the end effector mass to 30Kg yields the following results.
+The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro file``, which contains all the physical model parameters. Changing the end effector mass to 30Kg yields the following results.
+
+.. code-block::
+   :linenos:
+   :emphasize-lines: 16
+
+   <?xml version="1.0"?>
+   <robot name="DESE3R" xmlns:xacro="http://www.ros.org/wiki/xacro">
+   <xacro:property name="link_length_0_init" value="1"/>
+   <xacro:property name="link_length_1_init" value="1"/>
+   <xacro:property name="link_length_2_init" value="1"/>
+
+   <xacro:property name="link_radius" value="0.05"/>
+   <xacro:property name="link_mass" value="0.5"/>
+   <xacro:property name="base_height" value="0.1"/>
+   <xacro:property name="base_side" value="0.6"/>
+   <xacro:property name="case_radius" value="${link_radius}"/>
+   <xacro:property name="case_length" value="${case_radius*2}"/>
+   <xacro:property name="ee_length" value="0.04"/>
+   <xacro:property name="ee_side" value="0.02"/>
+
+   <xacro:property name="ee_mass" value="30"/>
+
+   <xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
+   <xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
+   <xacro:property name="link_length_2" value="${link_length_2_init-case_radius}"/>
+
 
 Results
+-------
 
 Embedded video
+--------------
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -759,9 +787,12 @@ Task J: Adapting Controller Gains
 
 Using the same methods as in Task H, the PID values are updated to account for the new response of the system.
 
-Results.
+Results
+-------
 
 Embedded video
+--------------
+
 
 
 
