@@ -21,28 +21,32 @@ We have decided to create a Readthedocs page for our coursework submissions inst
 
 .. _web: https://robotics-coursework-de3.readthedocs.io/en/latest/#
 
-============
-Introduction
-============
+=====
+Setup
+=====
 
-**Login for VM machine**
+Open Terminator to input commands to run different services or files.
 
-Password: deniro123
+Start by entering ``roscore`` - this is required to launch nodes and programs for the roscore system to start. It must be running in order for ROS nodes to communicate.
 
+To start gazebo, in a new terminal, use ``rosrun gazebo_ros gazebo``, which generates an empty world.
 
-Open Terminator to input commands to run different services or files
+- To close this instance use ``Ctrl+c``. 
+- To close the Gazebo properly, in case multiple instances are running and it does not close, run ``killall gzserver gzclient``. The following response should occur if it has closed, ``gzserver: no process found and gzclient: no process found``.
+
+Now it is possible to add the robotic arm to the simulation. In a new terminal run:
+
+- ``cd Desktop/DE3Robotics``
+- ``source devel/setup.bash``
+- ``roslaunch coursework_1 coursework_1.launch``
+
+The robotic arm should now be in Gazebo
 
 .. note::
    Top Tip! The shortcut for opening new terminal instances:
 
    - ‘Ctrl+Shift+o’ - split horizontally
    - ‘Ctrl+Shift+e’ - split vertically
-
-================================================
-Starting the Virtual Machine and Troubleshooting
-================================================
-
-Troubleshooting notes here
 
 ==================
 Forward Kinematics
@@ -52,31 +56,10 @@ Forward Kinematics
 Task A: Computing the D-H Table
 -------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table. The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other. As the robot moves, the D-H table is updated. The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
-
-The numpy array, self.DH_tab, in line 230 of kinematics.py is the live D-H table for the robot. It’s initial state is entered, with link lengths stored in self.links[n], where n is link number. This refers to a list self.links created in line 225. The list is based on the link_lengths variable which is passed into the function. This function is the __init__ of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run. The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
-
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 13-16
-
-    class RobotKineClass():
-
-    def __init__(self,link_lengths):
-
-        self.ROSPublishers = set_joint_publisher()
-
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
-
-        ################################################ TASK 1
-        #Define DH table for each link. DH_tab in R^njx4
-        #d,theta,a,alpha
-        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
-                                [0., 0., 0., pi/2.],
-                                [0., 0., self.links[1], 0.],
-                                [0., 0., self.links[2], 0.]])
-        self.joint_types = 'rrr'	# three revolute joints
+This task initialises the Denavit-Hartenberg, D-H, table.
+The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
+As the robot moves, the D-H table is updated.
+The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
 Derivation
 ----------------------------
@@ -103,8 +86,39 @@ Insert images showing derivation
 | 4     | 0      | 0      | l2     | 0      |
 +-------+--------+--------+--------+--------+
 
-The function getFK(self,q) accesses the DH_tab a row at a time and copies the ith row to DH_params to compute the transformation matrix from one frame to the next.
-A list q of current joint angles (theta) is passed in, and added to the base-state DH_params, in order to compute the current transformation matrix.
+The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
+Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
+This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the function.
+This function is the ``__init__`` of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run.
+The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
+
+.. warning::
+
+   Line numbers in the follow code blocks do not correspond to the line numbers in kinematics.py or any other script mentioned
+
+.. code-block:: python
+   :linenos:
+
+    class RobotKineClass():
+
+    def __init__(self,link_lengths):
+
+        self.ROSPublishers = set_joint_publisher()
+
+        self.nj = 3    #number of joints
+        self.links = link_lengths    # length of links
+
+        ################################################ TASK 1
+        #Define DH table for each link. DH_tab in R^njx4
+        #d,theta,a,alpha
+        self.DH_tab = np.array([0., 0., 0., 0.],
+                                [0., 0., 0., 0.],
+                                [0., 0., 0., 0.],
+                                [0., 0., 0., 0.]])
+        self.joint_types = 'rrr'	# three revolute joints
+
+The function ``getFK(self,q)`` accesses the ``DH_tab`` a row at a time and copies the ith row to ``DH_params`` to compute the transformation matrix from one frame to the next.
+A list ``q`` of current joint angles (theta) is passed in, and added to the base-state ``DH_params``, in order to compute the current transformation matrix.
 This is how the DH table is “updated” with changing theta.
 
 .. code-block:: python
@@ -127,26 +141,46 @@ Therefore, since theta in the D-H table is updated by iteration at each step rat
 This is because the base configuration of the robot is such that the ith joints are in line with each other which results in the angles being set to 0.
 These results are entered into the D-H table defined in the code.
 
+.. note::
+   
+   Our edits and additions to the code are highlighted in the following code blocks
+
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 13-16
 
-   self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
-                        [0., 0., 0., pi/2.],
-                        [0., 0., self.links[1], 0.],
-                        [0., 0., self.links[2], 0.]])
+    class RobotKineClass():
+
+    def __init__(self,link_lengths):
+
+        self.ROSPublishers = set_joint_publisher()
+
+        self.nj = 3    #number of joints
+        self.links = link_lengths    # length of links
+
+        ################################################ TASK 1
+        #Define DH table for each link. DH_tab in R^njx4
+        #d,theta,a,alpha
+        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
+                                [0., 0., 0., pi/2.],
+                                [0., 0., self.links[1], 0.],
+                                [0., 0., self.links[2], 0.]])
+        self.joint_types = 'rrr'	# three revolute joints
 
 ----------------------------
 Task B: Coding the D-H Table
 ----------------------------
 
-The numpy array, DH_matrix, in line 211 represents the transformation matrix from frame i-1 to frame i.
+The numpy array, ``DH_matrix``, line 8, represents the transformation matrix from frame i-1 to frame i.
 As such, the transformation matrices of each joint can be multiplied in a chain to transform coordinates from the end effector frame to the base frame.
-This is taken care of in the next section, this function DH_matrix() only creates the i-1 to i matrix.
-The definition for this is shown below, and simply written in Python
+This is taken care of in the next section, this function ``DH_matrix()`` only creates the i-1 to i matrix by copying in the relavent lines of the D-H table..
+The definition for this is shown below
 
 .. image:: img/transform.png
    :width: 500
    :alt: i-1 to i transformation matrix
+
+This definition is translated into the array in Python.
 
 .. code-block:: python
    :linenos:
@@ -169,13 +203,12 @@ The definition for this is shown below, and simply written in Python
 Task C: Computing Forward Kinematics
 ------------------------------------
 
-This function gets the forward kinematics, FK, of the robot as any given instance.
+The function ``getFK(self,q)`` gets the forward kinematics, FK, of the robot as any given instance.
 It involves multiplying each on the link transformation matrices together to make the compound transformation matrix.
 This is done iteratively in a for loop, beginning line 4. The matrix is updated in line 17.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 4, 17
 
    def getFK(self,q):
 
@@ -201,7 +234,7 @@ This is done iteratively in a for loop, beginning line 4. The matrix is updated 
          T_n_1_n = DH_matrix(DH_params)
          T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
-The following equation shows how the pose of the end effector can be calculated with respect to the base frame; by multiplying together the transformation matrices of each joint.
+The following equation shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint.
 
 .. image:: img/task_c_eq1.png
    :width: 414
@@ -214,9 +247,11 @@ To do this iteratively, premultiply the transformation matrix of the ith frame b
    :alt: Task C equation 2
 
 The following line of code implements this equation inside the loop that iterates over each joint.
-Np.matmul is a numpy function that multiplies two matrices together. T_0_i is  the matrix giving the ith joint wrt the base frame and is updated at each iteration.
-T_0_i_1 is the matrix from the base frame to the i-1th frame, and T_i_1_i is the matrix from the i-1th frame to the ith frame.
-The code iteratively calls the previous function DH_matrix() to get the i-1 to i transformation matrix, T_i_1_i.
+``np.matmul`` is a numpy function that multiplies two matrices together. ``T_0_i`` is the matrix giving the ith joint with respect to the base frame and is updated at each iteration.
+``T_0_i_1`` is the matrix from the base frame to the i-1th frame, and ``T_i_1_i`` is the matrix from the i-1th frame to the ith frame.
+The code iteratively calls the previous function ``DH_matrix()`` to get the i-1 to i transformation matrix, ``T_i_1_i``.
+
+To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
 .. code-block:: python
    :linenos:
@@ -271,7 +306,7 @@ Task D: Checking if a point is in the workspace
 
 To convert coordinates from task space to joint space, the geometric inverse kinematics of the robot arm must be calculated.
 The diagram demonstrates the home position of the robot arm.
-In the home position, the first link (l0), is along the z0 axis of the frame, and the second and third link (l1, l2 respectively) are defined along the y0 plane, meaning joint angles (q0, q1 and q2) are measured relative to this.
+In the home position, the first link **l0**, is along the **z0** axis of the frame, and the second and third link (**l1**, **l2** respectively) are defined along the **y0** plane, meaning joint angles (**q0**, **q1** and **q2**) are measured relative to this.
 
 Before computing the inverse kinematics of the arm, we must check if a given point is inside its reachable workspace. This is defined by a spherical shell centered on the end of its first link.
 
@@ -281,7 +316,7 @@ MATHEMATICAL EXPLANATION REQUIRED.
    :width: 500
    :alt: Diagram of reachable space
 
-The following code completes the calculation for the minimum and maximum sphere that defines the reachable workspace, with val, r_max and r_min needing to be entered:
+The following code completes the calculation for the minimum and maximum sphere that defines the reachable workspace, with ``val``, ``r_max`` and ``r_min`` needing to be entered in the following section of code, function ``checkInWS(self, P)``.
 
 .. code-block:: python
    :linenos:
@@ -303,15 +338,16 @@ The following code completes the calculation for the minimum and maximum sphere 
 
         return inWS
 
-The r_max and r_min are defined as:
+The ``r_max`` and ``r_min`` are defined as:
 
 .. image:: img/task_d.png
    :width: 252
 
-Therefore, r_max and r_min are defined in the code as shown below and the **2 is removed in the if statement to remove the terms being squared twice.
+Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and the ``**2`` is removed in the if statement to remove the terms being squared twice.
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 8,9,13
 
    #Check if point is in WS. returns true or false
    def checkInWS(self, P):
@@ -328,7 +364,6 @@ Therefore, r_max and r_min are defined in the code as shown below and the **2 is
       if val > r_max or val < r_min:
          inWS = False
 
-
       return inWS
 
 --------------------------------------
@@ -336,7 +371,13 @@ Task E: Calculating Inverse Kinematics
 --------------------------------------
 
 Inverse kinematics are used to obtain the joint angles required to reach a desired end effector position.
-For this, we need equations for q0, q1, q2 in terms of lengths and coordinates.
+For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and coordinates.
+
+.. Note::
+
+   Due to the test point error at the time, two different derivations were used with additional custom test points, verified by the FK model.
+   This was used to correct the test points.
+   Results with corrected test points shown in **Task F**.
 
 Derivation 1
 ------------
@@ -349,18 +390,14 @@ Derivation 2
 Task F: Coding Inverse Kinematics
 ---------------------------------
 
-Using the derivations from Task E, the code can be populated with the definitions for q.
+Using the derivations from **Task E**, the code can be populated with the definitions for ``q``.
 
 Given any feasible point, there may be two configurations to reach it.
-These two sets of configurations are stored in 3x1 vectors q_a and q_b, containing qa0, qa1, qa2 and qb0, qb1, qb2 respectively.
+These two sets of configurations are stored in 3x1 vectors ``q_a`` and ``q_b``, containing ``qa0``, ``qa1``, ``qa2`` and ``qb0``, ``qb1``, ``qb2`` respectively.
 
-The robot can be treated as a planar two link robot, being rotated about z0 by q0.
-Therefore, for any point there is only one q0 value which satisfies.
-The two configurations are stored together as columns in matrix q.
-
-Note: Due to the test point error at the time, three different derivations were used with additional custom test points, verified by the FK model.
-This was  used to correct the test points.
-Results with corrected test points shown.
+The robot can be treated as a planar two link robot, being rotated about ``z0`` by ``q0``.
+Therefore, for any point there is only one ``q0`` value which satisfies the point.
+The two configurations are stored together as columns in matrix ``q``.
 
 Unsolved code to fill:
 
@@ -388,6 +425,10 @@ Code from derivation 1:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 4-12, 14,15, 17,18, 20,21, 23
+
+   q_a = np.zeros(3)
+   q_b = np.zeros(3)
 
    theta_1 = np.arctan2(yP, xP)
    r_1 = sqrt(xP**2 + yP**2)
@@ -399,15 +440,12 @@ Code from derivation 1:
    phi_3 = np.arccos((r_3**2 - l2**2 - l3**2) / (-2 * l2 * l3))
    theta_3 = pi - phi_3
 
-   
    q_a[0] = theta_1 #np.arctan2(yP,xP)
    q_b[0] = theta_1 #np.arctan2(yP,xP)
 
-   #r = np.power(np.power(xP,2)+np.power(yP,2),0.5)
-   #z = zP-l1
-
    q_a[2] = pi-phi_3
-   q_b[2] = -pi+phi_3        
+   q_b[2] = -pi+phi_3 
+
    q_a[1] = phi_2-phi_1
    q_b[1] = phi_2+phi_1
    
@@ -417,6 +455,10 @@ Code from derivation 2:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
+
+   q_a = np.zeros(3)
+   q_b = np.zeros(3)
 
    theta_1 = np.arctan2(yP, xP)
    r_1 = sqrt(xP**2 + yP**2)
@@ -426,9 +468,6 @@ Code from derivation 2:
    
    q_a[0] = theta_1 #np.arctan2(yP,xP)
    q_b[0] = theta_1 #np.arctan2(yP,xP)
-
-   #r = np.power(np.power(xP,2)+np.power(yP,2),0.5)
-   #z = zP-l1
 
    q_a[2] = np.arctan2(sqrt(1-D**2),D)
    q_b[2] = np.arctan2(-sqrt(1-D**2),D)
@@ -485,6 +524,21 @@ Corrected test points:
 | 1.75  | 0     | 1     | 0     | -0.505| 1.011 | 0     | 0.505 | -1.011|
 +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 
+To validate the Inverse Kinematics model with corrected test points, run:
+
+.. code-block:: python
+   :linenos:
+
+   cd Desktop/DE3Robotics/src/coursework_1/src
+   python3 kinematics.py ik 
+
+The IK model runs successfully if the following message appears:
+
+.. code-block:: python
+   :linenos:
+
+   "Inverse Kinematics calculations are correct, well done!"
+
 =======================
 Differential Kinematics
 =======================
@@ -493,39 +547,92 @@ Differential Kinematics
 Task G: Computing the Jacobian
 -------------------------------
 
-The Jacobian is a matrix of first order partial derivatives, in this case of x, y and z (columns) with respect to q1, q2, and q3 (rows).
+The Jacobian is a matrix of first order partial derivatives, in this case of ``x``, ``y`` and ``z`` (columns) with respect to ``q1``, ``q2``, and ``q3`` (rows).
 This allows task space velocity to be calculated from joint space velocities, as shown in the relationship below.
-
-.. image:: img/jacobian.png
-   :width: 299
-
-With the provided equations, these can be expanded to isolate the different theta_dot multipliers (elements in the Jacobian)
-
-.. image:: img/jacobian_equations.png
-   :width: 500
-   
-These equations can be used to define the matrix in the code below, with red green and blue indicating the q0_dot, q1_dot and q2_dot components respectively.
+This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation in the code provided.
 
 .. code-block:: python
    :linenos:
 
-   J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)
-   J_21=(l1*cos(q1)+l2*cos(q1+q2))*cos(q0)
-   J_31=0
+   def getDK(self, q, q_dot):
+      q0, q1, q2 = q
+      l1, l2, l3 = self.links
+      
+      ################################################ TASK 7
+      
+      J_11=0
+      J_21=0
+      J_31=0
+      
+      J_12=0
+      J_22=0
+      J_32=0
+      
+      J_13=0
+      J_23=0
+      J_33=0
+      
+      self.Jacobian = np.array([[J_11, J_12, J_13],
+                                 [J_21, J_22, J_23],
+                                 [J_31, J_32, J_33]])
+      x_dot = np.matmul(self.Jacobian, q_dot)
+      return x_dot
+
+To dervie the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
+The Jacobian, for this case, can be written as:
+
+.. image:: img/jacobian.png
+   :width: 299
+
+With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian) as shown:
+
+.. image:: img/jacobian_equations.png
+   :width: 500
    
-   J_12=-(l1*sin(q1)+l2*sin(q1+q2))*cos(q0)
-   J_22=-(l1*sin(q1)+l2*sin(q1+q2))*sin(q0)
-   J_32=l1*cos(q1)+l2*cos(q1+q2)
-   
-   J_13=-(l2*sin(q1+q2))*cos(q0)
-   J_23=-(l2*sin(q1+q2))*sin(q0)
-   J_33=l2*cos(q1+q2)
-   
-   self.Jacobian = np.array([[J_11, J_12, J_13],
-                              [J_21, J_22, J_23],
-                              [J_31, J_32, J_33]])
-   x_dot = np.matmul(self.Jacobian, q_dot)
-   return x_dot
+Upon inspection, these equations reveal the definitions of J_11, J_12... and can be used to define the matrix in the code below, with red green and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 7-9, 11-13, 15-17
+
+   def getDK(self, q, q_dot):
+      q0, q1, q2 = q
+      l1, l2, l3 = self.links
+      
+      ################################################ TASK 7
+
+      J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)
+      J_21=(l1*cos(q1)+l2*cos(q1+q2))*cos(q0)
+      J_31=0
+      
+      J_12=-(l1*sin(q1)+l2*sin(q1+q2))*cos(q0)
+      J_22=-(l1*sin(q1)+l2*sin(q1+q2))*sin(q0)
+      J_32=l1*cos(q1)+l2*cos(q1+q2)
+      
+      J_13=-(l2*sin(q1+q2))*cos(q0)
+      J_23=-(l2*sin(q1+q2))*sin(q0)
+      J_33=l2*cos(q1+q2)
+      
+      self.Jacobian = np.array([[J_11, J_12, J_13],
+                                 [J_21, J_22, J_23],
+                                 [J_31, J_32, J_33]])
+      x_dot = np.matmul(self.Jacobian, q_dot)
+      return x_dot
+
+To validate the jacobian, run:
+
+.. code-block:: python
+   :linenos:
+
+   cd Desktop/DE3Robotics/src/coursework_1/src
+   python3 kinematics.py dk
+
+The IK model runs successfully if the following message appears:
+
+.. code-block:: python
+   :linenos:
+
+   "Differential Kinematics calculations correct, well done!"
 
 =============
 Robot Control
@@ -542,7 +649,7 @@ SHORT EXPLANATION OF PID.
 .. image:: img/pid.png
    :width: 497
 
-The robot arm can be moved by running the following line in Terminator. 
+The robot arm can be moved by running the following line in Terminator:
 
 .. code-block:: python
    :linenos:
@@ -550,7 +657,7 @@ The robot arm can be moved by running the following line in Terminator.
    cd Desktop/DE3Robotics/src/coursework_1/src 
    python3 kinematics.py full
 
-This in turn eventually calls the function sendCommands() which communicates with Gazebo using a .publish() method.
+This in turn eventually calls the function ``sendCommands(self,q)`` which communicates with Gazebo using a ``.publish()`` method.
 
 .. code-block:: python
    :linenos:
@@ -569,13 +676,72 @@ This in turn eventually calls the function sendCommands() which communicates wit
 
 Each joint has its own PID control parameters. These can be tuned using *method maybe*
 
-Table of results
+PID values are found in lines 11, 15, and 19 of the ``controller_settings.yaml`` file shown below:
 
-Embedded video
- 
+.. code-block:: python
+   :linenos:
+
+   DESE3R:
+   # Publish all joint states -----------------------------------
+   joint_state_controller:
+      type: joint_state_controller/JointStateController
+      publish_rate: 100  
+   
+   # Position Controllers ---------------------------------------
+   joint_0_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_0
+      pid: {p: 0.1, i: 0, d: 0}
+   joint_1_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_1
+      pid: {p: 0.1, i: 0, d: 0}
+   joint_2_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_2
+      pid: {p: 0.1, i: 0, d: 0}
+
+To run the robot with updated values, first close all instances of Gazebo, re-open Gazebo and run the ``kinematics.py full`` code again.
+
+Tuning the PID controller
+-------------------------
+
 To begin tuning the robotic arm, the starting parameters for the proportional, integral and derivative terms were 0. The outcome of the is 
 
 Errors are huge as it cannot move at all because default controllers gains are very low. Errors changing as we send it different commands.
+
+Table of results
+----------------
+
+Video results
+-------------
+
+Final Results
+-------------
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 11,15,19
+
+   DESE3R:
+   # Publish all joint states -----------------------------------
+   joint_state_controller:
+      type: joint_state_controller/JointStateController
+      publish_rate: 100  
+   
+   # Position Controllers ---------------------------------------
+   joint_0_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_0
+      pid: {p: 0.1, i: 0, d: 0}
+   joint_1_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_1
+      pid: {p: 0.1, i: 0, d: 0}
+   joint_2_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_2
+      pid: {p: 0.1, i: 0, d: 0}
 
 ------------------------------
 Task I: Adapting the Robot Arm
