@@ -29,10 +29,9 @@ Introduction
 
 Password: deniro123
 
-
-Open Terminator to input commands to run different services or files
-
 .. note::
+   Open Terminator to input commands to run different services or files
+   
    Top Tip! The shortcut for opening new terminal instances:
 
    - ‘Ctrl+Shift+o’ - split horizontally
