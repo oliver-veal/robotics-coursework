@@ -66,7 +66,7 @@ The D-H table is a convenient way to store this information as the transformatio
 Derivation
 ----------------------------
 
-Insert images showing derivation
+To make the D-H table, the reference frames for each joint and for the end-effector must first be made and assigned origins and orientations. This is done according to the Denavit-Hartenberg convention. The steps for doing so with this particular robot are detailed below:
 
 .. image:: img/diagram_with_frames.png
    :width: 500
@@ -76,17 +76,17 @@ Insert images showing derivation
 
 *Table 1: D-H Table based on derivation*
 
-+-------+--------+--------+--------+-------+
-| link  |   d    |   θ    |   a    |   α   |
-+=======+========+========+========+=======+
-| **1** | l0     | θ1     | 0      |   0   |
-+-------+--------+--------+--------+-------+
-| **2** | 0      | θ2     | 0      |  π/2  |
-+-------+--------+--------+--------+-------+
-| **3** | 0      | θ3     | l1     |   0   |
-+-------+--------+--------+--------+-------+
-| **4** | 0      | 0      | l2     |   0   |
-+-------+--------+--------+--------+-------+
++-------+--------+--------+--------+--------+
+| link  |   d    |   θ    |   a    |   α    |
++=======+========+========+========+========+
+| **1** | l\ :sub:`0`     | θ1     | 0      |   0    |
++-------+--------+--------+--------+--------+
+| **2** | 0      | θ2     | 0      |  π/2   |
++-------+--------+--------+--------+--------+
+| **3** | 0      | θ3     | l1     |   0    |
++-------+--------+--------+--------+--------+
+| **4** | 0      | 0      | l2     |   0    |
++-------+--------+--------+--------+--------+
 
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
