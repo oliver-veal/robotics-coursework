@@ -68,7 +68,7 @@ Derivation
 
 Insert images showing derivation
 
-.. image:: img/diagram.png
+.. image:: img/diagram_with_frames.png
    :width: 500
    :alt: Robot Diagram
 
