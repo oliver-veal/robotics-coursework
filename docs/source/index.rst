@@ -67,10 +67,25 @@ Derivation
 ----------------------------
 
 To make the D-H table, the reference frames for each joint and for the end-effector must first be made and assigned origins and orientations. This is done according to the Denavit-Hartenberg convention. The steps for doing so with this particular robot are detailed below:
-:List of Things:
-    1. test test test
-    2. test test
-    
+
+   1. Origin of *frame 0* was set at *joint 1*
+   2. |z0| was set arbitrarily for simplicity pointing upwards towards *joint 2*
+   3. Origin of *frame 1* was set at the intersection of the joint axes of *joint 1* and *joint 2*, so in the middle of the *joint 2*
+   4. |z1| was set in the direction of the joint axis of *joint 1* and with the positive direction defined by the positive direction of rotation of *joint 1* (using the right-hand rule), so directly upwards
+   5. Origin of *frame 2* was set at the same place as the origin of *frame 1*
+   6. *z*:sub:`2` was set in the direction of the joint axis of *joint 2* and with the positive direction defined by the positive direction of rotation of *joint 2*
+   7. Since *z*:sub:`1` and *z*:sub:`2` intersect, *x*:sub:`1` was set as the normal to the plane containing *z*:sub:`1` and *z*:sub:`2`, pointing towards *joint 3*
+   8. For simplicity, *x*:sub:`0` was arbitrarily set as parallel and pointing in the same direction as *x*:sub:`1` in the starting position
+   9. Origin of *frame 3* was set at the intersection of the joint axis of *joint 3* and the common perpendicular of the joint axes of *joint 2* and *joint 3* along *l*:sub:`1`, so in the centre of *joint 3*
+   10. *z*:sub:`3` was set in the direction of the joint axis of *joint 3* and with the positive direction defined by the positive direction of rotation of *joint 3*
+   11. *x*:sub:`2` was set as pointing along the common perpendicular of *z*:sub:`2` and *z*:sub:`3` along *l*:sub:`1`, pointing at *joint 3* 
+   12. Origin of *frame 4* was set at the centre of the end effector
+   13. For simplicity, *z*:sub:`4` was arbitrarily set to be parallel to and in the same direction as *z*:sub:`3`
+   14. *x*:sub:`3` was set as pointing along the common perpendicular of *z*:sub:`3` and *z*:sub:`4` towards the origin of *frame 4*
+   15. For simplicity, *x*:sub:`4` was arbitrarily set as parallel to and in the same direction as *x*:sub:`3`
+   16. All *y* axes were set according to the right-hand coordinate system convention, completing the setup.
+
+The result of this setup is shown below:
 
 .. image:: img/diagram_with_frames.png
    :width: 500
@@ -80,17 +95,34 @@ To make the D-H table, the reference frames for each joint and for the end-effec
 
 *Table 1: D-H Table based on derivation*
 
-+-------+--------+--------+--------+--------+
-| link  |   d    |   θ    |   a    |   α    |
-+=======+========+========+========+========+
-| **1** | l0     | θ1     | 0      |   0    |
-+-------+--------+--------+--------+--------+
-| **2** | 0      | θ2     | 0      |  π/2   |
-+-------+--------+--------+--------+--------+
-| **3** | 0      | θ3     | l1     |   0    |
-+-------+--------+--------+--------+--------+
-| **4** | 0      | 0      | l2     |   0    |
-+-------+--------+--------+--------+--------+
++-----+-----+-----+-----+-----+
+|link |  d  |  θ  |  a  |  α  |
++=====+=====+=====+=====+=====+
+|**1**||l0| ||θ1| |  0  |  0  |
++-----+-----+-----+-----+-----+
+|**2**|  0  ||θ2| |  0  |*π*/2|
++-----+-----+-----+-----+-----+
+|**3**|  0  ||θ3| ||l1| |  0  |
++-----+-----+-----+-----+-----+
+|**4**|  0  |  0  ||l2| |  0  |
++-----+-----+-----+-----+-----+
+
+.. |z0| replace:: *z*:sub:`0`
+.. |z1| replace:: *z*:sub:`1`
+.. |z2| replace:: *z*:sub:`2`
+.. |z3| replace:: *z*:sub:`3`
+.. |z4| replace:: *z*:sub:`4`
+.. |x0| replace:: *x*:sub:`0`
+.. |x1| replace:: *x*:sub:`1`
+.. |x2| replace:: *x*:sub:`2`
+.. |x3| replace:: *x*:sub:`3`
+.. |x4| replace:: *x*:sub:`4`
+.. |l0| replace:: *l*:sub:`0`
+.. |l1| replace:: *l*:sub:`1`
+.. |l2| replace:: *l*:sub:`2`
+.. |θ1| replace:: *θ*:sub:`1`
+.. |θ2| replace:: *θ*:sub:`2`
+.. |θ3| replace:: *θ*:sub:`3`
 
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
