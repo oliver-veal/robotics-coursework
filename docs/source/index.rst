@@ -68,9 +68,9 @@ Derivation
 
 To make the D-H table, the reference frames for each joint and for the end-effector must first be made and assigned origins and orientations. This is done according to the Denavit-Hartenberg convention. The steps for doing so with this particular robot are detailed below:
 :List of Things:
-    item1 - these are 'field lists' not bulleted lists
-    item2
-    item 3
+    1. test test test
+    2. test test
+    
 
 .. image:: img/diagram_with_frames.png
    :width: 500
