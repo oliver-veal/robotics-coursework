@@ -73,16 +73,16 @@ To make the D-H table, the reference frames for each joint and for the end-effec
    3. Origin of *frame 1* was set at the intersection of the joint axes of *joint 1* and *joint 2*, so in the middle of the *joint 2*
    4. |z1| was set in the direction of the joint axis of *joint 1* and with the positive direction defined by the positive direction of rotation of *joint 1* (using the right-hand rule), so directly upwards
    5. Origin of *frame 2* was set at the same place as the origin of *frame 1*
-   6. *z*:sub:`2` was set in the direction of the joint axis of *joint 2* and with the positive direction defined by the positive direction of rotation of *joint 2*
-   7. Since *z*:sub:`1` and *z*:sub:`2` intersect, *x*:sub:`1` was set as the normal to the plane containing *z*:sub:`1` and *z*:sub:`2`, pointing towards *joint 3*
-   8. For simplicity, *x*:sub:`0` was arbitrarily set as parallel and pointing in the same direction as *x*:sub:`1` in the starting position
-   9. Origin of *frame 3* was set at the intersection of the joint axis of *joint 3* and the common perpendicular of the joint axes of *joint 2* and *joint 3* along *l*:sub:`1`, so in the centre of *joint 3*
-   10. *z*:sub:`3` was set in the direction of the joint axis of *joint 3* and with the positive direction defined by the positive direction of rotation of *joint 3*
-   11. *x*:sub:`2` was set as pointing along the common perpendicular of *z*:sub:`2` and *z*:sub:`3` along *l*:sub:`1`, pointing at *joint 3* 
+   6. |z2| was set in the direction of the joint axis of *joint 2* and with the positive direction defined by the positive direction of rotation of *joint 2*
+   7. Since |z1| and |z2| intersect, |x1| was set as the normal to the plane containing |z1| and |z2|, pointing towards *joint 3*
+   8. For simplicity, |x0| was arbitrarily set as parallel and pointing in the same direction as |x1| in the starting position
+   9. Origin of *frame 3* was set at the intersection of the joint axis of *joint 3* and the common perpendicular of the joint axes of *joint 2* and *joint 3* along |l1|, so in the centre of *joint 3*
+   10. |z3| was set in the direction of the joint axis of *joint 3* and with the positive direction defined by the positive direction of rotation of *joint 3*
+   11. |x2| was set as pointing along the common perpendicular of |z2| and |z3| along |l1|, pointing at *joint 3* 
    12. Origin of *frame 4* was set at the centre of the end effector
-   13. For simplicity, *z*:sub:`4` was arbitrarily set to be parallel to and in the same direction as *z*:sub:`3`
-   14. *x*:sub:`3` was set as pointing along the common perpendicular of *z*:sub:`3` and *z*:sub:`4` towards the origin of *frame 4*
-   15. For simplicity, *x*:sub:`4` was arbitrarily set as parallel to and in the same direction as *x*:sub:`3`
+   13. For simplicity, |z4| was arbitrarily set to be parallel to and in the same direction as |z3|
+   14. |x3| was set as pointing along the common perpendicular of |z3| and |z4| towards the origin of *frame 4*
+   15. For simplicity, |x4| was arbitrarily set as parallel to and in the same direction as |x3|
    16. All *y* axes were set according to the right-hand coordinate system convention, completing the setup.
 
 The result of this setup is shown below:
@@ -92,6 +92,15 @@ The result of this setup is shown below:
    :alt: Robot Diagram
 
 *Diagram of robot with D-H conventional reference axes*
+
+Using this diagram, the Denavit-Hartenberg table was made according to the following definitions:
+
+   1. |ai| = the distance from |zi-1| to |zi| measured along |xi-1|
+   2. |αi| = the angle between |zi-1| and |zi| measured about |xi-1|
+   3. |di| = the distance from |xi-1| to |xi| measured along |zi|
+   4. |θi| = the angle between |xi-1| and |xi| measured about |zi|
+
+The resulting table is shown below:
 
 *Table 1: D-H Table based on derivation*
 
@@ -107,22 +116,41 @@ The result of this setup is shown below:
 |**4**|  0  |  0  ||l2| |  0  |
 +-----+-----+-----+-----+-----+
 
+.. |z| replace:: *z*
 .. |z0| replace:: *z*:sub:`0`
 .. |z1| replace:: *z*:sub:`1`
 .. |z2| replace:: *z*:sub:`2`
 .. |z3| replace:: *z*:sub:`3`
 .. |z4| replace:: *z*:sub:`4`
+.. |x| replace:: *x*
 .. |x0| replace:: *x*:sub:`0`
 .. |x1| replace:: *x*:sub:`1`
 .. |x2| replace:: *x*:sub:`2`
 .. |x3| replace:: *x*:sub:`3`
 .. |x4| replace:: *x*:sub:`4`
+.. |y| replace:: *y*
+.. |y0| replace:: *y*:sub:`0`
+.. |y1| replace:: *y*:sub:`1`
+.. |y2| replace:: *y*:sub:`2`
+.. |y3| replace:: *y*:sub:`3`
+.. |y4| replace:: *y*:sub:`4`
+.. |l| replace:: *l*
 .. |l0| replace:: *l*:sub:`0`
 .. |l1| replace:: *l*:sub:`1`
 .. |l2| replace:: *l*:sub:`2`
+.. |θ| replace:: *θ*
 .. |θ1| replace:: *θ*:sub:`1`
 .. |θ2| replace:: *θ*:sub:`2`
 .. |θ3| replace:: *θ*:sub:`3`
+.. |ai| replace:: *a*:sub:`i`
+.. |αi| replace:: *α*:sub:`i`
+.. |di| replace:: *d*:sub:`i`
+.. |θi| replace:: *θ*:sub:`i`
+.. |zi| replace:: *z*:sub:`i`
+.. |xi| replace:: *x*:sub:`i`
+.. |zi-1| replace:: *z*:sub:`i-1`
+.. |xi-1| replace:: *x*:sub:`i-1`
+
 
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
@@ -357,6 +385,14 @@ MATHEMATICAL EXPLANATION REQUIRED. [5]_
    :alt: Diagram of reachable space
 
 *diagram of reachable workspace*. [6]_
+
+Deriving the Reachable Workspace
+--------------------------------
+
+Using the general equation for a sphere (with *a*, *b*, *c* being the |x|, |y|, |z| coordinates of the centre):
+.. image:: img/D_equation1.png
+   :width: 500
+   :alt: D_equation1
 
 The following code completes the calculation for the minimum and maximum sphere that defines the reachable workspace, with ``val``, ``r_max`` and ``r_min`` needing to be entered in the following section of code, function ``checkInWS(self, P)``.
 
