@@ -72,12 +72,12 @@ Insert images showing derivation
    :width: 500
    :alt: Robot Diagram
 
-*Diagram of robot with reference axes* [1]_
+*Diagram of robot with D-H conventional reference axes*
 
 *Table 1: D-H Table based on derivation*
 
 +-------+--------+--------+--------+--------+
-| link  | d      | theta  | a      | alpha  |
+| link  | d      | θ      | a      | α      |
 +=======+========+========+========+========+
 | 1     | l0     | theta1 | 0      | 0      |
 +-------+--------+--------+--------+--------+
