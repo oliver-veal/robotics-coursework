@@ -116,42 +116,6 @@ The resulting table is shown below:
 |**4**|  0  |  0  ||l2| |  0  |
 +-----+-----+-----+-----+-----+
 
-.. |z| replace:: *z*
-.. |z0| replace:: *z*:sub:`0`
-.. |z1| replace:: *z*:sub:`1`
-.. |z2| replace:: *z*:sub:`2`
-.. |z3| replace:: *z*:sub:`3`
-.. |z4| replace:: *z*:sub:`4`
-.. |x| replace:: *x*
-.. |x0| replace:: *x*:sub:`0`
-.. |x1| replace:: *x*:sub:`1`
-.. |x2| replace:: *x*:sub:`2`
-.. |x3| replace:: *x*:sub:`3`
-.. |x4| replace:: *x*:sub:`4`
-.. |y| replace:: *y*
-.. |y0| replace:: *y*:sub:`0`
-.. |y1| replace:: *y*:sub:`1`
-.. |y2| replace:: *y*:sub:`2`
-.. |y3| replace:: *y*:sub:`3`
-.. |y4| replace:: *y*:sub:`4`
-.. |l| replace:: *l*
-.. |l0| replace:: *l*:sub:`0`
-.. |l1| replace:: *l*:sub:`1`
-.. |l2| replace:: *l*:sub:`2`
-.. |θ| replace:: *θ*
-.. |θ1| replace:: *θ*:sub:`1`
-.. |θ2| replace:: *θ*:sub:`2`
-.. |θ3| replace:: *θ*:sub:`3`
-.. |ai| replace:: *a*:sub:`i`
-.. |αi| replace:: *α*:sub:`i`
-.. |di| replace:: *d*:sub:`i`
-.. |θi| replace:: *θ*:sub:`i`
-.. |zi| replace:: *z*:sub:`i`
-.. |xi| replace:: *x*:sub:`i`
-.. |zi-1| replace:: *z*:sub:`i-1`
-.. |xi-1| replace:: *x*:sub:`i-1`
-
-
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
 This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the function.
@@ -390,9 +354,24 @@ Deriving the Reachable Workspace
 --------------------------------
 
 Using the general equation for a sphere (with *a*, *b*, *c* being the |x|, |y|, |z| coordinates of the centre):
+
 .. image:: img/D_equation1.png
-   :width: 500
-   :alt: D_equation1
+   :width: 300
+   :alt: Task D Equation 1
+
+Inequalities can be derived for the outer and inner spheres which bound the workspace, for any point, *P*, in the workspace: 
+
+.. image:: img/D_equation2.png
+   :width: 300
+   :alt: Task D Equation 2
+
+and
+
+.. image:: img/D_equation3.png
+   :width: 300
+   :alt: Task D Equation 3
+
+Or in other words, the workspace is a hollow sphere shell with the centre at the origin of *frame 1* (which is at (0,0,\ |l0|) with reference to *frame 0*) , and the radius, *r* according to (\ |l1| - \ |l2|) ≤ *r* ≤ (\ |l1| + \ |l2|).
 
 The following code completes the calculation for the minimum and maximum sphere that defines the reachable workspace, with ``val``, ``r_max`` and ``r_min`` needing to be entered in the following section of code, function ``checkInWS(self, P)``.
 
@@ -462,9 +441,135 @@ For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and c
 Derivation 1 [8]_ [9]_ [10]_
 ----------------------------
 
+.. image:: img/diagram_with_frames_and_angles.png
+   :width: 500
+   :alt: Diagram of robot with reference frames and angles
+
+*Diagram of robot with D-H conventional reference axes and angles*
+
+To get the inverse kinematics of this robot, a top view and side view are considered.
+
+.. image:: img/diagram_top_view.png
+   :width: 500
+   :alt: Top view diagram of the robot
+
+*Top view diagram of the robot*
+
+From this top view, the following can be expressed:
+
+.. image:: img/E_equation1.png
+   :width: 300
+   :alt: Task E Equation 1
+
+and
+
+.. image:: img/E_equation2.png
+   :width: 300
+   :alt: Task E Equation 2
+
+.. image:: img/diagram_side_view.png
+   :width: 500
+   :alt: Side view diagram of the robot
+
+*Side view diagram of the robot with arm bent upwards*
+
+From this side view, the following can be expressed:
+
+.. image:: img/E_equation3.png
+   :width: 300
+   :alt: Task E Equation 3
+
+which enables the calculation of *φ*:sub:`1` and *r*:sub:`3`:
+
+.. image:: img/E_equation4.png
+   :width: 300
+   :alt: Task E Equation 4
+
+and
+
+.. image:: img/E_equation5.png
+   :width: 300
+   :alt: Task E Equation 5
+
+Using the cosine rule, it can then be derived:
+
+.. image:: img/E_equation6.png
+   :width: 300
+   :alt: Task E Equation 6
+
+|θ2| can then be found by:
+
+.. image:: img/E_equation7.png
+   :width: 300
+   :alt: Task E Equation 7
+
+Using the cosine rule again, *φ*:sub:`3` can be derived:
+
+.. image:: img/E_equation8.png
+   :width: 300
+   :alt: Task E Equation 8
+
+Which is included in the final equation for |θ3|:
+
+.. image:: img/E_equation9.png
+   :width: 300
+   :alt: Task E Equation 9
+
 Derivation 2 [11]_
 ------------------
 
+.. image:: img/diagram_side_view_2.png
+   :width: 500
+   :alt: Side view diagram of the robot
+
+*Side view diagram of the robot with arm bent downwards*
+
+When the arm is bent the other way (as shown above), equations (7) and (9) are altered, giving:
+
+.. image:: img/E_equation10.png
+   :width: 300
+   :alt: Task E Equation 10
+
+and
+
+.. image:: img/E_equation11.png
+   :width: 300
+   :alt: Task E Equation 11
+
+.. |z| replace:: *z*
+.. |z0| replace:: *z*:sub:`0`
+.. |z1| replace:: *z*:sub:`1`
+.. |z2| replace:: *z*:sub:`2`
+.. |z3| replace:: *z*:sub:`3`
+.. |z4| replace:: *z*:sub:`4`
+.. |x| replace:: *x*
+.. |x0| replace:: *x*:sub:`0`
+.. |x1| replace:: *x*:sub:`1`
+.. |x2| replace:: *x*:sub:`2`
+.. |x3| replace:: *x*:sub:`3`
+.. |x4| replace:: *x*:sub:`4`
+.. |y| replace:: *y*
+.. |y0| replace:: *y*:sub:`0`
+.. |y1| replace:: *y*:sub:`1`
+.. |y2| replace:: *y*:sub:`2`
+.. |y3| replace:: *y*:sub:`3`
+.. |y4| replace:: *y*:sub:`4`
+.. |l| replace:: *l*
+.. |l0| replace:: *l*:sub:`0`
+.. |l1| replace:: *l*:sub:`1`
+.. |l2| replace:: *l*:sub:`2`
+.. |θ| replace:: *θ*
+.. |θ1| replace:: *θ*:sub:`1`
+.. |θ2| replace:: *θ*:sub:`2`
+.. |θ3| replace:: *θ*:sub:`3`
+.. |ai| replace:: *a*:sub:`i`
+.. |αi| replace:: *α*:sub:`i`
+.. |di| replace:: *d*:sub:`i`
+.. |θi| replace:: *θ*:sub:`i`
+.. |zi| replace:: *z*:sub:`i`
+.. |xi| replace:: *x*:sub:`i`
+.. |zi-1| replace:: *z*:sub:`i-1`
+.. |xi-1| replace:: *x*:sub:`i-1`
 
 ---------------------------------
 Task F: Coding Inverse Kinematics
