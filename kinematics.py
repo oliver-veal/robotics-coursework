@@ -1,295 +1,6 @@
-test
-
-#Final PID values for 0.01kg End effector mass, Task H
-#i_clamp_min and max added to allow adjustment of i values, otherwise default min/max is 0.
-#final values p 110, i 0, d 90
-#.yaml file
-DESE3R:
-  # Publish all joint states -----------------------------------
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 100  
-  
-  # Position Controllers ---------------------------------------
-  joint_0_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_0
-    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
-  joint_1_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_1
-    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
-  joint_2_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_2
-    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
-      
 ##################################################################################
-#TASK I
-#.xacro file
-<?xml version="1.0"?>
-<robot name="DESE3R" xmlns:xacro="http://www.ros.org/wiki/xacro">
-<xacro:property name="link_length_0_init" value="1"/>
-<xacro:property name="link_length_1_init" value="1"/>
-<xacro:property name="link_length_2_init" value="1"/>
-
-<xacro:property name="link_radius" value="0.05"/>
-<xacro:property name="link_mass" value="0.5"/>
-<xacro:property name="base_height" value="0.1"/>
-<xacro:property name="base_side" value="0.6"/>
-<xacro:property name="case_radius" value="${link_radius}"/>
-<xacro:property name="case_length" value="${case_radius*2}"/>
-<xacro:property name="ee_length" value="0.04"/>
-<xacro:property name="ee_side" value="0.02"/>
-
-<xacro:property name="ee_mass" value="30"/> # END EFFECTOR MASS CHANGED HERE, ONLY LINE CHANGED FOR THIS TASK.
-
-<xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
-<xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
-<xacro:property name="link_length_2" value="${link_length_2_init-case_radius}"/>
+#                                   TASK A   
 ##################################################################################
-#Final PID values for 30kg End effector mass, Task J
-#final values p 3250, i 0, d 1600
-#.yaml file
-DESE3R:
-  # Publish all joint states -----------------------------------
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 100  
-  
-  # Position Controllers ---------------------------------------
-  joint_0_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_0
-    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}
-  joint_1_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_1
-    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}
-  joint_2_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: joint_2
-    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}
-      
-##################################################################################
-#kinematics.py
-#!/usr/bin/python
-
-"""
-kinematics.py
-
-Made for DE3 Robotics Term 2, Coursework 1 - MODEL
-
-January 2021
-Petar Kormushev, Francesco Cursi, Digby Chappell
-"""
-
-from math import cos, sin, acos, asin, atan2, sqrt, pi
-from numpy.linalg import matrix_rank as rank
-from numpy.linalg import pinv, norm
-from std_msgs.msg import Float64
-from numpy import genfromtxt
-import numpy as np
-import rospy
-import sys
-
-
-def main(task):
-    #GENERATE ROBOT MODEL
-    l1 = 1.
-    l2 = 1.
-    l3 = 1.
-
-    Robot = RobotKineClass([l1,l2,l3])
-
-    # FORWARD KINEMATICS
-    if task == "fk":
-        print("============================================================")
-        print("Testing Forward Kinematics")
-        print("------------------------------------------------------------")
-        fk_points_file = "test_points/fk_points.csv"
-        fk_points = ReadCSV(fk_points_file)
-        for i, points in zip(range(len(fk_points)), fk_points):
-            print("Test point:\t", i+1)
-            joint_space_points = points[:3]
-            task_space_points = points[3:]
-            print("Joint space points to test:\n", joint_space_points)
-            predicted_task_space_points = Robot.getFK(joint_space_points)
-            print("Calculated task space points:\n", np.round(predicted_task_space_points, 3))
-            error = np.linalg.norm(task_space_points - predicted_task_space_points)
-            print("Passed?\t", error<1e-3)
-            if error > 1e-3:
-                print("Forward Kinematics calculations incorrect, exiting.")
-                return
-            print("------------------------------------------------------------")
-        print("Forward Kinematics calculations correct, well done!")
-    elif task == "ws":
-        print("============================================================")
-        print("Testing Workspace")
-        print("------------------------------------------------------------")
-        ws_points_file = "test_points/workspace_points.csv"
-        ws_points = ReadCSV(ws_points_file)
-        for i, points in zip(range(len(ws_points)), ws_points):
-            print("Test point:\t", i+1)
-            task_space_points = points[:3]
-            workspace_flag = points[3:]
-            print("Task space points to test:\n", task_space_points)
-            predicted_workspace_flag = Robot.checkInWS(task_space_points)
-            print("Calculated work space flag:\t", predicted_workspace_flag)
-            print("Passed?\t", workspace_flag == predicted_workspace_flag)
-            if workspace_flag != predicted_workspace_flag:
-                print("Workspace calculations incorrect, exiting.")
-                return
-            print("------------------------------------------------------------")
-        print("Workspace calculations correct, well done!")
-    elif task=="ik":
-        print("============================================================")
-        print("Testing Inverse Kinematics")
-        print("------------------------------------------------------------")
-        ik_points_file = "test_points/ik_points.csv"
-        ik_points = ReadCSV(ik_points_file)
-        for i, points in zip(range(len(ik_points)), ik_points):
-            print("Test point:\t", i+1)
-            task_space_points = points[:3]
-            joint_space_points_1 = points[3:6]
-            joint_space_points_2 = points[6:]
-            print("Task space points to test:\n", task_space_points)
-            predicted_joint_space_points_1 = Robot.getIK(task_space_points)[0][0]
-            predicted_joint_space_points_2 = Robot.getIK(task_space_points)[0][1]
-            print("Calculated joint space points 1:\n", predicted_joint_space_points_1)
-            print("Calculated joint space points 2:\n", predicted_joint_space_points_2)
-            error1 = np.linalg.norm(joint_space_points_1 - predicted_joint_space_points_1)
-            error2 = np.linalg.norm(joint_space_points_2 - predicted_joint_space_points_2)
-            pass1 = error1 < 1e-2 and error2 < 1e-2
-            error3 = np.linalg.norm(joint_space_points_1 - predicted_joint_space_points_2)
-            error4 = np.linalg.norm(joint_space_points_2 - predicted_joint_space_points_1)
-            pass2 = error3 < 1e-2 and error4 < 1e-2
-            passed = pass1 or pass2
-            print("Passed?\t", passed)
-            if not passed:
-                print("Inverse Kinematics calculations incorrect, exiting.")
-                return
-            print("------------------------------------------------------------")
-        print("Inverse Kinematics calculations correct, well done!")
-    elif task=="dk":
-        print("============================================================")
-        print("Testing Differential Kinematics")
-        print("------------------------------------------------------------")
-        dk_points_file = "test_points/dk_points.csv"
-        dk_points = ReadCSV(dk_points_file)
-        for i, points in zip(range(len(dk_points)), dk_points):
-            print("Test point:\t", i+1)
-            joint_space_points = points[:3]
-            joint_space_velocities = points[3:6]
-            task_space_velocities = points[6:]
-            print("Joint space points to test:\n", joint_space_points)
-            print("Joint space velocities to test:\n", joint_space_velocities)
-            predicted_task_space_velocities = Robot.getDK(joint_space_points, joint_space_velocities)
-            print("Calculated task space velocities:\n", predicted_task_space_velocities)
-            error = np.linalg.norm(task_space_velocities - predicted_task_space_velocities)
-            passed = error < 1e-3
-            print("Passed?\t", passed)
-            if not passed:
-                print("Differential Kinematics calculations incorrect, exiting.")
-                return
-            print("------------------------------------------------------------")
-        print("Differential Kinematics calculations correct, well done!")
-                   
-    elif task=="full":
-        print("============================================================")
-        print("Testing Full Setup")
-        print("------------------------------------------------------------")
-        #LOAD TASK SPACE POINTS
-        points_file = "test_points/points.csv"
-
-        CartPoints = ReadCSV(points_file)
-
-        m = CartPoints.shape[0]
-
-        q_old = np.zeros(3) #initial configuration
-        Robot.sendCommands(q_old)
-        for i in range(m):
-
-            P = CartPoints[i, :]
-            print(" Step " + str(i+1) + "/" + str(m))
-            print("Desired Point ", P)
-            [q_IK, Positions] = Robot.getIK(P)
-
-            #check solution closer to previous step
-            q = Robot.chooseSol(q_IK, q_old)[0]
-
-            #Interpolate
-            N_steps = 100
-            Q = LinInterp(q_old, q, N_steps)
-            q_old = q
-
-            for j in range(N_steps):
-                q_comm = Q[j, :]
-
-                #send commands
-                Robot.sendCommands(q_comm)
-
-            P_achieved = Robot.getFK(q)
-            P_error = P-P_achieved
-            print("p achieved", np.round(P_achieved, 3))
-            print("position error", np.round(P_error, 3))
-            print("------------------------------------------------------------")
-
-
-#Creates joint publishers
-def set_joint_publisher():
-    rospy.init_node("joint_positions_node")
-
-    wait = True
-    while(wait):
-        now = rospy.Time.now()
-        if now.to_sec() > 0:
-            wait = False
-
-    pubs = []
-
-    for i in range(3):
-        topic_name = "/DESE3R/joint_"+str(i)+"_position_controller/command"
-        pub = rospy.Publisher(topic_name,Float64,queue_size=1000)
-        pubs.append(pub)
-
-    return pubs
-
-#Returns matrix in R^mx3
-def ReadCSV(filename):
-
-    Data = genfromtxt(filename, delimiter=',')
-    return Data
-
-
-#returns a matrix of interpolated pints in R^N_stepsx3
-def LinInterp(qi,qf,N_steps):
-
-    n = np.linspace(0,1,num=N_steps)
-
-    dq = qf-qi
-
-    Q_interp = np.multiply(dq.reshape(-1,1),n)+qi.reshape(-1,1)
-    Q_interp = Q_interp.T
-
-    return Q_interp
-
-
-#DH_params = parameters for link i
-#d,theta,a,alpha
-def DH_matrix(DH_params):
-    d = DH_params[0]
-    theta = DH_params[1]
-    a = DH_params[2]
-    alpha = DH_params[3]
-    
-    ################################################ TASK 2
-    DH_matrix = np.array([[cos(theta) , -sin(theta), 0., a],
-                          [sin(theta)*cos(alpha) , cos(theta)*cos(alpha), -sin(alpha), -sin(alpha)*d],
-                          [sin(theta)*sin(alpha) , cos(theta)*sin(alpha), cos(alpha), cos(alpha)*d],
-                          [0., 0., 0., 1.]])
-    
-    return DH_matrix
 
 class RobotKineClass():
 
@@ -309,7 +20,31 @@ class RobotKineClass():
                                 [0., 0., self.links[2], 0.]])
         self.joint_types = 'rrr'	# three revolute joints
 
-    #Computes Forward Kinematics. Returns 3x1 position vector
+##################################################################################
+#                                   TASK B   
+##################################################################################
+
+#DH_params = parameters for link i
+#d,theta,a,alpha
+def DH_matrix(DH_params):
+    d = DH_params[0]
+    theta = DH_params[1]
+    a = DH_params[2]
+    alpha = DH_params[3]
+    
+    ################################################ TASK 2
+    DH_matrix = np.array([[cos(theta) , -sin(theta), 0., a],
+                          [sin(theta)*cos(alpha) , cos(theta)*cos(alpha), -sin(alpha), -sin(alpha)*d],
+                          [sin(theta)*sin(alpha) , cos(theta)*sin(alpha), cos(alpha), cos(alpha)*d],
+                          [0., 0., 0., 1.]])
+    
+    return DH_matrix
+
+##################################################################################
+#                                   TASK C   
+##################################################################################
+
+#Computes Forward Kinematics. Returns 3x1 position vector
     def getFK(self,q):
 
         T_0_i_1 = np.identity(4)
@@ -334,6 +69,10 @@ class RobotKineClass():
 
         return T_0_n[0:3,3]
 
+##################################################################################
+#                                   TASK D   
+##################################################################################
+
     #Check if point is in WS. returns true or false
     def checkInWS(self, P):
         xP, yP, zP = P
@@ -351,6 +90,10 @@ class RobotKineClass():
 
 
         return inWS
+
+##################################################################################
+#                                   TASK F   
+##################################################################################
 
     # Solve IK gemoetrically. Returns list of all possible solutions
     def getIK(self,P):
@@ -394,23 +137,10 @@ class RobotKineClass():
         Poses = [self.getFK(q_a), self.getFK(q_b)]
         return q, Poses
 
-    #given list of solutions q_IK, returns closest value to old one and list of error norms
-    def chooseSol(self,q_IK,q_old):
+##################################################################################
+#                                   TASK G   
+##################################################################################
 
-        diff = []
-        q = q_old
-        for i in range(len(q_IK)):
-
-            dq = norm(q_IK[i]-q_old)
-            diff.append(dq)
-
-        if len(diff) > 0:
-            index = np.argmin(diff)
-            q = q_IK[index]
-
-
-        return q,diff
-        
     # Computes Differential Kinematics
     def getDK(self, q, q_dot):
         q0, q1, q2 = q
@@ -436,29 +166,83 @@ class RobotKineClass():
         x_dot = np.matmul(self.Jacobian, q_dot)
         return x_dot
 
-    #send commands to Gazebo
-    def sendCommands(self,q):
+##################################################################################
+#                                   TASK H   
+##################################################################################
 
-        print("SENDING JOINT VALUES ", q)
-        rate = rospy.Rate(100) #Hz
-        for i in range(3):
+#Final PID values for 0.01kg End effector mass, Task H
+#i_clamp_min and max added to allow adjustment of i values, otherwise default min/max is 0.
+#final values p 110, i 0, d 90
+#.yaml file
+DESE3R:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100  
+  
+  # Position Controllers ---------------------------------------
+  joint_0_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_0
+    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
+  joint_1_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_1
+    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
+  joint_2_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_2
+    pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}
+      
+##################################################################################
+#                                   TASK I   
+##################################################################################
 
-            n_conn = 0
-            while not n_conn:
-                self.ROSPublishers[i].publish(q[i])
-                n_conn = self.ROSPublishers[i].get_num_connections()
-                rate.sleep()
+#.xacro file
+<?xml version="1.0"?>
+<robot name="DESE3R" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:property name="link_length_0_init" value="1"/>
+<xacro:property name="link_length_1_init" value="1"/>
+<xacro:property name="link_length_2_init" value="1"/>
 
+<xacro:property name="link_radius" value="0.05"/>
+<xacro:property name="link_mass" value="0.5"/>
+<xacro:property name="base_height" value="0.1"/>
+<xacro:property name="base_side" value="0.6"/>
+<xacro:property name="case_radius" value="${link_radius}"/>
+<xacro:property name="case_length" value="${case_radius*2}"/>
+<xacro:property name="ee_length" value="0.04"/>
+<xacro:property name="ee_side" value="0.02"/>
 
+<xacro:property name="ee_mass" value="30"/> # END EFFECTOR MASS CHANGED HERE, ONLY LINE CHANGED FOR THIS TASK.
 
-if __name__ == "__main__":
-    tasks = ['fk', 'ws', 'ik', 'dk', 'full','test']
-    if len(sys.argv) <= 1:
-        print('Please include a task to run from the following options:\n', tasks)
-    else:
-        task = str(sys.argv[1])
-        if task in tasks:
-            print("Running Coursework 1 -", task)
-            main(task)
-        else:
-            print('Please include a task to run from the following options:\n', tasks)
+<xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
+<xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
+<xacro:property name="link_length_2" value="${link_length_2_init-case_radius}"/>
+
+##################################################################################
+#                                   TASK J   
+##################################################################################
+
+#Final PID values for 30kg End effector mass, Task J
+#final values p 3250, i 0, d 1600
+#.yaml file
+DESE3R:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100  
+  
+  # Position Controllers ---------------------------------------
+  joint_0_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_0
+    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}
+  joint_1_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_1
+    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}
+  joint_2_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_2
+    pid: {p: 3250, i: 0, d: 1600, i_clamp_max: 1000, i_clamp_min: 1000}

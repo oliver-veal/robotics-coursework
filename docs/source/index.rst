@@ -997,7 +997,7 @@ Final Results
 Task I: Adapting the Robot Arm
 ------------------------------
 
-The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro file``, which contains all the physical model parameters. Changing the end effector mass to 30Kg yields the following results.
+The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro`` file, which contains all the physical model parameters. Changing the end effector mass to 30Kg yields the following results.
 
 .. code-block::
    :linenos:
@@ -1018,7 +1018,7 @@ The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro
    <xacro:property name="ee_length" value="0.04"/>
    <xacro:property name="ee_side" value="0.02"/>
 
-   <xacro:property name="ee_mass" value="30"/>
+   <xacro:property name="ee_mass" value="30"/> # END EFFECTOR MASS CHANGED HERE, ONLY LINE CHANGED FOR THIS TASK.
 
    <xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
    <xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
