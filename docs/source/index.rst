@@ -203,14 +203,51 @@ Task B: Coding the D-H Table
 
 The numpy array, ``DH_matrix``, line 8, represents the transformation matrix from frame i-1 to frame i.
 As such, the transformation matrices of each joint can be multiplied in a chain to transform coordinates from the end effector frame to the base frame.
-This is taken care of in the next section, this function ``DH_matrix()`` only creates the i-1 to i matrix by copying in the relavent lines of the D-H table..
-The definition for this is shown below
+This is taken care of in the next section, this function ``DH_matrix()`` only creates the i-1 to i matrix by copying in the relevant lines of the D-H table.
+The definition for this is shown and derived below.
 
-.. image:: img/transform.png
+.. image:: img/Transform_Matrix.png
    :width: 500
    :alt: i-1 to i transformation matrix
 
-*definition of i-1 to i th frame transformation matrix* [2]_
+*Definition of i-1 to i th frame transformation matrix* [2]_
+
+Deriving this Transformation Matrix [1]_
+----------------------------------------
+
+.. image:: img/Screw_Theory.png
+   :width: 300
+   :alt: Screw theory illustration
+
+*Screw theory illustration*
+
+Because the frames of reference were set up according to denavit-hartenberg convention, and the positive directions of axes were set according to the Right-Hand-Rule convention or “Screw” convention (illustrated above), the generic transformation matrix, :sup:`i-1`\ *T*:sub:`i`, is derived with the following steps: 
+
+.. image:: img/B_equation1.png
+   :width: 300
+   :alt: Task B Equation 1
+
+Substituting in Screw, *S*:
+
+.. image:: img/B_equation2.png
+   :width: 300
+   :alt: Task B Equation 2
+
+Then,
+
+.. image:: img/B_equation3.png
+   :width: 300
+   :alt: Task B Equation 3
+
+.. image:: img/B_equation4.png
+   :width: 300
+   :alt: Task B Equation 4
+
+Which leads to:
+
+.. image:: img/B_equation5.png
+   :width: 300
+   :alt: Task B Equation 5
 
 This definition is translated into the array in Python.
 
@@ -272,16 +309,17 @@ The following equation shows how the pose of the end effector can be calculated 
    :width: 414
    :alt: Task C equation 1
 
-To do this iteratively, premultiply the transformation matrix of the ith frame by the matrix of the i-1th frame, for each frame. [4]_
+To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th` frame by the matrix of the i-1\ :sup:`th` frame, for each frame. [4]_
 
 .. image:: img/task_c_eq2.png
    :width: 286
    :alt: Task C equation 2
 
 The following line of code implements this equation inside the loop that iterates over each joint.
-``np.matmul`` is a numpy function that multiplies two matrices together. ``T_0_i`` is the matrix giving the ith joint with respect to the base frame and is updated at each iteration.
-``T_0_i_1`` is the matrix from the base frame to the i-1th frame, and ``T_i_1_i`` is the matrix from the i-1th frame to the ith frame.
+``np.matmul`` is a numpy function that multiplies two matrices together. ``T_0_i`` is the matrix giving the i\ :sup:`th` joint with respect to the base frame and is updated at each iteration.
+``T_0_i_1`` is the matrix from the base frame to the i-1\ :sup:`th` frame, and ``T_i_1_i`` is the matrix from the i-1\ :sup:`th` frame to the i\ :sup:`th` frame.
 The code iteratively calls the previous function ``DH_matrix()`` to get the i-1 to i transformation matrix, ``T_i_1_i``.
+
 
 To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
@@ -436,8 +474,8 @@ For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and c
    This was used to correct the test points.
    Results with corrected test points shown in **Task F**.
 
-Deriving Angle |q1| [8]_ [9]_ [10]_
-------------------------------------
+Derivation for Arm Bent Upwards [8]_ [9]_ [10]_
+-----------------------------------------------
 
 .. image:: img/diagram_with_frames_and_angles.png
    :width: 500
@@ -513,8 +551,8 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Deriving Angle |q2| [11]_
---------------------------
+Derivation for Arm Bent Downwards |q2| [11]_
+--------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
    :width: 500
@@ -571,7 +609,8 @@ and
 .. |q0| replace:: *q*:sub:`0`
 .. |q1| replace:: *q*:sub:`1`
 .. |q2| replace:: *q*:sub:`2`
-
+.. |i-1th| replace:: i-1\ :sup:`th`
+.. |ith| replace:: i\ :sup:`th`
 
 ---------------------------------
 Task F: Coding Inverse Kinematics
