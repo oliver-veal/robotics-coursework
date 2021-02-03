@@ -19,7 +19,7 @@ class RobotKineClass():
                                 [0., 0., self.links[2], 0.]])   # with respect to the previous frame (there are 3 joints and 1 end effector,
                                                                 # each having a reference frame attached, so 4 rows total).
         
-        self.joint_types = 'rrr'	                            # Defining the type of each joint as a string with the ith character
+        self.joint_types = 'rrr'                                # Defining the type of each joint as a string with the ith character
                                                                 # representing the type of the ith joint,
                                                                 # with r representing revolute and p prismatic; all are revolute in this case.
 
