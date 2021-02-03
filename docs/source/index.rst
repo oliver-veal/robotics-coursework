@@ -734,51 +734,52 @@ This was also used to confirm the error in the intially provided CSV file of tes
 .. code-block:: python
    :linenos:
 
-   elif task=="test":                              # Was the "test" flag passed in when running the program.
-      point = [0.2, 0.5, 0.7]                      # "Random" test point.
+   elif task=="test":                                 # Was the "test" flag passed in when running the program.
+      point = [0.2, 0.5, 0.7]                         # "Random" test point.
 
-      joint_angles = Robot.getIK(point)[0]         # Obtain joint angles through IK
-      test_point_1 = Robot.getFK(joint_angles[0])  # Robot pose that solution 1 produces.
-      test_point_2 = Robot.getFK(joint_angles[1])  # Robot pose that solution 2 produces.
+      joint_angles = Robot.getIK(point)[0]            # Obtain joint angles through IK
+      test_point_1 = Robot.getFK(joint_angles[0])     # Robot pose that solution 1 produces.
+      test_point_2 = Robot.getFK(joint_angles[1])     # Robot pose that solution 2 produces.
 
-   print(point, test_point_1, test_point_2)        # Verify by eye that these 3 points are the same. If they are, the IK is valid.
+   print(point, test_point_1, test_point_2)           # Verify by eye that these 3 points are the same. If they are, the IK is valid.
 
 .. code-block:: python
    :linenos:
 
-   tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']
+   tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']   # Add "test" flag to list of tasks.
 
-The original method used was based on comparing values in a ``.csv`` file, but this method may be prone to errors such as the one found below.
+.. note::
+   The IK validation uses a ``.csv`` file containing test points, but the originally provided points were found to contain errors, so an updated CSV file was used to validate the IK.
+   
+   Original incorrect test points:
 
-Original incorrect test points:
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
+   +=======+=======+=======+=======+=======+=======+=======+=======+=======+
+   | 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0.5   | -0.5  |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.75  | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
-+=======+=======+=======+=======+=======+=======+=======+=======+=======+
-| 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0.5   | -0.5  |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.75  | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   Corrected test points:
 
-Corrected test points:
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
+   +=======+=======+=======+=======+=======+=======+=======+=======+=======+
+   | 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0     | -0.5  |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.75  | 0     | 1     | 0     | -0.505| 1.011 | 0     | 0.505 | -1.011|
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
-+=======+=======+=======+=======+=======+=======+=======+=======+=======+
-| 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0     | -0.5  |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.75  | 0     | 1     | 0     | -0.505| 1.011 | 0     | 0.505 | -1.011|
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-
-To validate the Inverse Kinematics model with corrected test points, run:
+To validate the Inverse Kinematics model with the test points, run:
 
 .. code-block:: python
    :linenos:
