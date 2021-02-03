@@ -1045,7 +1045,8 @@ To effectively tune the gains of the robotic arm such that it follows the trajec
 This can be accessed by using the ``rqt`` command in the terminal and then selecting *Plugins* → *Visualization* → *Plot*, then typing ``/DES3R/joint_0_position_controller/state/error``. 
 Then repeating this for each ``joint_1_position_controller`` and ``joint_2_position_controller``.
 
-**Screenshots for rqt visualization.**
+.. image:: img/rqt.png
+   :width: 300
 
 There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [19]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
@@ -1071,6 +1072,7 @@ The steps used are summarised below.
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/1vohFpeS7VF_hNJAqXjmSp3kg7R_fH8QN/preview" width="640" height="480"></iframe>
     </div
+
 
 The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
