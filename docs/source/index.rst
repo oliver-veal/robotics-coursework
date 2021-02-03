@@ -1043,6 +1043,10 @@ Then repeating this for each ``joint_1_position_controller`` and ``joint_2_posit
 
 **Screenshots for rqt visualization.**
 
+.. image:: img/rqt_menu.png
+   :width: 300
+
+
 There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [19]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
 Alternatively, for the purpose of this report, it can be done through trial and error, visually determining results.
