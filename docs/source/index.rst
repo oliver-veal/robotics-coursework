@@ -863,6 +863,12 @@ The video below demonstrates this in action for the robotic arm.
 
 **P only video**
 
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
+
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
 This is where the integral term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
@@ -873,6 +879,12 @@ This is ideal when the system is experiencing static loads and can be seen that 
 This is specific to this simulation scenario as there is no static load.
 
 **PI video**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
@@ -887,6 +899,12 @@ An example of this can be seen in the video below where a purposefully aggressiv
 
 
 **PID with good D video**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
 
 Implementation
 --------------
@@ -988,6 +1006,12 @@ The steps used are summarised below.
 
    **Video with too much D**
 
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
+
 The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
 
@@ -1065,6 +1089,12 @@ Final Results
 Video Results
 -------------
 
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
+
 ------------------------------
 Task I: Adapting the Robot Arm
 ------------------------------
@@ -1110,6 +1140,12 @@ The increased gains will likely be significantly higher than the previous roboti
 
 Video Results
 -------------
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1162,26 +1198,43 @@ This caused an exploration of a range of PID values, ultimately returning to the
 Video Results
 --------------
 
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
+
 -----------------
 Supporting Videos
 -----------------
 
-
-
 Short Video of Achievements
 ---------------------------
 
+.. raw:: html
 
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
 
 Full Simulations
 ----------------
 
+.. raw:: html
 
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
 
 Detailed Step-by-step Code Explanation Video
 --------------------------------------------
 
+.. raw:: html
 
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+    </div
+   
 ==========
 References
 ==========
