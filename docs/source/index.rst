@@ -1056,8 +1056,10 @@ Video results
 ------------------------------
 Task I: Adapting the Robot Arm
 ------------------------------
-
-The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro`` file, which contains all the physical model parameters. Changing the end effector mass to 30Kg yields the following results.
+This task requires the user to edit the parameters of the robotic arm, in this case the mass of the end effector. 
+The mass of the end effector is modified from 0.01kg to 30kg. 
+The file to edit is the robot_model_gazebo.xacro which is located in the file path ``/Desktop/DE3Robotics/src/coursework_1/urdf``.
+The ``ee_mass`` variable contains this information on line 16 as highlighted. Change this from 0.01kg to 30kg as shown below.
 
 .. code-block::
    :linenos:
@@ -1087,6 +1089,12 @@ The end effector mass is controlled in line 16 of the ``robot_model_gazebo.xacro
 Results
 -------
 
+Running the previous PID controller values with this new end effector mass shows that the gain values are not high enough to drive the links. 
+This is due to the additional force exerted on the joints by the mass which requires an increased set of gains.
+ The only joint able to move is joint 0 when rotating about the base. 
+ This suggests that each joint could be tuned differently, with joint 1 and 2 requiring more gain to lift the increased end effector mass up against the effect of gravity, whereas joint 0 does not have to do this. 
+ The increased gains will likely be significantly higher than the previous robotic arm. The next section focuses on repeating the PID tuning process.
+
 Embedded video
 --------------
 
@@ -1094,12 +1102,52 @@ Embedded video
 Task J: Adapting Controller Gains
 ---------------------------------
 
-Using the same methods as in Task H, the PID values are updated to account for the new response of the system.
+Using the same method as described in Task H, the PID values were updated to account for the increased end effector mass. 
+The initial starting values used are based on the previous values obtained.
 
-Results
--------
+Table of Results
+----------------
 
-Embedded video
+.. image:: img/TaskJTable.png
+   :width: 1367
+
+Final Results
+-------------
+
+Final PID Values
+**P: 3250**
+**I: 0**
+**D: 1600**
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 11,15,19
+
+   DESE3R:
+   # Publish all joint states -----------------------------------
+   joint_state_controller:
+      type: joint_state_controller/JointStateController
+      publish_rate: 100  
+   
+   # Position Controllers ---------------------------------------
+   joint_0_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_0
+      pid: {p: 3250, i: 0, d: 1600}
+   joint_1_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_1
+      pid: {p: 3250, i: 0, d: 1600}
+   joint_2_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint_2
+      pid: {p: 3250, i: 0, d: 1600}
+
+It was found that utilizing I to reduce steady state error was not necessary in this case given that it added to the overshoot in the system.
+The tradeoff between the reduced steady-state error was not worth the significantly higher added overshoot.
+This caused an exploration of a range of PID values, ultimately returning to the original pairing that was found to be effective, demonstrating a relatively robust method with parameters that allow for effective control of the robotic arm.
+
+Video Results
 --------------
 
 
