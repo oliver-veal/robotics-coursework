@@ -71,11 +71,11 @@ def DH_matrix(DH_params):
             T_0_i = np.matmul(T_0_i_1,T_i_1_i)          # Transformation matrix describing pose of joint i w.r.t. base frame, obtained through matrix multiplication as described above.
             T_0_i_1 = T_0_i                             # The base-to-previous-frame matrix now refers to this frame's base transformation matrix, such that next iteration it does indeed refer to the "previous" frame.
         
-        T_0_n_1 = T_0_i                                 # --
-        DH_params = np.copy(self.DH_tab[self.nj, :])    # ----
-        T_n_1_n = DH_matrix(DH_params)                  # IDK why this is here pls help.
-        T_0_n = np.matmul(T_0_n_1, T_n_1_n)             # ----
-                                                        # --
+        T_0_n_1 = T_0_i                                 
+        DH_params = np.copy(self.DH_tab[self.nj, :])    # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
+        T_n_1_n = DH_matrix(DH_params)                  
+        T_0_n = np.matmul(T_0_n_1, T_n_1_n)             
+                                                        
         return T_0_n[0:3,3]
 
 ##################################################################################
