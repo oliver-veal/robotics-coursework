@@ -919,15 +919,15 @@ This will determine how much correction should occur at the output.
 The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop [16]_.
 The video below demonstrates this in action for the robotic arm.
 
-
-**P only video**
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/1rka11c9npSWNzV7mlrXrqpwd0ejSi4zH/preview" width="640" height="480"></iframe>
     </div
 
+=====
+
+*Example of just P controller*
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
@@ -938,14 +938,15 @@ The integral term in the controller is determining the sum of error over time of
 This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
 This is specific to this simulation scenario as there is no static load.
 
-**PI video**
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/12OzNvLl_kGkr62jAek1EM2aiLzsqw7PI/preview" width="640" height="480"></iframe>
     </div
 
+=====
+
+*Example PD controller*
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
@@ -958,14 +959,15 @@ An example of this can be seen in the video below where a purposefully aggressiv
    If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
    ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
-
-**PID with good D video**
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/1LTqJd79TCwN7U531D_uA9pme66MgPibh/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Example of full PID*
 
 Implementation
 --------------
@@ -1066,13 +1068,16 @@ The steps used are summarised below.
    Therefore, D should be increased cautiously. 
    The video below demonstrates this.
 
-   **Video with too much D**
-
 .. raw:: html
 
-    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1vohFpeS7VF_hNJAqXjmSp3kg7R_fH8QN/preview" width="640" height="480"></iframe>
-    </div
+   <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+      <iframe src="https://drive.google.com/file/d/1vohFpeS7VF_hNJAqXjmSp3kg7R_fH8QN/preview" width="640" height="480"></iframe>
+   </div
+      
+======
+
+*Example of Kd set too high*
+
 
 
 The table below summarises the process and outputs seen. 
@@ -1158,6 +1163,10 @@ Video Results
         <iframe src="https://drive.google.com/file/d/1M3zKruD8aL2gYgifIs7t-wkUNCW_5i0_/preview" width="640" height="480"></iframe>
     </div
 
+=====
+
+*Task H results*
+
 ------------------------------
 Task I: Adapting the Robot Arm
 ------------------------------
@@ -1209,6 +1218,10 @@ Video Results
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/1v-9kEdmb4pujtKrijLh4NKcjAT9SiQiH/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Task I results*
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1272,6 +1285,10 @@ Video Results
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/15s1TPCJru349MUU-lZx6lY2YIy1BYJMC/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Task J results*
 
 -----------------
 Supporting Videos
