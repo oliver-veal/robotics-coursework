@@ -999,14 +999,14 @@ Table of Results
 ----------------
 
 .. image:: img/TaskHTable.png
-   :width: 2555
+   :width: 900
 
 *Task H PID Results Table*
 
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
 .. image:: img/TuningTable.png
-   :width: 1970
+   :width: 700
 
 *PID Tuning Table* [20]_
 
@@ -1122,7 +1122,7 @@ Table of Results
 ----------------
 
 .. image:: img/TaskJTable.png
-   :width: 1367
+   :width: 900
 
 *Task J PID Results Table* [23]_   
 
