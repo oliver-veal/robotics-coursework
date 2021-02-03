@@ -1157,7 +1157,7 @@ The initial starting values used are based on the previous values obtained.
 Table of Results
 ----------------
 
-.. image:: img/TaskJTable.png
+.. image:: _images/TaskJTable.png
    :width: 900
 
 *Task J PID Results Table* [23]_   
