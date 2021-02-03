@@ -1092,6 +1092,7 @@ Table of Results
 
 *Task H PID Results Table*
 
+There was no obvious reason to individually tune joints so the values for all controllers could be kept the same for simplicity sake in control - this may not be the case for where the load is increased on specific joints.
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
 .. image:: img/TuningTable.png
@@ -1226,6 +1227,12 @@ Table of Results
    :width: 900
 
 *Task J PID Results Table* [23]_   
+
+Hyper tuning was explored for joints 1 and 2 as the load acting on them increased due to the increased mass of the end effector. 
+This is highligted well in the video.
+A value of 5000 was applied to joint 2, whilst joint 1 and joint 0 were kept at 3500. 
+It clearly benefited the robotic arm doing this, as it reduced the 'droop' experienced by the final link, however to keep further tuning simple, values were made identical again for further iterations.
+
 
 Final Results
 -------------
