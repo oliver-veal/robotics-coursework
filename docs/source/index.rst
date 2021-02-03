@@ -675,7 +675,7 @@ The following code implements the derivation to obtain both IK solutions:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 4-12, 14,15, 17,18, 20,21, 23
+   :emphasize-lines: 4-10, 12,13, 15,16, 18, 19, 21
 
    q_a = np.zeros(3)             # Variables ending in _a represent values for the first possible solution, and _b the second.
    q_b = np.zeros(3)             # Initialise joint angle arrays for the two solutions.
