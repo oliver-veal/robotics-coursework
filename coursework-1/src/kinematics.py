@@ -301,19 +301,23 @@ class RobotKineClass():
         ################################################ TASK 6
         q_a = np.zeros(3)
         q_b = np.zeros(3)
-        
+
+        theta_1 = np.arctan2(yP, xP)
         r_1 = sqrt(xP**2 + yP**2)
         r_2 = zP - l1
-        D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
-        
-        q_a[0] = np.arctan2(yP,xP) #theta 1
-        q_b[0] = np.arctan2(yP,xP) #theta 1
+        phi_2 = np.arctan2(r_2, r_1)
+        r_3 = sqrt(r_1**2 + r_2**2)
+        phi_1 = np.arccos((l3**2 - l2**2 - r_3**2) / (-2 * l2 * r_3))
+        phi_3 = np.arccos((r_3**2 - l2**2 - l3**2) / (-2 * l2 * l3))
 
-        q_a[2] = np.arctan2(sqrt(1-D**2),D) #theta 3
-        q_b[2] = np.arctan2(-sqrt(1-D**2),D) #theta 3
-        
-        q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2])) #theta 2
-        q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2])) # theta 2
+        q_a[0] = theta_1
+        q_b[0] = theta_1
+
+        q_a[2] = pi-phi_3
+        q_b[2] = -pi+phi_3
+
+        q_a[1] = phi_2-phi_1
+        q_b[1] = phi_2+phi_1
         
         q = [q_a, q_b]
         

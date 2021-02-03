@@ -200,6 +200,7 @@ These results are entered into the D-H table defined in the code.
         self.joint_types = 'rrr'	                              # Defining the type of each joint as a string with the ith character
                                                                # representing the type of the ith joint,
                                                                # with r representing revolute and p prismatic; all are revolute in this case.
+
 ----------------------------
 Task B: Coding the D-H Table
 ----------------------------
@@ -648,11 +649,7 @@ The robot can be treated as a planar two link robot, being rotated about ``z0`` 
 Therefore, for any point there is only one ``q0`` value which satisfies the point.
 The two configurations are stored together as columns in matrix ``q``.
 
-There are however two different sets of equations that were derived to find the set of angles.
-The output of them is ultimately the same, but the equations are formulated slightly differently, as reflected in the code blocks below.
-**UPDATE DESCRIPTION FOR THIS**
-
-Original Code Block:
+Original code to complete:
 
 .. code-block:: python
    :linenos:
@@ -674,37 +671,35 @@ Original Code Block:
    
    q = [q_a, q_b]
 
-Solved Code Block with Formulation 1:
+The following code implements the derivation to obtain both IK solutions:
 
 .. code-block:: python
    :linenos:
    :emphasize-lines: 4-12, 14,15, 17,18, 20,21, 23
 
-   q_a = np.zeros(3)
-   q_b = np.zeros(3)
+   q_a = np.zeros(3)             # Variables ending in _a represent values for the first possible solution, and _b the second.
+   q_b = np.zeros(3)             # Initialise joint angle arrays for the two solutions.
 
-   theta_1 = np.arctan2(yP, xP)
+   theta_1 = np.arctan2(yP, xP)  # The following lines compute the variable values for equations 1-11, for both cases.
    r_1 = sqrt(xP**2 + yP**2)
    r_2 = zP - l1
    phi_2 = np.arctan2(r_2, r_1)
    r_3 = sqrt(r_1**2 + r_2**2)
    phi_1 = np.arccos((l3**2 - l2**2 - r_3**2) / (-2 * l2 * r_3))
-   theta_2 = phi_2 - phi_1
    phi_3 = np.arccos((r_3**2 - l2**2 - l3**2) / (-2 * l2 * l3))
-   theta_3 = pi - phi_3
 
-   q_a[0] = theta_1 #np.arctan2(yP,xP)
-   q_b[0] = theta_1 #np.arctan2(yP,xP)
+   q_a[0] = theta_1              # Theta 1 value from case 1.
+   q_b[0] = theta_1              # Value is identical to case 1, as demonstrated in the note above.
 
-   q_a[2] = pi-phi_3
-   q_b[2] = -pi+phi_3 
+   q_a[2] = pi-phi_3             # Theta 3 value from case 1.
+   q_b[2] = -pi+phi_3            # Theta 3 value from case 2.
 
-   q_a[1] = phi_2-phi_1
-   q_b[1] = phi_2+phi_1
+   q_a[1] = phi_2-phi_1          # Theta 2 value from case 1.
+   q_b[1] = phi_2+phi_1          # Theta 2 value from case 2.
    
-   q = [q_a, q_b]
+   q = [q_a, q_b]                # Return the calculated joint angles and poses in an array, as required by the function.
 
-Solved Code Block with Formulation 2:
+The following code implements a alternative derivation (not shown here) to validate and compare the solutions from the previous method:
 
 .. code-block:: python
    :linenos:
@@ -713,7 +708,7 @@ Solved Code Block with Formulation 2:
    q_a = np.zeros(3)    # Variables ending in _a represent values for the first possible solution, and _b the second.
    q_b = np.zeros(3)    # Initialise joint angle arrays for the two solutions.
 
-   theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the two derivations to compute the joint angles.
+   theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the alternative derivation.
    r_1 = sqrt(xP**2 + yP**2)
    r_2 = zP - l1
    
@@ -722,30 +717,31 @@ Solved Code Block with Formulation 2:
    q_a[0] = theta_1       # Theta 1 value from derivation 1.
    q_b[0] = theta_1       # Value is identical to solution 1, as demonstrated in the note above.
 
-   q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Theta 3 value from derivation 1.
-   q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Theta 3 value from derivation 2.
+   q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Alternative theta 3, case 1 value from another derivation.
+   q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Alternative theta 3, case 2 value from another derivation.
    
-   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Theta 2 value from derivation 1.
-   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Theta 2 value from derivation 2.
+   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Alternative theta 2, case 1 value from another derivation.
+   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Alternative theta 2, case 2 value from another derivation.
    
    q = [q_a, q_b]    # Return the calculated joint angles and poses in an array, as required by the function.
 
-Either formulation is acceptable and correct.
+Both methods produce the same values, and pass the provided IK test, so we can successfully validate them.
 
-To further test if both of these equations are correct, a Forward Kinematics Tester was coded to validate the outut.
-This was also used to confirm the error in the test points.
+For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
+Note: We know the FK solver is valid from Task C.
+This was also used to confirm the error in the intially provided CSV file of test points.
 
 .. code-block:: python
    :linenos:
 
-   elif task=="test":
-      point = [0.2, 0.5, 0.7]
+   elif task=="test":                              # Was the "test" flag passed in when running the program.
+      point = [0.2, 0.5, 0.7]                      # "Random" test point.
 
-      joint_angles = Robot.getIK(point)[0]
-      test_point_1 = Robot.getFK(joint_angles[0])
-      test_point_2 = Robot.getFK(joint_angles[1])
+      joint_angles = Robot.getIK(point)[0]         # Obtain joint angles through IK
+      test_point_1 = Robot.getFK(joint_angles[0])  # Robot pose that solution 1 produces.
+      test_point_2 = Robot.getFK(joint_angles[1])  # Robot pose that solution 2 produces.
 
-   print(point, test_point_1, test_point_2) 
+   print(point, test_point_1, test_point_2)        # Verify by eye that these 3 points are the same. If they are, the IK is valid.
 
 .. code-block:: python
    :linenos:
