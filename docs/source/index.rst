@@ -11,13 +11,13 @@
 Welcome to DE3 Robotics Group 1 Coursework Documentation
 ========================================================
 
-We are the **BROBOTICISTS** and this is our journey.
-
-We have decided to create a Readthedocs page for our coursework submissions instead of a Google Drive document. This way this documentation can be used for teaching ROS at any point in the future, as well as integrated code blocks and interactive videos.
+We are the **BROBOTICISTS**
+We have decided to create a readthedocs page for our coursework submissions instead of a Google Drive or Word document. This way this documentation can be used for teaching ROS at any point in the future, as well as have integrated code blocks and interactive videos.
+For the purpose of archiving the document, we will be submitting in a PDF format.
 
 .. warning::
 
-    For an epic ROS gamer UI experience, please use the web_ version instead of the PDF. Thanks!
+    For a more interactive experience, please use the web_ version instead of the PDF. Thanks!
 
 .. _web: https://robotics-coursework-de3.readthedocs.io/en/latest/#
 
@@ -25,14 +25,14 @@ We have decided to create a Readthedocs page for our coursework submissions inst
 Setup
 =====
 
-Open Terminator to input commands to run different services or files.
+Open Terminator to input commands and run different services or files.
 
 Start by entering ``roscore`` - this is required to launch nodes and programs for the roscore system to start. It must be running in order for ROS nodes to communicate.
 
 To start gazebo, in a new terminal, use ``rosrun gazebo_ros gazebo``, which generates an empty world.
 
 - To close this instance use ``Ctrl+c``. 
-- To close the Gazebo properly, in case multiple instances are running and it does not close, run ``killall gzserver gzclient``. The following response should occur if it has closed, ``gzserver: no process found and gzclient: no process found``.
+- To close the Gazebo properly, in case multiple instances are running and it does not close, run ``killall gzserver gzclient``. The following response should occur if it has closed, ``gzserver: no process found`` and ``gzclient: no process found``.
 
 Now it is possible to add the robotic arm to the simulation. In a new terminal run:
 
@@ -105,7 +105,7 @@ The resulting table is shown below:
 *Table 1: D-H Table based on derivation*
 
 +-----+-----+-----+-----+-----+
-|link |  d  |  θ  |  a  |  α  |
+|Link |  d  |  θ  |  a  |  α  |
 +=====+=====+=====+=====+=====+
 |**1**||l0| ||θ1| |  0  |  0  |
 +-----+-----+-----+-----+-----+
@@ -124,7 +124,7 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
 
 .. warning::
 
-   Line numbers in the follow code blocks do not correspond to the line numbers in kinematics.py or any other script mentioned
+   Line numbers in the following code blocks do not correspond to the line numbers in kinematics.py or any other script mentioned, only within the blocks.
 
 .. code-block:: python
    :linenos:
@@ -148,8 +148,8 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
         self.joint_types = 'rrr'	# three revolute joints
 
 The function ``getFK(self,q)`` accesses the ``DH_tab`` a row at a time and copies the ith row to ``DH_params`` to compute the transformation matrix from one frame to the next.
-A list ``q`` of current joint angles (theta) is passed in, and added to the base-state ``DH_params``, in order to compute the current transformation matrix.
-This is how the DH table is “updated” with changing theta.
+A list ``q`` of current joint angles (|θ|) is passed in, and added to the base-state ``DH_params``, in order to compute the current transformation matrix.
+This is how the DH table is “updated” with changing |θ|.
 
 .. code-block:: python
    :linenos:
@@ -167,13 +167,13 @@ This is how the DH table is “updated” with changing theta.
       elif self.joint_types[i] == 'p':
             DH_params[0] = DH_params[0]+q[i]
 
-Therefore, since theta in the D-H table is updated by iteration at each step rather than updating a variable, theta1, theta2, and theta3 are set to 0.
+Therefore, since theta in the D-H table is updated by iteration at each step rather than updating a variable, |θ1|, |θ2|, and |θ3| are set to 0.
 This is because the base configuration of the robot is such that the ith joints are in line with each other which results in the angles being set to 0.
 These results are entered into the D-H table defined in the code.
 
 .. note::
    
-   Our edits and additions to the code are highlighted in the following code blocks
+   Our edits and additions to the code are highlighted in the following code blocks.
 
 .. code-block:: python
    :linenos:
@@ -338,20 +338,18 @@ Task D: Checking if a point is in the workspace
 
 To convert coordinates from task space to joint space, the geometric inverse kinematics of the robot arm must be calculated.
 The diagram demonstrates the home position of the robot arm.
-In the home position, the first link **l0**, is along the **z0** axis of the frame, and the second and third link (**l1**, **l2** respectively) are defined along the **y0** plane, meaning joint angles (**q0**, **q1** and **q2**) are measured relative to this.
+In the home position, the first link |l0|, is along the |z0| axis of the frame, and the second and third link (|l1|, |l2| respectively) are defined along the |y0| plane, meaning joint angles (|q0|, |q1| and |q2|) are measured relative to this.
 
 Before computing the inverse kinematics of the arm, we must check if a given point is inside its reachable workspace. This is defined by a spherical shell centered on the end of its first link.
-
-MATHEMATICAL EXPLANATION REQUIRED. [5]_
 
 .. image:: img/reachable.png
    :width: 500
    :alt: Diagram of reachable space
 
-*diagram of reachable workspace*. [6]_
+*Diagram of reachable workspace*. [5]_
 
-Deriving the Reachable Workspace
---------------------------------
+Deriving the Reachable Workspace [6]_
+-------------------------------------
 
 Using the general equation for a sphere (with *a*, *b*, *c* being the |x|, |y|, |z| coordinates of the centre):
 
@@ -438,8 +436,8 @@ For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and c
    This was used to correct the test points.
    Results with corrected test points shown in **Task F**.
 
-Derivation 1 [8]_ [9]_ [10]_
-----------------------------
+Deriving Angle |q1| [8]_ [9]_ [10]_
+------------------------------------
 
 .. image:: img/diagram_with_frames_and_angles.png
    :width: 500
@@ -515,8 +513,8 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Derivation 2 [11]_
-------------------
+Deriving Angle |q2| [11]_
+--------------------------
 
 .. image:: img/diagram_side_view_2.png
    :width: 500
@@ -570,6 +568,10 @@ and
 .. |xi| replace:: *x*:sub:`i`
 .. |zi-1| replace:: *z*:sub:`i-1`
 .. |xi-1| replace:: *x*:sub:`i-1`
+.. |q0| replace:: *q*:sub:`0`
+.. |q1| replace:: *q*:sub:`1`
+.. |q2| replace:: *q*:sub:`2`
+
 
 ---------------------------------
 Task F: Coding Inverse Kinematics
@@ -584,7 +586,11 @@ The robot can be treated as a planar two link robot, being rotated about ``z0`` 
 Therefore, for any point there is only one ``q0`` value which satisfies the point.
 The two configurations are stored together as columns in matrix ``q``.
 
-Unsolved code to fill:
+There are however two different sets of equations that were derived to find the set of angles.
+The output of them is ultimately the same, but the equations are formulated slightly differently, as reflected in the code blocks below.
+**UPDATE DESCRIPTION FOR THIS**
+
+Original Code Block:
 
 .. code-block:: python
    :linenos:
@@ -606,7 +612,7 @@ Unsolved code to fill:
    
    q = [q_a, q_b]
 
-Code from derivation 1:
+Solved Code Block with Formulation 1:
 
 .. code-block:: python
    :linenos:
@@ -636,7 +642,7 @@ Code from derivation 1:
    
    q = [q_a, q_b]
 
-Code from derivation 2:
+Solved Code Block with Formulation 2:
 
 .. code-block:: python
    :linenos:
@@ -662,7 +668,10 @@ Code from derivation 2:
    
    q = [q_a, q_b]
 
-Forward Kinematics Tester to validate solution (confirm error in test points)
+Either formulation is acceptable and correct.
+
+To further test if both of these equations are correct, a Forward Kinematics Tester was coded to validate the outut.
+This was also used to confirm the error in the test points.
 
 .. code-block:: python
    :linenos:
@@ -681,7 +690,9 @@ Forward Kinematics Tester to validate solution (confirm error in test points)
 
    tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']
 
-Incorrect test points:
+The original method used was based on comparing values in a ``.csv`` file, but this method may be prone to errors such as the one found below.
+
+Original incorrect test points:
 
 +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 | x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
@@ -838,15 +849,15 @@ The robot arm uses a simple PID controller to reach desired joint positions.
 
 *PID controller definition for torque output* [14]_
 
-PID controller background [15]_ [16]_ [17]_ [18]_ [19]_ [20]_
--------------------------------------------------------------
+PID Controller Explanation
+---------------------------------------------------------------
 
 The PID controller that is being used is broken up into 3 terms, a proportional, derivative and integral term.
-PID gains are reactive and make up what is known as ‘feedback’ control, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
+PID gains are reactive and make up what is known as ‘feedback’ control [15]_, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
 The proportional term on its own is measuring the difference between the achieved joint angle and desired joint angle - this is defined as the error - and then multiplied by a scalar gain value Kp.
 It is a measure of ‘system stiffness’ and determines the amount of restoring force needed to overcome simple positional error, with the proportional aspect resulting from the Kp term multiplier.
 This will determine how much correction should occur at the output.
-The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop.
+The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop [16]_.
 The video below demonstrates this in action for the robotic arm.
 
 
@@ -856,14 +867,14 @@ Given that the response is based on previous error, the moving average can also 
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
 This is where the integral term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
 
-Let’s consider PI control which brings the output back to set point, in this case the desired joint angle.
+Let’s consider PI control which brings the output back to set point, in this case the desired joint angle [17]_.
 The integral term in the controller is determining the sum of error over time of the joint angle and multiplying it by the scalar gain Ki.
 This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
 This is specific to this simulation scenario as there is no static load.
 
 **PI video**
 
-Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control.
+Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
 The purpose of this term is to ‘guess’ where the error is going to go and respond accordingly, i.e. if the error is increasing, D will increment the response so that the increase is prevented, then the PI control will bring this back to the desired set point joint angle.
 If the PI control responds too aggressively, the D control will be a brake to the system and subdue the PI response.
@@ -953,12 +964,12 @@ It communicates at a frequency of 100 Hz, where the ``kinematics.py`` file is se
                   rate.sleep()
 
 To effectively tune the gains of the robotic arm such that it follows the trajectory with minimal error, the error graph for joint angles can be used. 
-This can be accessed by using the ``rqt`` command in the terminal and then selecting Plugins → Visualization → Plot, then typing /DES3R/joint_0_position_controller/state/error. 
-Then repeating this for each joint_1_position_controller and joint_2_position_controller.
+This can be accessed by using the ``rqt`` command in the terminal and then selecting *Plugins* → *Visualization* → *Plot*, then typing ``/DES3R/joint_0_position_controller/state/error``. 
+Then repeating this for each ``joint_1_position_controller`` and ``joint_2_position_controller``.
 
 **Screenshots for rqt visualization.**
 
-There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols.
+There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [19]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
 Alternatively, for the purpose of this report, it can be done through trial and error, visually determining results.
 It is performed similarly to the order of explanation in this report.
@@ -984,16 +995,20 @@ Due to computing limits, the identical PID values will be processed for each joi
 Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
 
 
-Table of results
+Table of Results
 ----------------
 
 .. image:: img/TaskHTable.png
    :width: 2555
 
+*Task H PID Results Table*
+
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
 .. image:: img/TuningTable.png
    :width: 1970
+
+*PID Tuning Table* [20]_
 
 After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
 Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
@@ -1005,7 +1020,7 @@ Point 3 of the simulation was outside the workspace so it provides a large posit
 This means that in the gazebo simulation, the positional error is not affected as the robotic arm assumes the same pose as the last command it was sent.
 
 .. note::
-   Quick Tuning Guide:
+   Quick Tuning Guide [21]_ :
 
    - Use Kp to decrease rise time (increases oscillation and system instability)
    - Use Kd to reduce overshoot and settling time (too high is bad for noise when in a real-world environment)
@@ -1016,15 +1031,12 @@ In later tasks, this was not the case and the effects of individual joint tuning
 
 The final results demonstrate excellent control of the robotic arm with minimal error. 
 To improve the final values, the P term and D term could both be set even higher.
-However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
+However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise [22]_ and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
 
 Final Results
 -------------
 
-Final PID Values
-**P: 110**
-**I: 0**
-**D: 90**
+**P:** 110 , **I:** 0 , **D:** 90
 
 .. code-block:: python
    :linenos:
@@ -1050,7 +1062,7 @@ Final PID Values
       joint: joint_2
       pid: {p: 110, i: 0, d: 90}
 
-Video results
+Video Results
 -------------
 
 ------------------------------
@@ -1091,12 +1103,13 @@ Results
 
 Running the previous PID controller values with this new end effector mass shows that the gain values are not high enough to drive the links. 
 This is due to the additional force exerted on the joints by the mass which requires an increased set of gains.
- The only joint able to move is joint 0 when rotating about the base. 
- This suggests that each joint could be tuned differently, with joint 1 and 2 requiring more gain to lift the increased end effector mass up against the effect of gravity, whereas joint 0 does not have to do this. 
- The increased gains will likely be significantly higher than the previous robotic arm. The next section focuses on repeating the PID tuning process.
+The only joint able to move is joint 0 when rotating about the base. 
+This suggests that each joint could be tuned differently, with joint 1 and 2 requiring more gain to lift the increased end effector mass up against the effect of gravity, whereas joint 0 does not have to do this. 
+The increased gains will likely be significantly higher than the previous robotic arm. The next section focuses on repeating the PID tuning process.
 
-Embedded video
---------------
+
+Video Results
+-------------
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1111,13 +1124,12 @@ Table of Results
 .. image:: img/TaskJTable.png
    :width: 1367
 
+*Task J PID Results Table* [23]_   
+
 Final Results
 -------------
 
-Final PID Values
-**P: 3250**
-**I: 0**
-**D: 1600**
+**P:** 3250 , **I:** 0 , **D:** 1600
 
 .. code-block:: python
    :linenos:
@@ -1150,6 +1162,24 @@ This caused an exploration of a range of PID values, ultimately returning to the
 Video Results
 --------------
 
+-----------------
+Supporting Videos
+-----------------
+
+
+
+Short Video of Achievements
+---------------------------
+
+
+
+Full Simulations
+----------------
+
+
+
+Detailed Step-by-step Code Explanation
+---------------------------------------
 
 
 ==========
@@ -1160,8 +1190,8 @@ References
 .. [2] Course notes, adapted
 .. [3] Course notes, adapted
 .. [4] Course notes, adapted
-.. [5] **Derviation to be added**
-.. [6] **Image source to be added**
+.. [5] **Image source to be added**
+.. [6] **Derviation to be added**
 .. [7] Course notes
 .. [8] Derivation 1
 .. [9] Derivation 1
@@ -1174,5 +1204,8 @@ References
 .. [16] PID information: https://epxx.co/artigos/feedback_en.html
 .. [17] PID information: https://blog.opticontrols.com/archives/344
 .. [18] PID information: https://pidexplained.com/how-to-tune-a-pid-controller/
-.. [19] PID information: https://en.wikipedia.org/wiki/Ziegler%E2%80%93Nichols_method
-.. [20] PID information: https://www.electronicshub.org/pid-controller-working-and-tuning-methods/#Trial_and_Error_Method
+.. [19] PID information: https://www.electronicshub.org/pid-controller-working-and-tuning-methods/#Trial_and_Error_Method
+.. [20] PID Tuning Table: http://eprints.gla.ac.uk/3817/1/IEEE3.pdf
+.. [21] PID Quick Tuning: https://web.archive.org/web/20150421081758/http://saba.kntu.ac.ir/eecd/pcl/download/PIDtutorial.pdf
+.. [22] PID Stability: https://www.ni.com/en-gb/innovations/white-papers/06/pid-theory-explained.htm
+.. [23] PID Tuning Table: https://controlguru.com/pid-control-and-derivative-on-measurement/
