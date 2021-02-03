@@ -381,7 +381,7 @@ In the home position, the first link |l0|, is along the |z0| axis of the frame, 
 Before computing the inverse kinematics of the arm, we must check if a given point is inside its reachable workspace. This is defined by a spherical shell centered on the end of its first link.
 
 .. image:: img/reachable.png
-   :width: 500
+   :width: 300
    :alt: Diagram of reachable space
 
 *Diagram of reachable workspace*. [5]_
@@ -905,7 +905,7 @@ The video below demonstrates this in action for the robotic arm.
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1rka11c9npSWNzV7mlrXrqpwd0ejSi4zH/preview" width="640" height="480"></iframe>
     </div
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
@@ -922,7 +922,7 @@ This is specific to this simulation scenario as there is no static load.
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/12OzNvLl_kGkr62jAek1EM2aiLzsqw7PI/preview" width="640" height="480"></iframe>
     </div
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
@@ -942,7 +942,7 @@ An example of this can be seen in the video below where a purposefully aggressiv
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1LTqJd79TCwN7U531D_uA9pme66MgPibh/preview" width="640" height="480"></iframe>
     </div
 
 Implementation
@@ -1048,7 +1048,7 @@ The steps used are summarised below.
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/18OYk7nwtqqZ4hJkTgSn4_5ucHtIIScA5/preview" width="640" height="480"></iframe>
     </div
 
 The table below summarises the process and outputs seen. 
@@ -1061,14 +1061,14 @@ Following this, hyper-parameter tuning can then be considered to optimise the re
 Table of Results
 ----------------
 
-.. image:: _images/TaskHTable.png
+.. image:: img/TaskHTable.png
    :width: 900
 
 *Task H PID Results Table*
 
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
-.. image:: _images/TuningTable.png
+.. image:: img/TuningTable.png
    :width: 700
 
 *PID Tuning Table* [20]_
@@ -1131,7 +1131,7 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1M3zKruD8aL2gYgifIs7t-wkUNCW_5i0_/preview" width="640" height="480"></iframe>
     </div
 
 ------------------------------
@@ -1183,7 +1183,7 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1v-9kEdmb4pujtKrijLh4NKcjAT9SiQiH/preview" width="640" height="480"></iframe>
     </div
 
 ---------------------------------
@@ -1196,7 +1196,7 @@ The initial starting values used are based on the previous values obtained.
 Table of Results
 ----------------
 
-.. image:: _images/TaskJTable.png
+.. image:: img/TaskJTable.png
    :width: 900
 
 *Task J PID Results Table* [23]_   
@@ -1240,7 +1240,7 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/16xOz6yj6uyhM2BjvhC2zpO7XIAc778Tc/preview" width="640" height="480"></iframe>
     </div
 
 -----------------
@@ -1262,7 +1262,7 @@ Full Simulations
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1FKHNNQ953DjILROMgBm2bznpT5S7EpHU/preview" width="640" height="480"></iframe>
     </div
 
 Detailed Step-by-step Code Explanation Video
@@ -1271,7 +1271,7 @@ Detailed Step-by-step Code Explanation Video
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1ZfTbdnwyOicxQVv5SndT5aMMX2w02Mv_/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1S8u39y-hh95IlLO-t3of_ZcpE3gOOLmG/preview" width="640" height="480"></iframe>
     </div
    
 ==========
