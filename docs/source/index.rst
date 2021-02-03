@@ -135,8 +135,8 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
 
         self.ROSPublishers = set_joint_publisher()
 
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
+        self.nj = 3
+        self.links = link_lengths
 
         ################################################ TASK 1
         #Define DH table for each link. DH_tab in R^njx4
@@ -179,24 +179,27 @@ These results are entered into the D-H table defined in the code.
    :linenos:
    :emphasize-lines: 13-16
 
-    class RobotKineClass():
-
-    def __init__(self,link_lengths):
-
+    class RobotKineClass():                           
+                                                      
+    def __init__(self,link_lengths):                           # Initialise the class with link lenghs, DH parameters
+                                                               # and joint types of the robot.
         self.ROSPublishers = set_joint_publisher()
 
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
+        self.nj = 3                                            # Number of joints in the robot.
+        self.links = link_lengths                              # Array containing the length of each joint in the robot.
 
         ################################################ TASK 1
         #Define DH table for each link. DH_tab in R^njx4
         #d,theta,a,alpha
-        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
-                                [0., 0., 0., pi/2.],
-                                [0., 0., self.links[1], 0.],
-                                [0., 0., self.links[2], 0.]])
-        self.joint_types = 'rrr'	# three revolute joints
-
+        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],   # NumPy array representation of DH matrix.
+                                [0., 0., 0., pi/2.],           # The four columns represent the DH parameters d, theta, a and alpha.
+                                [0., 0., self.links[1], 0.],   # Each row contains the DH parameter values for each frame, with the values being
+                                [0., 0., self.links[2], 0.]])  # with respect to the previous frame (there are 3 joints and 1 end effector,
+                                                               # three revolute joints# each having a reference frame attached, so 4 rows total).
+        
+        self.joint_types = 'rrr'	                              # Defining the type of each joint as a string with the ith character
+                                                               # representing the type of the ith joint,
+                                                               # with r representing revolute and p prismatic; all are revolute in this case.
 ----------------------------
 Task B: Coding the D-H Table
 ----------------------------
@@ -255,8 +258,8 @@ This definition is translated into the array in Python.
    :linenos:
    :emphasize-lines: 9-12
    
-   def DH_matrix(DH_params):
-      d = DH_params[0]
+   def DH_matrix(DH_params):  
+      d = DH_params[0]        # Unpacking the DH_params array for convenience.
       theta = DH_params[1]
       a = DH_params[2]
       alpha = DH_params[3]
@@ -267,6 +270,11 @@ This definition is translated into the array in Python.
       [sin(theta)*cos(alpha), cos(theta)*cos(alpha), -sin(alpha), -sin(alpha)*d],
       [sin(theta)*sin(alpha) ,cos(theta)*sin(alpha), cos(alpha), cos(alpha)*d],
       [0., 0., 0., 1.]])
+
+      # NumPy array representation of the standard DH transformation matrix from the previous frame to the current frame,
+      # as shown in the above figure.
+      # Updated each discrete simulation time interval with current DH parameter values.
+      # Note: cos() and sin() are imported explicitly so can be used as shorthand (instead of math.sin() etc).
 
 ------------------------------------
 Task C: Computing Forward Kinematics
@@ -329,25 +337,25 @@ To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
    def getFK(self,q):
 
-        T_0_i_1 = np.identity(4)
-        for i in range(self.nj):
+        T_0_i_1 = np.identity(4)                      # Initialise matrix describing transformation from base frame to "previous" frame, to indentity.
+        for i in range(self.nj):                      # Loop over all joints.
 
-            DH_params = np.copy(self.DH_tab[i,:])
+            DH_params = np.copy(self.DH_tab[i,:])     # Copy DH params of ith link from ith row of DH_tab matrix, include all columns.
             #print('q',q)
             #print(DH_params)
-            if self.joint_types[i] == 'r':
-                DH_params[1] = DH_params[1]+q[i]
+            if self.joint_types[i] == 'r':            # Add the current joint angle to the "home" angle.
+                DH_params[1] = DH_params[1]+q[i]      # If the joint is a revolute joint, add the joint angle to the theta parameter (the joint is rotating).
             elif self.joint_types[i] == 'p':
-                DH_params[0] = DH_params[0]+q[i]
+                DH_params[0] = DH_params[0]+q[i]      # If prismatic, add the joint position to the d parameter (the joint is sliding).
             
-            T_i_1_i = DH_matrix(DH_params) #Pose of joint i wrt i-1
+            T_i_1_i = DH_matrix(DH_params)            # Transformation matrix describing pose of joint i w.r.t. joint i-1, obtained from DH_matrix function.
             
-            ################################################ TASK 3 (replace np.eye(4) with the correct matrices)
-            T_0_i = np.matmul(T_0_i_1, T_i_1_i) #Pose of joint i wrt base
+            ########################################### TASK 3 (replace np.eye(4) with the correct matrices)
+            T_0_i = np.matmul(T_0_i_1, T_i_1_i)       # Transformation matrix describing pose of joint i w.r.t. base frame, obtained through matrix multiplication as described above.
 
-            T_0_i_1 = T_0_i
-        T_0_n_1 = T_0_i
-        DH_params = np.copy(self.DH_tab[self.nj, :])
+            T_0_i_1 = T_0_i                           # The base-to-previous-frame matrix now refers to this frame's base transformation matrix, such that next iteration it does indeed refer to the "previous" frame.
+        T_0_n_1 = T_0_i                               
+        DH_params = np.copy(self.DH_tab[self.nj, :])  # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
         T_n_1_n = DH_matrix(DH_params)
         T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
@@ -446,18 +454,18 @@ Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and th
 
    #Check if point is in WS. returns true or false
    def checkInWS(self, P):
-      xP, yP, zP = P
-      l0, l1, l2 = self.links
+      xP, yP, zP = P                                                    # Unpacking the x, y, z components of vector (point) P.
+      l0, l1, l2 = self.links                                           # Unpacking robot link lengths from self.links array.
       
       ################################################ TASK 4
-      val = np.power(xP, 2) + np.power(yP, 2) + np.power((zP - l0), 2)
-      r_max = np.power((l1 + l2), 2)
-      r_min = np.power((l1 - l2), 2)
+      val = np.power(xP, 2) + np.power(yP, 2) + np.power((zP - l0), 2)  # Calculate the square of the distance of the end effector from the center of the spherical workspace.
+      r_max = np.power((l1 + l2), 2)                                    # Calculate the maximum distance the end effector can be from the center of the workspace.
+      r_min = np.power((l1 - l2), 2)                                    # Calculate the minimum distance the end effector can be from the center of the workspace.
 
-      inWS = True
+      inWS = True                                                       # Initialise default return value to True.
 
-      if val > r_max or val < r_min:
-         inWS = False
+      if val > r_max or val < r_min:                                    # If the end effector is outside of the big sphere, or inside the small sphere, it is outside of the workspace.
+         inWS = False                                                   # Since val is the square of the distance, r_max and r_min must also be squared such that their magnitudes are validly comparable.
 
       return inWS
 
@@ -687,25 +695,25 @@ Solved Code Block with Formulation 2:
    :linenos:
    :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
 
-   q_a = np.zeros(3)
-   q_b = np.zeros(3)
+   q_a = np.zeros(3)    # Variables ending in _a represent values for the first possible solution, and _b the second.
+   q_b = np.zeros(3)    # Initialise joint angle arrays for the two solutions.
 
-   theta_1 = np.arctan2(yP, xP)
+   theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the two derivations to compute the joint angles.
    r_1 = sqrt(xP**2 + yP**2)
    r_2 = zP - l1
    
    D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
    
-   q_a[0] = theta_1 #np.arctan2(yP,xP)
-   q_b[0] = theta_1 #np.arctan2(yP,xP)
+   q_a[0] = theta_1       # Theta 1 value from derivation 1.
+   q_b[0] = theta_1       # Value is identical to solution 1, as demonstrated in the note above.
 
-   q_a[2] = np.arctan2(sqrt(1-D**2),D)
-   q_b[2] = np.arctan2(-sqrt(1-D**2),D)
+   q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Theta 3 value from derivation 1.
+   q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Theta 3 value from derivation 2.
    
-   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))
-   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))
+   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Theta 2 value from derivation 1.
+   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Theta 2 value from derivation 2.
    
-   q = [q_a, q_b]
+   q = [q_a, q_b]    # Return the calculated joint angles and poses in an array, as required by the function.
 
 Either formulation is acceptable and correct.
 
@@ -835,12 +843,12 @@ Upon inspection, these equations reveal the definitions of J_11, J_12... and can
    :emphasize-lines: 7-9, 11-13, 15-17
 
    def getDK(self, q, q_dot):
-      q0, q1, q2 = q
+      q0, q1, q2 = q                                  # Unpack the q and self.links arrays for convenience.
       l1, l2, l3 = self.links
       
       ################################################ TASK 7
 
-      J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)
+      J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)        # Compute each element of the Jacobian matrix, as defined in the derivation above.
       J_21=(l1*cos(q1)+l2*cos(q1+q2))*cos(q0)
       J_31=0
       
@@ -852,10 +860,10 @@ Upon inspection, these equations reveal the definitions of J_11, J_12... and can
       J_23=-(l2*sin(q1+q2))*sin(q0)
       J_33=l2*cos(q1+q2)
       
-      self.Jacobian = np.array([[J_11, J_12, J_13],
+      self.Jacobian = np.array([[J_11, J_12, J_13],   # Create a matrix using the above elements.
                                  [J_21, J_22, J_23],
                                  [J_31, J_32, J_33]])
-      x_dot = np.matmul(self.Jacobian, q_dot)
+      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the join velocity vector.
       return x_dot
 
 To validate the jacobian, run:
@@ -979,13 +987,13 @@ To begin with, all values are set to 0.
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}     # Define p, i and d values for this joint.
+   joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController                  # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
    joint_2_position_controller:
@@ -1111,13 +1119,13 @@ Final Results
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 110, i: 0, d: 90}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 110, i: 0, d: 90}                                        # Define p, i and d values for this joint.
+   joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController                  # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 110, i: 0, d: 90}
    joint_2_position_controller:
@@ -1161,7 +1169,7 @@ The ``ee_mass`` variable contains this information on line 16 as highlighted. Ch
    <xacro:property name="ee_length" value="0.04"/>
    <xacro:property name="ee_side" value="0.02"/>
 
-   <xacro:property name="ee_mass" value="30"/> # END EFFECTOR MASS CHANGED HERE, ONLY LINE CHANGED FOR THIS TASK.
+   <xacro:property name="ee_mass" value="30"/> # End effector mass defined here, no other lines changed for this task.
 
    <xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
    <xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
@@ -1216,13 +1224,13 @@ Final Results
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------    # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                      # Final PID values for 30kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController               # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 3250, i: 0, d: 1600}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 3250, i: 0, d: 1600}                                  # Define p, i and d values for this joint.
+   joint_1_position_controller:                                      # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController               # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 3250, i: 0, d: 1600}
    joint_2_position_controller:
