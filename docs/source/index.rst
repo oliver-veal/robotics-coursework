@@ -469,6 +469,21 @@ Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and th
 
       return inWS
 
+To test the code, open a new terminal and run
+
+.. code-block:: python
+   :linenos:
+
+   cd Desktop/DE3Robotics/src/coursework_1/src
+   python3 kinematics.py ws 
+
+The workspace check runs successfully if the following message appears:
+
+.. code-block:: python
+   :linenos:
+
+   "Workspace calculations are correct, well done!"
+
 --------------------------------------
 Task E: Calculating Inverse Kinematics
 --------------------------------------
@@ -792,7 +807,7 @@ Task G: Computing the Jacobian
 
 The Jacobian is a matrix of first order partial derivatives, in this case of ``x``, ``y`` and ``z`` (columns) with respect to ``q1``, ``q2``, and ``q3`` (rows).
 This allows task space velocity to be calculated from joint space velocities, as shown in the relationship below.
-This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation in the code provided.
+This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation.
 
 .. code-block:: python
    :linenos:
@@ -916,6 +931,7 @@ The video below demonstrates this in action for the robotic arm.
         <iframe src="https://drive.google.com/file/d/1rka11c9npSWNzV7mlrXrqpwd0ejSi4zH/preview" width="640" height="480"></iframe>
     </div
 
+
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
 This is where the integral term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
@@ -932,6 +948,7 @@ This is specific to this simulation scenario as there is no static load.
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="https://drive.google.com/file/d/12OzNvLl_kGkr62jAek1EM2aiLzsqw7PI/preview" width="640" height="480"></iframe>
     </div
+
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
@@ -1002,7 +1019,7 @@ To begin with, all values are set to 0.
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
 
 To test the robotic arm the following lines should be run. 
-To run the robot with updated values, first close all instances of Gazebo, re-open Gazebo and run the ``kinematics.py full`` code again.
+To run the robot with updated PID values, follow the above method and run the ``kinematics.py full`` code again.
 
 .. code-block:: python
    :linenos:
@@ -1056,7 +1073,7 @@ The steps used are summarised below.
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/18OYk7nwtqqZ4hJkTgSn4_5ucHtIIScA5/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1vohFpeS7VF_hNJAqXjmSp3kg7R_fH8QN/preview" width="640" height="480"></iframe>
     </div
 
 The table below summarises the process and outputs seen. 
@@ -1064,7 +1081,6 @@ For further insight, please view the embedded simulation video that demonstrates
 
 Due to computing limits, the identical PID values will be processed for each joint controller initially during the test methods. 
 Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
-
 
 Table of Results
 ----------------
@@ -1248,7 +1264,7 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/16xOz6yj6uyhM2BjvhC2zpO7XIAc778Tc/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/15s1TPCJru349MUU-lZx6lY2YIy1BYJMC/preview" width="640" height="480"></iframe>
     </div
 
 -----------------
