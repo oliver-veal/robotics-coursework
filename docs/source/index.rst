@@ -91,7 +91,7 @@ The result of this setup is shown below:
    :width: 500
    :alt: Robot Diagram
 
-*Diagram of robot with D-H conventional reference axes*
+*Fig 1: Diagram of robot with D-H conventional reference axes*
 
 Using this diagram, the Denavit-Hartenberg table was made according to the following definitions:
 
@@ -214,7 +214,7 @@ The definition for this is shown and derived below.
    :width: 500
    :alt: i-1 to i transformation matrix
 
-*Definition of i-1 to i th frame transformation matrix* [2]_
+*Definition 1: i-1 to i th frame transformation matrix* [2]_
 
 Deriving this Transformation Matrix [1]_
 ----------------------------------------
@@ -223,9 +223,9 @@ Deriving this Transformation Matrix [1]_
    :width: 300
    :alt: Screw theory illustration
 
-*Screw theory illustration*
+*Fig 2: Screw theory illustration*
 
-Because the frames of reference were set up according to denavit-hartenberg convention, and the positive directions of axes were set according to the Right-Hand-Rule convention or “Screw” convention (illustrated above), the generic transformation matrix, :sup:`i-1`\ *T*:sub:`i`, is derived with the following steps: 
+Because the frames of reference were set up according to Denavit-Hartenberg convention, and the positive directions of axes were set according to the right-hand rule, or “screw” convention (illustrated above), the generic transformation matrix, :sup:`i-1`\ *T*:sub:`i`, is derived with the following steps: 
 
 .. image:: img/B_equation1.png
    :width: 300
@@ -281,8 +281,8 @@ This definition is translated into the array in Python.
 Task C: Computing Forward Kinematics
 ------------------------------------
 
-The function ``getFK(self,q)`` gets the forward kinematics, FK, of the robot as any given instance.
-It involves multiplying each on the link transformation matrices together to make the compound transformation matrix.
+The function ``getFK(self,q)`` gets the forward kinematics, FK, of the robot at any given instance.
+It involves multiplying each of the link transformation matrices together to compute the compound transformation matrix.
 This is done iteratively in a for loop, beginning line 4. The matrix is updated in line 17.
 
 .. code-block:: python
@@ -312,11 +312,13 @@ This is done iteratively in a for loop, beginning line 4. The matrix is updated 
          T_n_1_n = DH_matrix(DH_params)
          T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
-The following equation shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [3]_
+The following equation, definition 2, shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [3]_
 
 .. image:: img/task_c_eq1.png
    :width: 414
    :alt: Task C equation 1
+
+*Definition 2*
 
 To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th` frame by the matrix of the i-1\ :sup:`th` frame, for each frame. [4]_
 
@@ -324,11 +326,12 @@ To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th
    :width: 286
    :alt: Task C equation 2
 
-The following line of code implements this equation inside the loop that iterates over each joint.
+*Definition 3*
+
+The following code implements this equation inside a loop that iterates over each joint.
 ``np.matmul`` is a numpy function that multiplies two matrices together. ``T_0_i`` is the matrix giving the i\ :sup:`th` joint with respect to the base frame and is updated at each iteration.
 ``T_0_i_1`` is the matrix from the base frame to the i-1\ :sup:`th` frame, and ``T_i_1_i`` is the matrix from the i-1\ :sup:`th` frame to the i\ :sup:`th` frame.
 The code iteratively calls the previous function ``DH_matrix()`` to get the i-1 to i transformation matrix, ``T_i_1_i``.
-
 
 To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
@@ -338,7 +341,7 @@ To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
    def getFK(self,q):
 
-        T_0_i_1 = np.identity(4)                      # Initialise matrix describing transformation from base frame to "previous" frame, to indentity.
+        T_0_i_1 = np.identity(4)                      # Initialise matrix describing transformation from base frame to "previous" frame, to identity.
         for i in range(self.nj):                      # Loop over all joints.
 
             DH_params = np.copy(self.DH_tab[i,:])     # Copy DH params of ith link from ith row of DH_tab matrix, include all columns.
