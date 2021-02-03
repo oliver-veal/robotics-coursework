@@ -841,72 +841,69 @@ The robot arm uses a simple PID controller to reach desired joint positions.
 PID controller background [15]_ [16]_ [17]_ [18]_ [19]_ [20]_
 -------------------------------------------------------------
 
-The PID controller that is being used is broken up into 3 terms, a **proportional**, **derivative** and **integral** term.
-PID gains are reactive and make up what is known as *‘feedback’* control, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
-The **proportional** term on its own is measuring the difference between the achieved joint angle and desired joint angle, defined as the error, and then multiplied by a scalar gain value ``Kp``.
-It is a measure of *‘system stiffness’* and determines the amount of restoring force needed to overcome simple positional error, with the **proportional** aspect resulting from the ``Kp`` term multiplier.
+The PID controller that is being used is broken up into 3 terms, a proportional, derivative and integral term.
+PID gains are reactive and make up what is known as ‘feedback’ control, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
+The proportional term on its own is measuring the difference between the achieved joint angle and desired joint angle - this is defined as the error - and then multiplied by a scalar gain value Kp.
+It is a measure of ‘system stiffness’ and determines the amount of restoring force needed to overcome simple positional error, with the proportional aspect resulting from the Kp term multiplier.
 This will determine how much correction should occur at the output.
-The issue with only **P** being active, is that when ``Kp`` is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop.
+The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop.
 The video below demonstrates this in action for the robotic arm.
+
 
 **P only video**
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
-Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the **P** on its own.
-This is where the **integral** term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
+Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
+This is where the integral term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
 
-Let’s consider **PI** control which brings the output back to set point, in this case the desired joint angle.
-The **integral** term in the controller is determining the sum of error over time of the joint angle and multiplying it by the scalar gain ``Ki``.
-This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined **P** controller.
-This is specific to this simulation scenario however as there is no static load.
+Let’s consider PI control which brings the output back to set point, in this case the desired joint angle.
+The integral term in the controller is determining the sum of error over time of the joint angle and multiplying it by the scalar gain Ki.
+This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
+This is specific to this simulation scenario as there is no static load.
 
 **PI video**
 
-Finally, the part of the system that will reduce the oscillations and overshoots caused by the **P** term, the **derivative** control.
+Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control.
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
-The purpose of this term is to *‘guess’* where the error is going to go and respond accordingly, i.e. if the error is increasing, D will increment the response so that the increase is prevented, then the **PI** control will bring this back to the desired set point joint angle.
-However if the **PI** control responds too aggressively, the **D** control will be a brake to the system and subdue to the **PI** response.
-This is tuned by the scalar gain ``Kd``.
-An example of this can be seen in the video below where a purposefully aggressive **PI** controller has been selected with clear overshoot and oscillation, and then the difference the **derivative** term makes in locking the **PI** response.
+The purpose of this term is to ‘guess’ where the error is going to go and respond accordingly, i.e. if the error is increasing, D will increment the response so that the increase is prevented, then the PI control will bring this back to the desired set point joint angle.
+If the PI control responds too aggressively, the D control will be a brake to the system and subdue the PI response.
+This is tuned by the scalar gain Kd.
+An example of this can be seen in the video below where a purposefully aggressive PI controller has been selected with clear overshoot and oscillation, and then the difference the derivative term makes in locking the PI response.
 
 .. note::
-   If ``Kp`` and ``Kd`` are increased, it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm).
-   In the case of this coursework simulation, it is likely ``Kd`` will have minimal effect.
+   If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
+   ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
-**PID aggresive video**
+
+**PID with good D video**
 
 Implementation
 --------------
 
-The robot arm can be moved by running the following line in Terminator:
+To implement this in ROS we must load up the simulation environment, Gazebo, using the command ``rosrun gazebo_ros gazebo`` - ensure that ``roscore`` is already running. 
+The robot arm can then be loaded into the world by using:
 
 .. code-block:: python
    :linenos:
 
-   cd Desktop/DE3Robotics/src/coursework_1/src 
-   python3 kinematics.py full
+   cd Desktop/DE3Robotics
+   source devel/setup.bash
+   roslaunch coursework_1 coursework_1.launch
 
-This in turn eventually calls the function ``sendCommands(self,q)`` which communicates with Gazebo using a ``.publish()`` method.
+The PID values are edited in the ``controller_settings.yaml`` file. 
+Any changes must first be saved, then the previous robotic arm must be terminated in its terminal window using ``Ctrl + C``. 
+The previous robotic arm can be deleted from gazebo by using the ``delete`` key. 
+Then simply repeat the process for loading in a new arm.
 
-.. code-block:: python
-   :linenos:
-
-   def sendCommands(self,q):
-
-      #print("SENDING JOINT VALUES ", q)
-      rate = rospy.Rate(100) #Hz
-      for i in range(3):
-
-         n_conn = 0
-         while not n_conn:
-               self.ROSPublishers[i].publish(q[i])
-               n_conn = self.ROSPublishers[i].get_num_connections()
-               rate.sleep()
-
-PID values are found in lines 11, 15, and 19 of the ``controller_settings.yaml`` file shown below:
+To edit the PID values for each controller, the highlighted lines should be changed. 
+By default the i value is clamped at 0. 
+To change this, two more variables should be added, ``i_clamp_max`` and ``i_clamp_min``. 
+Setting these allows the upper and lower bounds of i to be changed freely. 
+To begin with, all values are set to 0.
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 11, 15, 19
 
    DESE3R:
    # Publish all joint states -----------------------------------
@@ -918,56 +915,116 @@ PID values are found in lines 11, 15, and 19 of the ``controller_settings.yaml``
    joint_0_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_0
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
    joint_1_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_1
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
    joint_2_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_2
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
 
+To test the robotic arm the following lines should be run. 
 To run the robot with updated values, first close all instances of Gazebo, re-open Gazebo and run the ``kinematics.py full`` code again.
 
-Tuning the PID controller
--------------------------
+.. code-block:: python
+   :linenos:
 
-To effectively tune the gains of the robotic arm such that it follows the trajectory, the error graph for joint angles was used in the simulator.
-This can be accessed by using the ``rqt`` command in the terminal and then selecting **Plugins → Visualisaiton →** then typing **/DES3RXXXXXXXXXXXXXXX**.
-Then repeating this for each joint controller.
+   cd Desktop/DE3Robotics/src/coursework_1/src 
+   python3 kinematics.py full
 
-**Screenshots for rqt visualization**
+This runs the ``full`` command which is use to call the function ``sendCommands()`` which communicates with Gazebo using a ``.publish()`` method. 
+It communicates at a frequency of 100 Hz, where the ``kinematics.py`` file is sending interpolated joint values between its current position and desired position to allow it to move smoothly and simulate actual movement, rather than directly sending the final joint value which would not work.
 
-There are a number of methods that can be used, with a common and simple heuristic-based method being *Ziegler-Nichols*.
+.. code-block:: python
+   :linenos:
+
+   def sendCommands(self,q):
+
+         #print("SENDING JOINT VALUES ", q)
+         rate = rospy.Rate(100) #Hz
+         for i in range(3):
+
+               n_conn = 0
+               while not n_conn:
+                  self.ROSPublishers[i].publish(q[i])
+                  n_conn = self.ROSPublishers[i].get_num_connections()
+                  rate.sleep()
+
+To effectively tune the gains of the robotic arm such that it follows the trajectory with minimal error, the error graph for joint angles can be used. 
+This can be accessed by using the ``rqt`` command in the terminal and then selecting Plugins → Visualization → Plot, then typing /DES3R/joint_0_position_controller/state/error. 
+Then repeating this for each joint_1_position_controller and joint_2_position_controller.
+
+**Screenshots for rqt visualization.**
+
+There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
 Alternatively, for the purpose of this report, it can be done through trial and error, visually determining results.
 It is performed similarly to the order of explanation in this report.
 The steps used are summarised below.
 
-- Set all gains to zero
-- Increase ``Kp`` until the controller output oscillates at a constant rate. It should continue to be increased such that the response should increase more quickly without the system becoming unstable.
-- Once ``Kp`` response is fast enough, ``Ki`` is now increased with small steps to ensure the effects are seen. The goal of increasing ``Ki`` is to gradually reduce the oscillations and reduce the steady-state errors. Once the controller is stable, a **PI** controller has been formed.
-- With ``Kp`` and ``Ki`` set with minimal steady state error, ``Kd`` can be used for dampening effects. Increasing ``Kd`` will decrease overshoot of the system. The ramp rate should be monitored and the key is to prevent overshooting. Once the overshoot has been dampened, ``Kd`` is set.
+1. Set all gains to zero
+2. Increase Kp until the controller output oscillates at a constant rate. It should continue to be increased such that the response should increase more quickly without the system becoming unstable.
+3. Once Kp response is fast enough, Ki is now increased with small steps to ensure the effects are seen. The goal of increasing Ki is to reduce the steady state errors. If there are no steady state errors and primarily overshoot and oscillation, you can skip to tuning Kd.
+4. With Kp and Ki set with minimal steady state error and consistent oscillation, Kd can be used for dampening effects. Increasing Kd will decrease overshoot of the system. The ramp rate should be monitored to ensure that Kd is not tuned too high, such that the desired trajectory is still achieved. Increase this till the system is stable and overshoot and oscillation is minimised. System tuning complete.
 
-.. note::
-   If ``Kd`` is set too high, then the output of the **PI** controller will be against the **D** term as they are both trying to achieve opposite effects.
-   Therefore, **D** should be increased cautiously.
+.. warning::
 
-The table below summarises the process and outputs seen.
+   If Kd is set too high, then the output of the PI controller will be against the D term as they are both trying to achieve opposite effects. 
+   Therefore, D should be increased cautiously. 
+   The video below demonstrates this.
+
+   **Video with too much D**
+
+The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
 
-Due to computing limits, identical **PID** values will be processed for each joint controller initially during the test methods.
-Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller.
+Due to computing limits, the identical PID values will be processed for each joint controller initially during the test methods. 
+Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
+
 
 Table of results
 ----------------
 
-Video results
--------------
+.. image:: img/TaskHTable.png
+   :width: 2555
+
+The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
+
+.. image:: img/TuningTable.png
+   :width: 1970
+
+After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
+Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
+P was then incremented again to see if it made a positive difference to the rise time.
+Given this was the case, D was again incremented until the error was minimised.
+No steady-state error was identified, therefore no integral gain was required.
+
+Point 3 of the simulation was outside the workspace so it provides a large positional error shown in the code, which is expected, but this also means that no joint angles are sent to the robotic arm.
+This means that in the gazebo simulation, the positional error is not affected as the robotic arm assumes the same pose as the last command it was sent.
+
+.. note::
+   Quick Tuning Guide:
+
+   - Use Kp to decrease rise time (increases oscillation and system instability)
+   - Use Kd to reduce overshoot and settling time (too high is bad for noise when in a real-world environment)
+   - Use Ki to eliminate steady state error. (but adds to overshoot)
+
+During the live simulation session, it was found that hyper tuning was not needed as the end effector mass was 0.01kg, and all controllers could easily be set to the same value, thus streamlining the process and keeping control simple. 
+In later tasks, this was not the case and the effects of individual joint tuning was explored.
+
+The final results demonstrate excellent control of the robotic arm with minimal error. 
+To improve the final values, the P term and D term could both be set even higher.
+However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
 
 Final Results
 -------------
+
+Final PID Values
+**P: 110**
+**I: 0**
+**D: 90**
 
 .. code-block:: python
    :linenos:
@@ -983,15 +1040,18 @@ Final Results
    joint_0_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_0
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 110, i: 0, d: 90}
    joint_1_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_1
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 110, i: 0, d: 90}
    joint_2_position_controller:
       type: effort_controllers/JointPositionController
       joint: joint_2
-      pid: {p: 0.1, i: 0, d: 0}
+      pid: {p: 110, i: 0, d: 90}
+
+Video results
+-------------
 
 ------------------------------
 Task I: Adapting the Robot Arm
