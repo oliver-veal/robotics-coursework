@@ -13,7 +13,7 @@ Welcome to DE3 Robotics Group 1 Coursework Documentation
 
 We are the **BROBOTICISTS**.
 We have decided to create a readthedocs page for our coursework submissions instead of a Google Drive or Word document. This way this documentation can be used for teaching ROS at any point in the future, as well as have integrated code blocks and interactive videos.
-For the purpose of archiving the document, we will be submitting in a PDF format.
+For the purpose of archiving the document, we will be submitting in PDF and HTML formats.
 
 .. warning::
 
@@ -118,8 +118,8 @@ The resulting table is shown below:
 
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
-This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the function.
-This function is the ``__init__`` of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run.
+This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the constructor.
+This ``__init__`` function is the constructor of the ``RobotKineClass()`` class, meaning it is called when an instance of the class is initialised.
 The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
 
 .. warning::
