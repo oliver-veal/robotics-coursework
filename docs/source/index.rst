@@ -1022,14 +1022,14 @@ Following this, hyper-parameter tuning can then be considered to optimise the re
 Table of Results
 ----------------
 
-.. image:: img/TaskHTable.png
+.. image:: _images/TaskHTable.png
    :width: 900
 
 *Task H PID Results Table*
 
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
-.. image:: img/TuningTable.png
+.. image:: _images/TuningTable.png
    :width: 700
 
 *PID Tuning Table* [20]_
