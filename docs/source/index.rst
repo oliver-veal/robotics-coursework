@@ -147,7 +147,7 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
                                 [0., 0., 0., 0.]])
         self.joint_types = 'rrr'	# three revolute joints
 
-The function ``getFK(self,q)`` accesses the ``DH_tab`` a row at a time and copies the ith row to ``DH_params`` to compute the transformation matrix from one frame to the next.
+The function ``getFK(self,q)`` accesses the ``DH_tab`` a row at a time and copies the i\ :sup:`th` row to ``DH_params`` to compute the transformation matrix from one frame to the next.
 A list ``q`` of current joint angles (|θ|) is passed in, and added to the base-state ``DH_params``, in order to compute the current transformation matrix.
 This is how the DH table is “updated” with changing |θ|.
 
@@ -167,8 +167,8 @@ This is how the DH table is “updated” with changing |θ|.
       elif self.joint_types[i] == 'p':
             DH_params[0] = DH_params[0]+q[i]    # If the joint is prismatic, update the d value instead (the joint slides instead of rotating).
 
-Therefore, since theta in the D-H table is updated by iteration at each step rather than updating a variable, |θ1|, |θ2|, and |θ3| are set to 0.
-This is because the base configuration of the robot is such that the ith joints are in line with each other which results in the angles being set to 0.
+Therefore, since |θ| in the D-H table is updated by iteration at each step rather than updating a variable, |θ1|, |θ2|, and |θ3| are set to 0.
+This is because the base configuration of the robot is such that the i\ :sup:`th` joints are in line with each other which results in the angles being set to 0.
 These results are entered into the D-H table defined in the code.
 
 .. note::
@@ -214,7 +214,7 @@ The definition for this is shown and derived below.
    :width: 500
    :alt: i-1 to i transformation matrix
 
-*Definition 1: i-1 to i th frame transformation matrix* [2]_
+*Definition 1: i-1 to i th frame transformation matrix* [1]_
 
 Deriving this Transformation Matrix [1]_
 ----------------------------------------
@@ -312,7 +312,7 @@ This is done iteratively in a for loop, beginning line 4. The matrix is updated 
          T_n_1_n = DH_matrix(DH_params)
          T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
-The following equation, definition 2, shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [3]_
+The following equation, definition 2, shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [1]_
 
 .. image:: img/task_c_eq1.png
    :width: 414
@@ -320,7 +320,7 @@ The following equation, definition 2, shows how the pose of the end effector can
 
 *Definition 2*
 
-To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th` frame by the matrix of the i-1\ :sup:`th` frame, for each frame. [4]_
+To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th` frame by the matrix of the i-1\ :sup:`th` frame, for each frame. [1]_
 
 .. image:: img/task_c_eq2.png
    :width: 286
@@ -396,9 +396,9 @@ Before computing the inverse kinematics of the arm, we must check if a given poi
    :width: 300
    :alt: Diagram of reachable space
 
-*Fig 3: Diagram of reachable workspace*. [5]_
+*Fig 3: Diagram of reachable workspace*. [1]_
 
-Deriving the Reachable Workspace [6]_
+Deriving the Reachable Workspace [1]_
 -------------------------------------
 
 Using the general equation for a sphere (with *a*, *b*, *c* being the |x|, |y|, |z| coordinates of the centre):
@@ -448,7 +448,7 @@ The ``r_max`` and ``r_min`` are defined as:
 .. image:: img/task_d.png
    :width: 252
 
-*Definition 4* [7]_
+*Definition 4* [1]_
 
 Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and the ``**2`` is removed in the if statement to remove the terms being squared twice.
 
@@ -524,8 +524,8 @@ and
    :width: 300
    :alt: Task E Equation 2
 
-Derivation for |θ2| & |θ3|, Arm Bent Upwards [8]_ [9]_ [10]_
------------------------------------------------
+Derivation for |θ2| & |θ3|, Arm Bent Upwards [2]_ [3]_ [4]_
+-------------------------------------------------------------
 
 .. image:: img/diagram_side_view.png
    :width: 500
@@ -575,7 +575,7 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Derivation for |θ2| & |θ3|, Arm Bent Downwards [11]_
+Derivation for |θ2| & |θ3|, Arm Bent Downwards [5]_
 --------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
@@ -842,7 +842,7 @@ The Jacobian, for this case, can be written as:
 .. image:: img/jacobian.png
    :width: 299
 
-*Definition 5: Jacobian* [12]_
+*Definition 5: Jacobian* [1]_
 
 With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is shown in the expanded kinematics equations below:
 
@@ -907,17 +907,17 @@ The robot arm uses a simple PID controller to reach the desired joint positions.
 .. image:: img/pid.png
    :width: 497
 
-*Definition 6: PID controller for torque output* [14]_
+*Definition 6: PID controller for torque output* [1]_
 
 PID Controller Explanation
 ---------------------------------------------------------------
 
 The PID controller being used is broken up into 3 terms; a proportional, derivative and integral term.
-PID gains are reactive and make up what is known as ‘feedback’ control [15]_, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
+PID gains are reactive and make up what is known as ‘feedback’ control [6]_, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
 The proportional term on its own is measuring the difference between the achieved joint angle and desired joint angle - this is defined as the error - and then multiplied by a scalar gain value Kp.
 It is a measure of ‘system stiffness’ and determines the amount of restoring force needed to overcome simple positional error, with the proportional aspect resulting from the Kp term multiplier.
 This will determine how much correction should occur at the output.
-The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can potentially be destructive given the control system is closed loop [16]_ .
+The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can potentially be destructive given the control system is closed loop [7]_ .
 The video below demonstrates this in action for the robotic arm.
 
 .. raw:: html
@@ -934,7 +934,7 @@ Given that the response is based on previous error, the moving average can also 
 Using this controller type on its own can also result in a major drawback: offset. This is when there is a sustained error built up over time that cannot be removed by the P term on its own.
 The integral term aims to reduce this offset by incrementing or decrementing the controller output and drive the error back to zero, rather than letting it persist.
 
-Let’s consider PI control which brings the output back to a set point, in this case the desired joint angle [17]_.
+Let’s consider PI control which brings the output back to a set point, in this case the desired joint angle [8]_.
 The integral term in the controller is determining the sum of error over time of the joint angle and multiplying it by the scalar gain Ki.
 This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
 This is specific to this simulation scenario as there is no static load.
@@ -947,9 +947,9 @@ This is specific to this simulation scenario as there is no static load.
 
 =====
 
-*Example PD controller*
+*Video 2: Example PI controller*
 
-Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term; the derivative control [18]_ . 
+Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term; the derivative control [9]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
 The purpose of this term is to ‘guess’ where the error is going to go and respond accordingly, i.e. if the error is increasing, D will increment the response so that the increase is prevented, then the PI control will bring this back to the desired set point joint angle.
 If the PI control responds too aggressively, the D control will be a brake to the system and subdue the PI response.
@@ -957,8 +957,8 @@ This is tuned by the scalar gain Kd.
 An example of this can be seen in the video below where a purposefully aggressive PI controller has been selected with clear overshoot and oscillation, and then the difference the derivative term makes in locking the PI response.
 
 .. note::
-   If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
-   ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
+   If Kp is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
+   Kd is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
 .. raw:: html
 
@@ -968,7 +968,7 @@ An example of this can be seen in the video below where a purposefully aggressiv
 
 =====
 
-*Example of full PID*
+*Video 3: Example of full PID*
 
 Implementation
 --------------
@@ -1052,7 +1052,7 @@ Then repeating this for each ``joint_1_position_controller`` and ``joint_2_posit
 .. image:: img/rqt.png
    :width: 300
 
-There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [19]_.
+There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [10]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
 Alternatively, for the purpose of this report, it can be done through trial and error, visually determining results.
 It is performed similarly to the order of explanation in this report.
@@ -1101,7 +1101,7 @@ The table below helps to summarise the effects of increasing the PID parameters,
 .. image:: img/TuningTable.png
    :width: 700
 
-*PID Tuning Table* [20]_
+*PID Tuning Table* [11]_
 
 After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
 Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
@@ -1113,7 +1113,7 @@ Point 3 of the simulation was outside the workspace so it provides a large posit
 This means that in the gazebo simulation, the positional error is not affected as the robotic arm assumes the same pose as the last command it was sent.
 
 .. note::
-   Quick Tuning Guide [21]_ :
+   Quick Tuning Guide [12]_ :
 
    - Use Kp to decrease rise time (increases oscillation and system instability)
    - Use Kd to reduce overshoot and settling time (too high is bad for noise when in a real-world environment)
@@ -1124,7 +1124,7 @@ In later tasks, this was not the case and the effects of individual joint tuning
 
 The final results demonstrate excellent control of the robotic arm with minimal error. 
 To improve the final values, the P term and D term could both be set even higher.
-However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise [22]_ and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
+However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise [13]_ and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
 
 Final Results
 -------------
@@ -1237,7 +1237,7 @@ Table of Results
 .. image:: img/TaskJTable.png
    :width: 900
 
-*Task J PID Results Table* [23]_   
+*Task J PID Results Table* [14]_   
 
 Hyper tuning was explored for joints 1 and 2 as the load acting on them increased due to the increased mass of the end effector. 
 This is highligted well in the video.
@@ -1326,26 +1326,48 @@ Detailed Step-by-step Code Explanation Video
 References
 ==========
 
-.. [1] Course notes
-.. [2] Course notes, adapted
-.. [3] Course notes, adapted
-.. [4] Course notes, adapted
-.. [5] **Image source to be added**
-.. [6] **Derviation to be added**
-.. [7] Course notes
-.. [8] Derivation 1
-.. [9] Derivation 1
-.. [10] Derivation 1
-.. [11] Derivation 2
-.. [12] Course notes, adapted
-.. [13] Course notes, adapted
-.. [14] Course notes, adapted
-.. [15] PID information: https://www.motioncontroltips.com/faq-what-are-pid-gains-and-feed-forward-gains/
-.. [16] PID information: https://epxx.co/artigos/feedback_en.html
-.. [17] PID information: https://blog.opticontrols.com/archives/344
-.. [18] PID information: https://pidexplained.com/how-to-tune-a-pid-controller/
-.. [19] PID information: https://www.electronicshub.org/pid-controller-working-and-tuning-methods/#Trial_and_Error_Method
-.. [20] PID Tuning Table: http://eprints.gla.ac.uk/3817/1/IEEE3.pdf
-.. [21] PID Quick Tuning: https://web.archive.org/web/20150421081758/http://saba.kntu.ac.ir/eecd/pcl/download/PIDtutorial.pdf
-.. [22] PID Stability: https://www.ni.com/en-gb/innovations/white-papers/06/pid-theory-explained.htm
-.. [23] PID Tuning Table: https://controlguru.com/pid-control-and-derivative-on-measurement/
+.. [1]  | Kormushev, P. & Nanayakkara, T. (2020) \ *DESE96005 - Robotics 2020-2021 -*
+        | *Course Notes and Lectures* [Module Content] Imperial College London.
+.. [2]  | Gupta, A. & Chourika, S. & Agrawal, S. & Deshmukh, A. & Bhargava, P. (2018). 
+        | *A Geometric Approach to Inverse Kinematics of a 3 DOF Robotic Arm.* 
+        | Available from: https://www.researchgate.net/publication/328583527_A_Geometric_Approach_to_Inverse_Kinematics_of_a_3_DOF_Robotic_Arm 
+        | [Accessed: 1 February 2021].
+.. [3]  | Woolfrey (2018). *5.1 Inverse Kinematics.* [Online Video] Available from: 
+        | https://www.youtube.com/watch?v=RH3iAmMsolo&ab_channel=Woolfrey [Accessed: 1 February 2021].
+.. [4]  | Sodemann, A. (2017) *Inverse Kinematics of Articulated Manipulator* 
+        | [Online Video] Available from: https://www.youtube.com/watch?app=desktop&v=D93iQVoSScQ&ab_channel=AngelaSodemann 
+        | [Accessed: 1 February 2021].
+.. [5]  | Becker, A. (2017) *Intro2Robotics Lecture 9a: Inverse Kinematics Position* 
+        | [Online Video] Available from: https://youtu.be/9HfcMkfLh6k?t=520 
+        | [Accessed: 1 February 2021].
+.. [6]  | Collins, D. (n.d.) *FAQ: What are PID gains and feed-forward gains?* [Online]. 
+        | Motion Control Tips. Available from: 
+        | https://www.motioncontroltips.com/faq-what-are-pid-gains-and-feed-forward-gains/ 
+        | [Accessed: 3 February 2021].
+.. [7]  | Pfützenreuter, E. (n.d.) *Feedback and PID controllers.* [Online]. 
+        | EPx. Available from: https://epxx.co/artigos/feedback_en.html 
+        | [Accessed: 3 February 2021].
+.. [8]  | Anon (2011) *PID Controllers Explained.* [Online] Available from: 
+        | https://blog.opticontrols.com/archives/344 [Accessed: 3 February 2021].
+.. [9]  | Anon (2020) *How to Tune a PID Controller • PID Explained.* [Online]. 
+        | 7 March 2020. PID Explained. Available from: 
+        | https://pidexplained.com/how-to-tune-a-pid-controller/ 
+        | [Accessed: 3 February 2021]. 
+.. [10] | Anon (2017) *PID Controller-Working and Tuning Methods.* [Online]. 
+        | 24 December 2017. Electronics Hub. Available from: 
+        | https://www.electronicshub.org/pid-controller-working-and-tuning-methods/#Trial_and_Error_Method 
+        | [Accessed: 3 February 2021]. 
+.. [11] | Ang, K.H. & Chong, G.C.Y. & Li, Y. (2005) *PID control system analysis,* 
+        | *design, and technology. IEEE Transactions on Control Systems Technology* 
+        | 13(4):pp. 559-576. [Online] University of Glasgow. Available from: 
+        | http://eprints.gla.ac.uk/3817/1/IEEE3.pdf [Accessed: 3 February 2021]. 
+.. [12] | Zhong, J. (2006) *PID Controller Tuning: A Short Tutorial* [Online] 
+        | Purdue University. Available from: 
+        | https://web.archive.org/web/20150421081758/http://saba.kntu.ac.ir/eecd/pcl/download/PIDtutorial.pdf 
+        | [Accessed: 3 February 2021]. 
+.. [13] | Anon (n.d.) *PID Theory Explained.* [Online]. NI. Available from: 
+        | https://www.ni.com/en-gb/innovations/white-papers/06/pid-theory-explained.html 
+        | [Accessed: 3 February 2021].
+.. [14] | Anon (n.d.) *Derivative Action and PID Control.* [Online]. Control Guru. 
+        | Available from: https://controlguru.com/pid-control-and-derivative-on-measurement/ 
+        | [Accessed: 3 February 2021]. 
