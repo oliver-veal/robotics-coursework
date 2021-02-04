@@ -878,10 +878,10 @@ Upon inspection, these equations reveal the definitions of ``J_11``, ``J_12``...
       self.Jacobian = np.array([[J_11, J_12, J_13],   # Create a matrix using the above elements.
                                  [J_21, J_22, J_23],
                                  [J_31, J_32, J_33]])
-      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the join velocity vector.
+      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the joint velocity vector.
       return x_dot
 
-To validate the jacobian, run:
+To validate the Jacobian, run:
 
 .. code-block:: python
    :linenos:
@@ -889,7 +889,7 @@ To validate the jacobian, run:
    cd Desktop/DE3Robotics/src/coursework_1/src
    python3 kinematics.py dk
 
-The IK model runs successfully if the following message appears:
+The DK model runs successfully if the following message appears:
 
 .. code-block:: python
    :linenos:
