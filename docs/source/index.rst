@@ -735,7 +735,7 @@ The following code implements the derivation to obtain both IK solutions:
    For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
    
    *Note: We know the FK solver is valid from Task C.
-   This was also used as evidence to confirm the error in the intially provided CSV file of test points.*
+   This was also used as evidence to confirm the error in the initially provided CSV file of test points.*
 
    .. code-block:: python
       :linenos:
@@ -836,22 +836,20 @@ This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation.
       x_dot = np.matmul(self.Jacobian, q_dot)
       return x_dot
 
-To dervie the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
+To derive the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
 The Jacobian, for this case, can be written as:
 
 .. image:: img/jacobian.png
    :width: 299
 
-*Jacobian definition* [12]_
+*Definition 5: Jacobian* [12]_
 
-With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian) as shown:
+With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is shown in the expanded kinematics equations below:
 
 .. image:: img/jacobian_equations.png
    :width: 500
-
-*Kinematics equations expanded* [13]_
    
-Upon inspection, these equations reveal the definitions of J_11, J_12... and can be used to define the matrix in the code below, with red green and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
+Upon inspection, these equations reveal the definitions of ``J_11``, ``J_12``... and can be used to define the matrix in the code below, with red, green, and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
 
 .. code-block:: python
    :linenos:
@@ -878,10 +876,10 @@ Upon inspection, these equations reveal the definitions of J_11, J_12... and can
       self.Jacobian = np.array([[J_11, J_12, J_13],   # Create a matrix using the above elements.
                                  [J_21, J_22, J_23],
                                  [J_31, J_32, J_33]])
-      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the join velocity vector.
+      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the joint velocity vector.
       return x_dot
 
-To validate the jacobian, run:
+To validate the Jacobian, run:
 
 .. code-block:: python
    :linenos:
@@ -889,7 +887,7 @@ To validate the jacobian, run:
    cd Desktop/DE3Robotics/src/coursework_1/src
    python3 kinematics.py dk
 
-The IK model runs successfully if the following message appears:
+The DK model runs successfully if the following message appears:
 
 .. code-block:: python
    :linenos:
@@ -904,12 +902,12 @@ Robot Control
 Task H: Tuning Controller Gains
 -----------------------------------------------
 
-The robot arm uses a simple PID controller to reach desired joint positions.
+The robot arm uses a simple PID controller to reach the desired joint positions.
 
 .. image:: img/pid.png
    :width: 497
 
-*PID controller definition for torque output* [14]_
+*Definition 6: PID controller for torque output* [14]_
 
 PID Controller Explanation
 ---------------------------------------------------------------
@@ -930,7 +928,7 @@ The video below demonstrates this in action for the robotic arm.
 
 =====
 
-*Example of just P controller*
+*Video 1: Example of just P controller*
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
