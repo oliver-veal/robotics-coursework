@@ -846,7 +846,7 @@ The Jacobian, for this case, can be written as:
 
 *Definition 5: Jacobian* [12]_
 
-With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is show in the expanded kinematics equations below:
+With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is shown in the expanded kinematics equations below:
 
 .. image:: img/jacobian_equations.png
    :width: 500
