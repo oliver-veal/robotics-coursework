@@ -909,7 +909,7 @@ The robot arm uses a simple PID controller to reach desired joint positions.
 .. image:: img/pid.png
    :width: 497
 
-*PID controller definition for torque output* [14]_
+*Definition 6: PID controller for torque output* [14]_
 
 PID Controller Explanation
 ---------------------------------------------------------------
