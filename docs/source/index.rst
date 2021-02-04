@@ -524,7 +524,7 @@ and
    :width: 300
    :alt: Task E Equation 2
 
-Derivation for Arm Bent Upwards [8]_ [9]_ [10]_
+Derivation for |θ2| & |θ3|, Arm Bent Upwards [8]_ [9]_ [10]_
 -----------------------------------------------
 
 .. image:: img/diagram_side_view.png
@@ -575,7 +575,7 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Derivation for Arm Bent Downwards [11]_
+Derivation for |θ2| & |θ3|, Arm Bent Downwards [11]_
 --------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
