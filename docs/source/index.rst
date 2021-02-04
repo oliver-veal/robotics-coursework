@@ -1098,10 +1098,10 @@ Table of Results
 There was no obvious reason to individually tune joints so the values for all controllers could be kept the same for simplicity sake in control - this may not be the case for where the load is increased on specific joints.
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
+*Table 3: PID Tuning* [11]_
+
 .. image:: img/TuningTable.png
    :width: 700
-
-*PID Tuning Table* [11]_
 
 After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
 Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
