@@ -949,7 +949,7 @@ This is specific to this simulation scenario as there is no static load.
 
 *Video 2: Example PI controller*
 
-Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [9]_ . 
+Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term; the derivative control [9]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
 The purpose of this term is to ‘guess’ where the error is going to go and respond accordingly, i.e. if the error is increasing, D will increment the response so that the increase is prevented, then the PI control will bring this back to the desired set point joint angle.
 If the PI control responds too aggressively, the D control will be a brake to the system and subdue the PI response.
