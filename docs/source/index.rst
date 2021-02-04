@@ -575,7 +575,7 @@ Which is included in the final equation for |θ3|:
    :alt: Task E Equation 9
 
 Derivation for |θ2| & |θ3|, Arm Bent Downwards [5]_
---------------------------------------------
+---------------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
    :width: 500
