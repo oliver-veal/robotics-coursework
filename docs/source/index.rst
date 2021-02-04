@@ -737,7 +737,7 @@ The following code implements the derivation to obtain both IK solutions:
    For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
    
    *Note: We know the FK solver is valid from Task C.
-   This was also used as evidence to confirm the error in the intially provided CSV file of test points.*
+   This was also used as evidence to confirm the error in the initially provided CSV file of test points.*
 
    .. code-block:: python
       :linenos:
@@ -838,20 +838,18 @@ This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation.
       x_dot = np.matmul(self.Jacobian, q_dot)
       return x_dot
 
-To dervie the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
+To derive the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
 The Jacobian, for this case, can be written as:
 
 .. image:: img/jacobian.png
    :width: 299
 
-*Jacobian definition* [12]_
+*Definition 5: Jacobian* [12]_
 
-With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian) as shown:
+With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is show in the expanded kinematics equations below:
 
 .. image:: img/jacobian_equations.png
    :width: 500
-
-*Kinematics equations expanded* [13]_
    
 Upon inspection, these equations reveal the definitions of J_11, J_12... and can be used to define the matrix in the code below, with red green and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
 
