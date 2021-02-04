@@ -904,7 +904,7 @@ Robot Control
 Task H: Tuning Controller Gains
 -----------------------------------------------
 
-The robot arm uses a simple PID controller to reach desired joint positions.
+The robot arm uses a simple PID controller to reach the desired joint positions.
 
 .. image:: img/pid.png
    :width: 497
@@ -930,7 +930,7 @@ The video below demonstrates this in action for the robotic arm.
 
 =====
 
-*Example of just P controller*
+*Video 1: Example of just P controller*
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
