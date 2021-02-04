@@ -1119,9 +1119,6 @@ This means that in the gazebo simulation, the positional error is not affected a
    - Use Kd to reduce overshoot and settling time (too high is bad for noise when in a real-world environment)
    - Use Ki to eliminate steady state error. (but adds to overshoot)
 
-During the live simulation session, it was found that hyper tuning was not needed as the end effector mass was 0.01kg, and all controllers could easily be set to the same value, thus streamlining the process and keeping control simple. 
-In later tasks, this was not the case and the effects of individual joint tuning was explored.
-
 The final results demonstrate excellent control of the robotic arm with minimal error. 
 To improve the final values, the P term and D term could both be set even higher.
 However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise [13]_ and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
