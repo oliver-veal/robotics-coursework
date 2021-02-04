@@ -1082,7 +1082,7 @@ The steps used are summarised below.
 *Video 4: Example of Kd set too high*
 
 The table below summarises the process and outputs seen. 
-For further insight, please view the embedded simulation video that demonstrates each output.
+For further insight, please view the *"Detailed Step-by-step Code Explanation Video"*.
 
 Due to computing limits, the identical PID values will be processed for each joint controller initially during the test methods. 
 Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
