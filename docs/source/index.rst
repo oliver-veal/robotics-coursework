@@ -177,7 +177,7 @@ These results are entered into the D-H table defined in the code.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 13-16
+   :emphasize-lines: 13-17
 
    class RobotKineClass():                           
                                                    
@@ -495,13 +495,7 @@ Task E: Calculating Inverse Kinematics
 Inverse kinematics are used to obtain the joint angles required to reach a desired end effector position.
 For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and coordinates.
 
-.. Note::
-
-   Due to the test point error at the time, two different derivations were used with additional custom test points, verified by the FK model.
-   This was used to correct the test points.
-   Results with corrected test points shown in **Task F**.
-
-Derivation for Arm Bent Upwards [8]_ [9]_ [10]_
+Derivation for |θ1| angle
 -----------------------------------------------
 
 .. image:: img/diagram_with_frames_and_angles.png
@@ -529,6 +523,9 @@ and
 .. image:: img/E_equation2.png
    :width: 300
    :alt: Task E Equation 2
+
+Derivation for Arm Bent Upwards [8]_ [9]_ [10]_
+-----------------------------------------------
 
 .. image:: img/diagram_side_view.png
    :width: 500
@@ -578,7 +575,7 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Derivation for Arm Bent Downwards |q2| [11]_
+Derivation for Arm Bent Downwards [11]_
 --------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
@@ -702,58 +699,63 @@ The following code implements the derivation to obtain both IK solutions:
    
    q = [q_a, q_b]                # Return the calculated joint angles and poses in an array, as required by the function.
 
-The following code implements a alternative derivation (not shown here) to validate and compare the solutions from the previous method:
+.. Note::
 
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
-
-   q_a = np.zeros(3)    # Variables ending in _a represent values for the first possible solution, and _b the second.
-   q_b = np.zeros(3)    # Initialise joint angle arrays for the two solutions.
-
-   theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the alternative derivation.
-   r_1 = sqrt(xP**2 + yP**2)
-   r_2 = zP - l1
+   The IK validation uses a ``.csv`` file containing test points, but the originally provided points were found to contain errors, so we tried an additional derivation method and compared the results to make sure our first derivation was in fact producing the correct output.
    
-   D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
+   Source code implementing the additional derivation is shown below.
+   This evidence was used to feed back to the tutor team and correct the test points.
+
+   The following code implements an alternative derivation (not shown here) to validate and compare the solutions from the previous method:
+
+   .. code-block:: python
+      :linenos:
+      :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
+
+      q_a = np.zeros(3)    # Variables ending in _a represent values for the first possible solution, and _b the second.
+      q_b = np.zeros(3)    # Initialise joint angle arrays for the two solutions.
+
+      theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the alternative derivation.
+      r_1 = sqrt(xP**2 + yP**2)
+      r_2 = zP - l1
+      
+      D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
+      
+      q_a[0] = theta_1       # Theta 1 value from derivation 1.
+      q_b[0] = theta_1       # Value is identical to solution 1, as demonstrated in the note above.
+
+      q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Alternative theta 3, case 1 value from another derivation.
+      q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Alternative theta 3, case 2 value from another derivation.
+      
+      q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Alternative theta 2, case 1 value from another derivation.
+      q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Alternative theta 2, case 2 value from another derivation.
+      
+      q = [q_a, q_b]    # Return the calculated joint angles and poses in an array, as required by the function.
+
+   Both methods produce the same values, and pass the corrected IK test, so we can successfully validate them.
+
+   For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
    
-   q_a[0] = theta_1       # Theta 1 value from derivation 1.
-   q_b[0] = theta_1       # Value is identical to solution 1, as demonstrated in the note above.
+   *Note: We know the FK solver is valid from Task C.
+   This was also used as evidence to confirm the error in the intially provided CSV file of test points.*
 
-   q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Alternative theta 3, case 1 value from another derivation.
-   q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Alternative theta 3, case 2 value from another derivation.
-   
-   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Alternative theta 2, case 1 value from another derivation.
-   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Alternative theta 2, case 2 value from another derivation.
-   
-   q = [q_a, q_b]    # Return the calculated joint angles and poses in an array, as required by the function.
+   .. code-block:: python
+      :linenos:
 
-Both methods produce the same values, and pass the provided IK test, so we can successfully validate them.
+      elif task=="test":                                 # Was the "test" flag passed in when running the program.
+         point = [0.2, 0.5, 0.7]                         # "Random" test point.
 
-For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
-Note: We know the FK solver is valid from Task C.
-This was also used to confirm the error in the intially provided CSV file of test points.
+         joint_angles = Robot.getIK(point)[0]            # Obtain joint angles through IK
+         test_point_1 = Robot.getFK(joint_angles[0])     # Robot pose that solution 1 produces.
+         test_point_2 = Robot.getFK(joint_angles[1])     # Robot pose that solution 2 produces.
 
-.. code-block:: python
-   :linenos:
+      print(point, test_point_1, test_point_2)           # Verify by eye that these 3 points are the same. If they are, the IK is valid.
 
-   elif task=="test":                                 # Was the "test" flag passed in when running the program.
-      point = [0.2, 0.5, 0.7]                         # "Random" test point.
+   .. code-block:: python
+      :linenos:
 
-      joint_angles = Robot.getIK(point)[0]            # Obtain joint angles through IK
-      test_point_1 = Robot.getFK(joint_angles[0])     # Robot pose that solution 1 produces.
-      test_point_2 = Robot.getFK(joint_angles[1])     # Robot pose that solution 2 produces.
+      tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']   # Add "test" flag to list of tasks.
 
-   print(point, test_point_1, test_point_2)           # Verify by eye that these 3 points are the same. If they are, the IK is valid.
-
-.. code-block:: python
-   :linenos:
-
-   tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']   # Add "test" flag to list of tasks.
-
-.. note::
-   The IK validation uses a ``.csv`` file containing test points, but the originally provided points were found to contain errors, so an updated CSV file was used to validate the IK.
-   
    Original incorrect test points:
 
    +-------+-------+-------+-------+-------+-------+-------+-------+-------+
