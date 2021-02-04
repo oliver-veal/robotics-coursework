@@ -1219,7 +1219,7 @@ Video Results
 
 =====
 
-*Task I results*
+*Video 6: Task I results*
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1231,10 +1231,10 @@ The initial starting values used are based on the previous values obtained.
 Table of Results
 ----------------
 
-.. image:: img/TaskJTable.png
-   :width: 900
+*Table 4: Task J PID Results* [14]_
 
-*Task J PID Results Table* [14]_   
+.. image:: img/TaskJTable.png
+   :width: 900   
 
 Hyper tuning was explored for joints 1 and 2 as the load acting on them increased due to the increased mass of the end effector. 
 This is highligted well in the video.
@@ -1273,7 +1273,7 @@ Final Results
 
 It was found that utilizing I to reduce steady state error was not necessary in this case given that it added to the overshoot in the system.
 The tradeoff between the reduced steady-state error was not worth the significantly higher added overshoot.
-This caused an exploration of a range of PID values, ultimately returning to the original pairing that was found to be effective, demonstrating a relatively robust method with parameters that allow for effective control of the robotic arm.
+This caused an exploration of a range of PID values, ultimately returning to an I value of 0 and the control still remaining effective.
 
 Video Results
 --------------
@@ -1286,7 +1286,7 @@ Video Results
 
 =====
 
-*Task J results*
+*Video 7: Task J results*
 
 -----------------
 Supporting Videos
