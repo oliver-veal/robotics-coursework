@@ -11,7 +11,6 @@
 Welcome to DE3 Robotics Group 1 Coursework Documentation
 ========================================================
 
-We are the **BROBOTICISTS**.
 We have decided to create a readthedocs page for our coursework submissions instead of a Google Drive or Word document. This way this documentation can be used for teaching ROS at any point in the future, as well as have integrated code blocks and interactive videos.
 For the purpose of archiving the document, we will be submitting in PDF and HTML formats.
 
@@ -1004,9 +1003,9 @@ To begin with, all values are set to 0.
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
-   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
-      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
+   # Position Controllers ---------------------------------------
+   joint_0_position_controller:
+      type: effort_controllers/JointPositionController
       joint: joint_0
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}     # Define p, i and d values for this joint.
    joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
@@ -1082,7 +1081,7 @@ The steps used are summarised below.
 *Video 4: Example of Kd set too high*
 
 The table below summarises the process and outputs seen. 
-For further insight, please view the embedded simulation video that demonstrates each output.
+For further insight, please view the *"Detailed Step-by-step Code Explanation Video"*.
 
 Due to computing limits, the identical PID values will be processed for each joint controller initially during the test methods. 
 Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
@@ -1119,9 +1118,6 @@ This means that in the gazebo simulation, the positional error is not affected a
    - Use Kd to reduce overshoot and settling time (too high is bad for noise when in a real-world environment)
    - Use Ki to eliminate steady state error. (but adds to overshoot)
 
-During the live simulation session, it was found that hyper tuning was not needed as the end effector mass was 0.01kg, and all controllers could easily be set to the same value, thus streamlining the process and keeping control simple. 
-In later tasks, this was not the case and the effects of individual joint tuning was explored.
-
 The final results demonstrate excellent control of the robotic arm with minimal error. 
 To improve the final values, the P term and D term could both be set even higher.
 However in a real world scenario this may not be desirable as too much D can make the system highly sensitive to noise [13]_ and potentially cause instability, this is why the chosen values are appropriate for effective control of the robotic arm.
@@ -1142,8 +1138,8 @@ Final Results
       publish_rate: 100  
    
    # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
-   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
-      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task H.
+      type: effort_controllers/JointPositionController                  # The values are p=110, i=0, d=90.
       joint: joint_0
       pid: {p: 110, i: 0, d: 90}                                        # Define p, i and d values for this joint.
    joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
@@ -1166,7 +1162,7 @@ Video Results
 
 =====
 
-*Task H results*
+*Video 5: Task H results*
 
 ------------------------------
 Task I: Adapting the Robot Arm
@@ -1222,7 +1218,7 @@ Video Results
 
 =====
 
-*Task I results*
+*Video 6: Task I results*
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1234,10 +1230,10 @@ The initial starting values used are based on the previous values obtained.
 Table of Results
 ----------------
 
-.. image:: img/TaskJTable.png
-   :width: 900
+*Table 4: Task J PID Results* [14]_
 
-*Task J PID Results Table* [14]_   
+.. image:: img/TaskJTable.png
+   :width: 900   
 
 Hyper tuning was explored for joints 1 and 2 as the load acting on them increased due to the increased mass of the end effector. 
 This is highligted well in the video.
@@ -1276,7 +1272,7 @@ Final Results
 
 It was found that utilizing I to reduce steady state error was not necessary in this case given that it added to the overshoot in the system.
 The tradeoff between the reduced steady-state error was not worth the significantly higher added overshoot.
-This caused an exploration of a range of PID values, ultimately returning to the original pairing that was found to be effective, demonstrating a relatively robust method with parameters that allow for effective control of the robotic arm.
+This caused an exploration of a range of PID values, ultimately returning to an I value of 0 and the control still remaining effective.
 
 Video Results
 --------------
@@ -1289,7 +1285,7 @@ Video Results
 
 =====
 
-*Task J results*
+*Video 7: Task J results*
 
 -----------------
 Supporting Videos
