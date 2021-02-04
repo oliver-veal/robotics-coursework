@@ -1004,9 +1004,9 @@ To begin with, all values are set to 0.
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
-   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
-      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
+   # Position Controllers ---------------------------------------
+   joint_0_position_controller:
+      type: effort_controllers/JointPositionController
       joint: joint_0
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}     # Define p, i and d values for this joint.
    joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
@@ -1139,8 +1139,8 @@ Final Results
       publish_rate: 100  
    
    # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
-   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
-      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task H.
+      type: effort_controllers/JointPositionController                  # The values are p=110, i=0, d=90.
       joint: joint_0
       pid: {p: 110, i: 0, d: 90}                                        # Define p, i and d values for this joint.
    joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
