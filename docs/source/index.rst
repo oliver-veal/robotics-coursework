@@ -928,13 +928,13 @@ The video below demonstrates this in action for the robotic arm.
 
 =====
 
-*Video 1: Example of just P controller*
+*Video 1: Example of closed loop control when just the proportional term is set.*
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
-Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
-This is where the integral term comes in where it aims to increment or decrement the controller output and drive the error back to zero, rather than letting it persist.
+Using this controller type on its own can also result in a major drawback: offset. This is when there is a sustained error built up over time that cannot be removed by the P term on its own.
+The integral term aims to reduce this offset by incrementing or decrementing the controller output and drive the error back to zero, rather than letting it persist.
 
-Let’s consider PI control which brings the output back to set point, in this case the desired joint angle [8]_.
+Let’s consider PI control which brings the output back to a set point, in this case the desired joint angle [8]_.
 The integral term in the controller is determining the sum of error over time of the joint angle and multiplying it by the scalar gain Ki.
 This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
 This is specific to this simulation scenario as there is no static load.
@@ -947,7 +947,7 @@ This is specific to this simulation scenario as there is no static load.
 
 =====
 
-*Example PD controller*
+*Video 2: Example PI controller*
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [9]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
@@ -957,8 +957,8 @@ This is tuned by the scalar gain Kd.
 An example of this can be seen in the video below where a purposefully aggressive PI controller has been selected with clear overshoot and oscillation, and then the difference the derivative term makes in locking the PI response.
 
 .. note::
-   If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
-   ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
+   If Kp is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
+   Kd is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
 .. raw:: html
 
@@ -968,7 +968,7 @@ An example of this can be seen in the video below where a purposefully aggressiv
 
 =====
 
-*Example of full PID*
+*Video 3: Example of full PID*
 
 Implementation
 --------------
