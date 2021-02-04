@@ -1035,7 +1035,7 @@ It communicates at a frequency of 100 Hz, where the ``kinematics.py`` file is se
 
    def sendCommands(self,q):
 
-         #print("SENDING JOINT VALUES ", q)
+         print("SENDING JOINT VALUES ", q)
          rate = rospy.Rate(100) #Hz
          for i in range(3):
 
@@ -1052,8 +1052,10 @@ Then repeating this for each ``joint_1_position_controller`` and ``joint_2_posit
 .. image:: img/rqt.png
    :width: 300
 
+*Fig 8: Screenshot of RQT window*
+
 There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [10]_.
-This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
+This can be done by measuring the step-response of the system and first finding Kp, then using that to find Kd and Ki.
 Alternatively, for the purpose of this report, it can be done through trial and error, visually determining results.
 It is performed similarly to the order of explanation in this report.
 The steps used are summarised below.
@@ -1077,9 +1079,7 @@ The steps used are summarised below.
       
 ======
 
-*Example of Kd set too high*
-
-
+*Video 4: Example of Kd set too high*
 
 The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
@@ -1090,18 +1090,18 @@ Following this, hyper-parameter tuning can then be considered to optimise the re
 Table of Results
 ----------------
 
+*Table 2: Task H PID Results*
+
 .. image:: img/TaskHTable.png
    :width: 900
-
-*Task H PID Results Table*
 
 There was no obvious reason to individually tune joints so the values for all controllers could be kept the same for simplicity sake in control - this may not be the case for where the load is increased on specific joints.
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
+*Table 3: PID Tuning* [11]_
+
 .. image:: img/TuningTable.png
    :width: 700
-
-*PID Tuning Table* [11]_
 
 After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
 Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
