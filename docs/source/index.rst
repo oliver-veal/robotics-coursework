@@ -124,7 +124,7 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
 
 .. warning::
 
-   Line numbers in the following code blocks do not correspond to the line numbers in kinematics.py or any other script mentioned, only within the blocks.
+   Line numbers in the following code blocks do not correspond to the line numbers in ``kinematics.py`` or any other script mentioned, only within the blocks.
 
 .. code-block:: python
    :linenos:
@@ -159,13 +159,13 @@ This is how the DH table is “updated” with changing |θ|.
    T_0_i_1 = np.identity(4)
    for i in range(self.nj):
 
-      DH_params = np.copy(self.DH_tab[i,:])
+      DH_params = np.copy(self.DH_tab[i,:])     # DH values are deep copied so that the original values stored in the self.DH_tab variable are never modified.
       #print('q',q)
       #print(DH_params)
       if self.joint_types[i] == 'r':
-            DH_params[1] = DH_params[1]+q[i]
+            DH_params[1] = DH_params[1]+q[i]    # Current joint angle value added to "home" angle to get the current theta value.
       elif self.joint_types[i] == 'p':
-            DH_params[0] = DH_params[0]+q[i]
+            DH_params[0] = DH_params[0]+q[i]    # If the joint is prismatic, update the d value instead (the joint slides instead of rotating).
 
 Therefore, since theta in the D-H table is updated by iteration at each step rather than updating a variable, |θ1|, |θ2|, and |θ3| are set to 0.
 This is because the base configuration of the robot is such that the ith joints are in line with each other which results in the angles being set to 0.
@@ -179,27 +179,27 @@ These results are entered into the D-H table defined in the code.
    :linenos:
    :emphasize-lines: 13-16
 
-    class RobotKineClass():                           
-                                                      
-    def __init__(self,link_lengths):                           # Initialise the class with link lenghs, DH parameters
-                                                               # and joint types of the robot.
-        self.ROSPublishers = set_joint_publisher()
+   class RobotKineClass():                           
+                                                   
+   def __init__(self,link_lengths):                         # Initialise the class with link lenghs, DH parameters
+                                                            # and joint types of the robot.
+      self.ROSPublishers = set_joint_publisher()
 
-        self.nj = 3                                            # Number of joints in the robot.
-        self.links = link_lengths                              # Array containing the length of each joint in the robot.
+      self.nj = 3                                           # Number of joints in the robot.
+      self.links = link_lengths                             # Array containing the length of each joint in the robot.
 
-        ################################################ TASK 1
-        #Define DH table for each link. DH_tab in R^njx4
-        #d,theta,a,alpha
-        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],   # NumPy array representation of DH matrix.
-                                [0., 0., 0., pi/2.],           # The four columns represent the DH parameters d, theta, a and alpha.
-                                [0., 0., self.links[1], 0.],   # Each row contains the DH parameter values for each frame, with the values being
-                                [0., 0., self.links[2], 0.]])  # with respect to the previous frame (there are 3 joints and 1 end effector,
-                                                               # three revolute joints# each having a reference frame attached, so 4 rows total).
-        
-        self.joint_types = 'rrr'	                              # Defining the type of each joint as a string with the ith character
-                                                               # representing the type of the ith joint,
-                                                               # with r representing revolute and p prismatic; all are revolute in this case.
+      ################################################ TASK 1
+      #Define DH table for each link. DH_tab in R^njx4
+      #d,theta,a,alpha
+      self.DH_tab = np.array([[self.links[0], 0., 0., 0.],  # NumPy array representation of DH matrix.
+                              [0., 0., 0., pi/2.],          # The four columns represent the DH parameters d, theta, a and alpha.
+                              [0., 0., self.links[1], 0.],  # Each row contains the DH parameter values for each frame, with the values being
+                              [0., 0., self.links[2], 0.]]) # with respect to the previous frame (there are 3 joints and 1 end effector,
+                                                            # three revolute joints each having a reference frame attached, so 4 rows total).
+
+      self.joint_types = 'rrr'                              # Defining the type of each joint as a string with the ith character
+                                                            # representing the type of the ith joint,
+                                                            # with r representing revolute and p prismatic; all are revolute in this case.
 
 ----------------------------
 Task B: Coding the D-H Table
@@ -360,7 +360,7 @@ To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
             T_0_i_1 = T_0_i                           # The base-to-previous-frame matrix now refers to this frame's base transformation matrix, such that next iteration it does indeed refer to the "previous" frame.
         T_0_n_1 = T_0_i                               
         DH_params = np.copy(self.DH_tab[self.nj, :])  # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
-        T_n_1_n = DH_matrix(DH_params)
+        T_n_1_n = DH_matrix(DH_params)                # If you tried to do all 4 matrix multiplications in one loop, the q array would have an index out of bounds.
         T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
 To test the code, open a new terminal and run
