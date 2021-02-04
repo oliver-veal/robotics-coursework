@@ -957,8 +957,8 @@ This is tuned by the scalar gain Kd.
 An example of this can be seen in the video below where a purposefully aggressive PI controller has been selected with clear overshoot and oscillation, and then the difference the derivative term makes in locking the PI response.
 
 .. note::
-   If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
-   ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
+   If Kp is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
+   Kd is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
 .. raw:: html
 
@@ -968,7 +968,7 @@ An example of this can be seen in the video below where a purposefully aggressiv
 
 =====
 
-*Example of full PID*
+*Video 3: Example of full PID*
 
 Implementation
 --------------
