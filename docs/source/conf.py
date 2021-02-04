@@ -22,7 +22,7 @@ copyright = '2021, Oliver Veal, Shafae Ali, Oscar Jones, Oscar Leclercq'
 author = 'Oliver Veal, Shafae Ali, Oscar Jones, Oscar Leclercq'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
