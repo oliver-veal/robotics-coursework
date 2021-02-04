@@ -949,7 +949,7 @@ This is specific to this simulation scenario as there is no static load.
 
 =====
 
-*Example PD controller*
+*Video 2: Example PI controller*
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [18]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
