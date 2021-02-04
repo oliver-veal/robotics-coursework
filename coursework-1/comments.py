@@ -55,7 +55,7 @@ def DH_matrix(DH_params):
 #Computes Forward Kinematics. Returns 3x1 position vector
     def getFK(self,q):
 
-        T_0_i_1 = np.identity(4)                        # Initialise matrix describing transformation from base frame to "previous" frame, to indentity.
+        T_0_i_1 = np.identity(4)                        # Initialise matrix describing transformation from base frame to "previous" frame, to identity.
         for i in range(self.nj):                        # Loop over all joints.
             
             DH_params = np.copy(self.DH_tab[i,:])       # Copy DH params of ith link from ith row of DH_tab matrix, include all columns.
@@ -73,7 +73,7 @@ def DH_matrix(DH_params):
         
         T_0_n_1 = T_0_i                                 
         DH_params = np.copy(self.DH_tab[self.nj, :])    # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
-        T_n_1_n = DH_matrix(DH_params)                  
+        T_n_1_n = DH_matrix(DH_params)                  # If you tried to do all 4 matrix multiplications in one loop, the q array would have an index out of bounds.
         T_0_n = np.matmul(T_0_n_1, T_n_1_n)             
                                                         
         return T_0_n[0:3,3]
@@ -191,8 +191,8 @@ DESE3R:
     publish_rate: 100  
   
   # Position Controllers ---------------------------------------        # Note: PID values are identical for each joint.
-  joint_0_position_controller:                                          # Final PID values for 0.01kg end effector mass, Task J.
-    type: effort_controllers/JointPositionController                    # The values are p=3250, i=0, d=1600.
+  joint_0_position_controller:                                          # Final PID values for 0.01kg end effector mass, Task H.
+    type: effort_controllers/JointPositionController                    # The values are p=110, i=0, d=90.
     joint: joint_0
     pid: {p: 110, i: 0, d: 90, i_clamp_max: 1000, i_clamp_min: 1000}    # Define p, i and d values for this joint.
   joint_1_position_controller:                                          # Note: i_clamp_max and i_clamp_min are set here such that the i value
