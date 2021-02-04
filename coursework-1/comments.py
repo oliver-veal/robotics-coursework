@@ -71,11 +71,11 @@ def DH_matrix(DH_params):
             T_0_i = np.matmul(T_0_i_1,T_i_1_i)          # Transformation matrix describing pose of joint i w.r.t. base frame, obtained through matrix multiplication as described above.
             T_0_i_1 = T_0_i                             # The base-to-previous-frame matrix now refers to this frame's base transformation matrix, such that next iteration it does indeed refer to the "previous" frame.
         
-        T_0_n_1 = T_0_i                                 # --
-        DH_params = np.copy(self.DH_tab[self.nj, :])    # ----
-        T_n_1_n = DH_matrix(DH_params)                  # IDK why this is here pls help.
-        T_0_n = np.matmul(T_0_n_1, T_n_1_n)             # ----
-                                                        # --
+        T_0_n_1 = T_0_i                                 
+        DH_params = np.copy(self.DH_tab[self.nj, :])    # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
+        T_n_1_n = DH_matrix(DH_params)                  
+        T_0_n = np.matmul(T_0_n_1, T_n_1_n)             
+                                                        
         return T_0_n[0:3,3]
 
 ##################################################################################
@@ -107,41 +107,45 @@ def DH_matrix(DH_params):
     # Solve IK gemoetrically. Returns list of all possible solutions
     def getIK(self,P):
 
-        l1 = self.links[0]          # Unpacking robot link lengths from self.links array.
+        l1 = self.links[0]            # Unpacking robot link lengths from self.links array.
         l2 = self.links[1]
         l3 = self.links[2]
 
-        xP = P[0]                   # Unpacking the x, y, z components of vector (point) P.
+        xP = P[0]                     # Unpacking the x, y, z components of vector (point) P.
         yP = P[1]
         zP = P[2]
 
-        inWS = self.checkInWS(P)    # Firstly, check that the target end effector position is in the reachable workspace.
+        inWS = self.checkInWS(P)      # Firstly, check that the target end effector position is in the reachable workspace.
 
-        q = []                      # Initialise empty arrays to return the joint angles and the end effector positions these angles imply.
-        Poses = []                  # Barring floating point errors the two poses should be identical if the IK is working correctly.
+        q = []                        # Initialise empty arrays to return the joint angles and the end effector positions these angles imply.
+        Poses = []                    # Barring floating point errors the two poses should be identical if the IK is working correctly.
 
-        if not inWS:                # Exit early if no solution is possible.
+        if not inWS:                  # Exit early if no solution is possible.
             print("OUT OF WS. NO SOLUTION FOUND")
             return q,Poses
         
         ################################################ TASK 6
-        q_a = np.zeros(3)           # Variables ending in _a represent values for the first possible solution, and _b the second.
-        q_b = np.zeros(3)           # Initialise joint angle arrays for the two solutions.
-        
-        r_1 = sqrt(xP**2 + yP**2)   # The following lines compute the variable values required by the two derivations to compute the joint angles.
-        r_2 = zP - l1
-        D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
-        
-        q_a[0] = np.arctan2(yP,xP)  # Theta 1 value from derivation 1.
-        q_b[0] = np.arctan2(yP,xP)  # Value is identical to solution 1, as demonstrated in the note above.
+        q_a = np.zeros(3)             # Variables ending in _a represent values for the first possible solution, and _b the second.
+        q_b = np.zeros(3)             # Initialise joint angle arrays for the two solutions.
 
-        q_a[2] = np.arctan2(sqrt(1-D**2),D)     # Theta 3 value from derivation 1.
-        q_b[2] = np.arctan2(-sqrt(1-D**2),D)    # Theta 3 value from derivation 2.
+        theta_1 = np.arctan2(yP, xP)  # The following lines compute the variable values for equations 1-11, for both cases.
+        r_1 = sqrt(xP**2 + yP**2)
+        r_2 = zP - l1
+        phi_2 = np.arctan2(r_2, r_1)
+        r_3 = sqrt(r_1**2 + r_2**2)
+        phi_1 = np.arccos((l3**2 - l2**2 - r_3**2) / (-2 * l2 * r_3))
+        phi_3 = np.arccos((r_3**2 - l2**2 - l3**2) / (-2 * l2 * l3))
+
+        q_a[0] = theta_1              # Theta 1 value from case 1.
+        q_b[0] = theta_1              # Value is identical to case 1, as demonstrated in the note above.
+
+        q_a[2] = pi-phi_3             # Theta 3 value from case 1.
+        q_b[2] = -pi+phi_3            # Theta 3 value from case 2.
+
+        q_a[1] = phi_2-phi_1          # Theta 2 value from case 1.
+        q_b[1] = phi_2+phi_1          # Theta 2 value from case 2.
         
-        q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))   # Theta 2 value from derivation 1.
-        q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))   # Theta 2 value from derivation 2.
-        
-        q = [q_a, q_b]  # Return the calculated joint angles and poses in an array, as required by the function.
+        q = [q_a, q_b]                # Return the calculated joint angles and poses in an array, as required by the function.
         Poses = [self.getFK(q_a), self.getFK(q_b)]  
 
         return q, Poses

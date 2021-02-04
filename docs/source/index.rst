@@ -13,7 +13,7 @@ Welcome to DE3 Robotics Group 1 Coursework Documentation
 
 We are the **BROBOTICISTS**.
 We have decided to create a readthedocs page for our coursework submissions instead of a Google Drive or Word document. This way this documentation can be used for teaching ROS at any point in the future, as well as have integrated code blocks and interactive videos.
-For the purpose of archiving the document, we will be submitting in a PDF format.
+For the purpose of archiving the document, we will be submitting in PDF and HTML formats.
 
 .. warning::
 
@@ -91,7 +91,7 @@ The result of this setup is shown below:
    :width: 500
    :alt: Robot Diagram
 
-*Diagram of robot with D-H conventional reference axes*
+*Fig 1: Diagram of robot with D-H conventional reference axes*
 
 Using this diagram, the Denavit-Hartenberg table was made according to the following definitions:
 
@@ -118,13 +118,13 @@ The resulting table is shown below:
 
 The numpy array, ``self.DH_tab``, line 13, is the live D-H table for the robot.
 Its initial state is entered, with link lengths stored in ``self.links[n]``, where ``n`` is link number.
-This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the function.
-This function is the ``__init__`` of the ``RobotKineClass()`` class, meaning it is called when the robot object is created when the code is run.
+This refers to a list ``self.links`` created in line 8. The list is based on the ``link_lengths`` variable which is passed into the constructor.
+This ``__init__`` function is the constructor of the ``RobotKineClass()`` class, meaning it is called when an instance of the class is initialised.
 The list of link lengths is passed in as the only parameter when the ``RobotKineClass()`` is called.
 
 .. warning::
 
-   Line numbers in the following code blocks do not correspond to the line numbers in kinematics.py or any other script mentioned, only within the blocks.
+   Line numbers in the following code blocks do not correspond to the line numbers in ``kinematics.py`` or any other script mentioned, only within the blocks.
 
 .. code-block:: python
    :linenos:
@@ -135,8 +135,8 @@ The list of link lengths is passed in as the only parameter when the ``RobotKine
 
         self.ROSPublishers = set_joint_publisher()
 
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
+        self.nj = 3
+        self.links = link_lengths
 
         ################################################ TASK 1
         #Define DH table for each link. DH_tab in R^njx4
@@ -159,13 +159,13 @@ This is how the DH table is “updated” with changing |θ|.
    T_0_i_1 = np.identity(4)
    for i in range(self.nj):
 
-      DH_params = np.copy(self.DH_tab[i,:])
+      DH_params = np.copy(self.DH_tab[i,:])     # DH values are deep copied so that the original values stored in the self.DH_tab variable are never modified.
       #print('q',q)
       #print(DH_params)
       if self.joint_types[i] == 'r':
-            DH_params[1] = DH_params[1]+q[i]
+            DH_params[1] = DH_params[1]+q[i]    # Current joint angle value added to "home" angle to get the current theta value.
       elif self.joint_types[i] == 'p':
-            DH_params[0] = DH_params[0]+q[i]
+            DH_params[0] = DH_params[0]+q[i]    # If the joint is prismatic, update the d value instead (the joint slides instead of rotating).
 
 Therefore, since |θ| in the D-H table is updated by iteration at each step rather than updating a variable, |θ1|, |θ2|, and |θ3| are set to 0.
 This is because the base configuration of the robot is such that the i\ :sup:`th` joints are in line with each other which results in the angles being set to 0.
@@ -177,25 +177,29 @@ These results are entered into the D-H table defined in the code.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 13-16
+   :emphasize-lines: 13-17
 
-    class RobotKineClass():
+   class RobotKineClass():                           
+                                                   
+   def __init__(self,link_lengths):                         # Initialise the class with link lenghs, DH parameters
+                                                            # and joint types of the robot.
+      self.ROSPublishers = set_joint_publisher()
 
-    def __init__(self,link_lengths):
+      self.nj = 3                                           # Number of joints in the robot.
+      self.links = link_lengths                             # Array containing the length of each joint in the robot.
 
-        self.ROSPublishers = set_joint_publisher()
+      ################################################ TASK 1
+      #Define DH table for each link. DH_tab in R^njx4
+      #d,theta,a,alpha
+      self.DH_tab = np.array([[self.links[0], 0., 0., 0.],  # NumPy array representation of DH matrix.
+                              [0., 0., 0., pi/2.],          # The four columns represent the DH parameters d, theta, a and alpha.
+                              [0., 0., self.links[1], 0.],  # Each row contains the DH parameter values for each frame, with the values being
+                              [0., 0., self.links[2], 0.]]) # with respect to the previous frame (there are 3 joints and 1 end effector,
+                                                            # three revolute joints each having a reference frame attached, so 4 rows total).
 
-        self.nj = 3    #number of joints
-        self.links = link_lengths    # length of links
-
-        ################################################ TASK 1
-        #Define DH table for each link. DH_tab in R^njx4
-        #d,theta,a,alpha
-        self.DH_tab = np.array([[self.links[0], 0., 0., 0.],
-                                [0., 0., 0., pi/2.],
-                                [0., 0., self.links[1], 0.],
-                                [0., 0., self.links[2], 0.]])
-        self.joint_types = 'rrr'	# three revolute joints
+      self.joint_types = 'rrr'                              # Defining the type of each joint as a string with the ith character
+                                                            # representing the type of the ith joint,
+                                                            # with r representing revolute and p prismatic; all are revolute in this case.
 
 ----------------------------
 Task B: Coding the D-H Table
@@ -210,7 +214,7 @@ The definition for this is shown and derived below.
    :width: 500
    :alt: i-1 to i transformation matrix
 
-*Definition of i-1 to i th frame transformation matrix* [1]_
+*Definition 1: i-1 to i th frame transformation matrix* [1]_
 
 Deriving this Transformation Matrix [1]_
 ----------------------------------------
@@ -219,9 +223,9 @@ Deriving this Transformation Matrix [1]_
    :width: 300
    :alt: Screw theory illustration
 
-*Screw theory illustration*
+*Fig 2: Screw theory illustration*
 
-Because the frames of reference were set up according to denavit-hartenberg convention, and the positive directions of axes were set according to the Right-Hand-Rule convention or “Screw” convention (illustrated above), the generic transformation matrix, :sup:`i-1`\ *T*:sub:`i`, is derived with the following steps: 
+Because the frames of reference were set up according to Denavit-Hartenberg convention, and the positive directions of axes were set according to the right-hand rule, or “screw” convention (illustrated above), the generic transformation matrix, :sup:`i-1`\ *T*:sub:`i`, is derived with the following steps: 
 
 .. image:: img/B_equation1.png
    :width: 300
@@ -255,8 +259,8 @@ This definition is translated into the array in Python.
    :linenos:
    :emphasize-lines: 9-12
    
-   def DH_matrix(DH_params):
-      d = DH_params[0]
+   def DH_matrix(DH_params):  
+      d = DH_params[0]        # Unpacking the DH_params array for convenience.
       theta = DH_params[1]
       a = DH_params[2]
       alpha = DH_params[3]
@@ -268,12 +272,17 @@ This definition is translated into the array in Python.
       [sin(theta)*sin(alpha) ,cos(theta)*sin(alpha), cos(alpha), cos(alpha)*d],
       [0., 0., 0., 1.]])
 
+      # NumPy array representation of the standard DH transformation matrix from the previous frame to the current frame,
+      # as shown in the above figure.
+      # Updated each discrete simulation time interval with current DH parameter values.
+      # Note: cos() and sin() are imported explicitly so can be used as shorthand (instead of math.sin() etc).
+
 ------------------------------------
 Task C: Computing Forward Kinematics
 ------------------------------------
 
-The function ``getFK(self,q)`` gets the forward kinematics, FK, of the robot as any given instance.
-It involves multiplying each on the link transformation matrices together to make the compound transformation matrix.
+The function ``getFK(self,q)`` gets the forward kinematics, FK, of the robot at any given instance.
+It involves multiplying each of the link transformation matrices together to compute the compound transformation matrix.
 This is done iteratively in a for loop, beginning line 4. The matrix is updated in line 17.
 
 .. code-block:: python
@@ -303,11 +312,13 @@ This is done iteratively in a for loop, beginning line 4. The matrix is updated 
          T_n_1_n = DH_matrix(DH_params)
          T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
-The following equation shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [1]_
+The following equation, definition 2, shows how the pose of the end effector can be calculated with respect to the base frame by multiplying together the transformation matrices of each joint. [1]_
 
 .. image:: img/task_c_eq1.png
    :width: 414
    :alt: Task C equation 1
+
+*Definition 2*
 
 To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th` frame by the matrix of the i-1\ :sup:`th` frame, for each frame. [1]_
 
@@ -315,11 +326,12 @@ To do this iteratively, premultiply the transformation matrix of the i\ :sup:`th
    :width: 286
    :alt: Task C equation 2
 
-The following line of code implements this equation inside the loop that iterates over each joint.
+*Definition 3*
+
+The following code implements this equation inside a loop that iterates over each joint.
 ``np.matmul`` is a numpy function that multiplies two matrices together. ``T_0_i`` is the matrix giving the i\ :sup:`th` joint with respect to the base frame and is updated at each iteration.
 ``T_0_i_1`` is the matrix from the base frame to the i-1\ :sup:`th` frame, and ``T_i_1_i`` is the matrix from the i-1\ :sup:`th` frame to the i\ :sup:`th` frame.
 The code iteratively calls the previous function ``DH_matrix()`` to get the i-1 to i transformation matrix, ``T_i_1_i``.
-
 
 To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
@@ -329,26 +341,26 @@ To implement the above equations in the script, ``[T_0_i] = [T_0_i_1][T_i_1_1]``
 
    def getFK(self,q):
 
-        T_0_i_1 = np.identity(4)
-        for i in range(self.nj):
+        T_0_i_1 = np.identity(4)                      # Initialise matrix describing transformation from base frame to "previous" frame, to identity.
+        for i in range(self.nj):                      # Loop over all joints.
 
-            DH_params = np.copy(self.DH_tab[i,:])
+            DH_params = np.copy(self.DH_tab[i,:])     # Copy DH params of ith link from ith row of DH_tab matrix, include all columns.
             #print('q',q)
             #print(DH_params)
-            if self.joint_types[i] == 'r':
-                DH_params[1] = DH_params[1]+q[i]
+            if self.joint_types[i] == 'r':            # Add the current joint angle to the "home" angle.
+                DH_params[1] = DH_params[1]+q[i]      # If the joint is a revolute joint, add the joint angle to the theta parameter (the joint is rotating).
             elif self.joint_types[i] == 'p':
-                DH_params[0] = DH_params[0]+q[i]
+                DH_params[0] = DH_params[0]+q[i]      # If prismatic, add the joint position to the d parameter (the joint is sliding).
             
-            T_i_1_i = DH_matrix(DH_params) #Pose of joint i wrt i-1
+            T_i_1_i = DH_matrix(DH_params)            # Transformation matrix describing pose of joint i w.r.t. joint i-1, obtained from DH_matrix function.
             
-            ################################################ TASK 3 (replace np.eye(4) with the correct matrices)
-            T_0_i = np.matmul(T_0_i_1, T_i_1_i) #Pose of joint i wrt base
+            ########################################### TASK 3 (replace np.eye(4) with the correct matrices)
+            T_0_i = np.matmul(T_0_i_1, T_i_1_i)       # Transformation matrix describing pose of joint i w.r.t. base frame, obtained through matrix multiplication as described above.
 
-            T_0_i_1 = T_0_i
-        T_0_n_1 = T_0_i
-        DH_params = np.copy(self.DH_tab[self.nj, :])
-        T_n_1_n = DH_matrix(DH_params)
+            T_0_i_1 = T_0_i                           # The base-to-previous-frame matrix now refers to this frame's base transformation matrix, such that next iteration it does indeed refer to the "previous" frame.
+        T_0_n_1 = T_0_i                               
+        DH_params = np.copy(self.DH_tab[self.nj, :])  # The q array only has 3 joint angles, so the end effector frame is handled seperately at the end.
+        T_n_1_n = DH_matrix(DH_params)                # If you tried to do all 4 matrix multiplications in one loop, the q array would have an index out of bounds.
         T_0_n = np.matmul(T_0_n_1, T_n_1_n)
 
 To test the code, open a new terminal and run
@@ -375,16 +387,16 @@ Task D: Checking if a point is in the workspace
 -----------------------------------------------
 
 To convert coordinates from task space to joint space, the geometric inverse kinematics of the robot arm must be calculated.
-The diagram demonstrates the home position of the robot arm.
+Figure 3 illustrates the home position of the robot arm.
 In the home position, the first link |l0|, is along the |z0| axis of the frame, and the second and third link (|l1|, |l2| respectively) are defined along the |y0| plane, meaning joint angles (|q0|, |q1| and |q2|) are measured relative to this.
 
 Before computing the inverse kinematics of the arm, we must check if a given point is inside its reachable workspace. This is defined by a spherical shell centered on the end of its first link.
 
 .. image:: img/reachable.png
-   :width: 500
+   :width: 300
    :alt: Diagram of reachable space
 
-*Diagram of reachable workspace*. [1]_
+*Fig 3: Diagram of reachable workspace*. [1]_
 
 Deriving the Reachable Workspace [1]_
 -------------------------------------
@@ -436,7 +448,7 @@ The ``r_max`` and ``r_min`` are defined as:
 .. image:: img/task_d.png
    :width: 252
 
-*definitions of variables* [1]_
+*Definition 4* [1]_
 
 Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and the ``**2`` is removed in the if statement to remove the terms being squared twice.
 
@@ -446,20 +458,35 @@ Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and th
 
    #Check if point is in WS. returns true or false
    def checkInWS(self, P):
-      xP, yP, zP = P
-      l0, l1, l2 = self.links
+      xP, yP, zP = P                                                    # Unpacking the x, y, z components of vector (point) P.
+      l0, l1, l2 = self.links                                           # Unpacking robot link lengths from self.links array.
       
       ################################################ TASK 4
-      val = np.power(xP, 2) + np.power(yP, 2) + np.power((zP - l0), 2)
-      r_max = np.power((l1 + l2), 2)
-      r_min = np.power((l1 - l2), 2)
+      val = np.power(xP, 2) + np.power(yP, 2) + np.power((zP - l0), 2)  # Calculate the square of the distance of the end effector from the center of the spherical workspace.
+      r_max = np.power((l1 + l2), 2)                                    # Calculate the maximum distance the end effector can be from the center of the workspace.
+      r_min = np.power((l1 - l2), 2)                                    # Calculate the minimum distance the end effector can be from the center of the workspace.
 
-      inWS = True
+      inWS = True                                                       # Initialise default return value to True.
 
-      if val > r_max or val < r_min:
-         inWS = False
+      if val > r_max or val < r_min:                                    # If the end effector is outside of the big sphere, or inside the small sphere, it is outside of the workspace.
+         inWS = False                                                   # Since val is the square of the distance, r_max and r_min must also be squared such that their magnitudes are validly comparable.
 
       return inWS
+
+To test the code, open a new terminal and run
+
+.. code-block:: python
+   :linenos:
+
+   cd Desktop/DE3Robotics/src/coursework_1/src
+   python3 kinematics.py ws 
+
+The workspace check runs successfully if the following message appears:
+
+.. code-block:: python
+   :linenos:
+
+   "Workspace calculations are correct, well done!"
 
 --------------------------------------
 Task E: Calculating Inverse Kinematics
@@ -468,20 +495,14 @@ Task E: Calculating Inverse Kinematics
 Inverse kinematics are used to obtain the joint angles required to reach a desired end effector position.
 For this, we need equations for ``q0``, ``q1``, ``q2`` in terms of lengths and coordinates.
 
-.. Note::
-
-   Due to the test point error at the time, two different derivations were used with additional custom test points, verified by the FK model.
-   This was used to correct the test points.
-   Results with corrected test points shown in **Task F**.
-
-Derivation for Arm Bent Upwards [2]_ [3]_ [4]_
+Derivation for |θ1| angle
 -----------------------------------------------
 
 .. image:: img/diagram_with_frames_and_angles.png
    :width: 500
    :alt: Diagram of robot with reference frames and angles
 
-*Diagram of robot with D-H conventional reference axes and angles*
+*Fig 4: Robot with D-H conventional reference axes and angles*
 
 To get the inverse kinematics of this robot, a top view and side view are considered.
 
@@ -489,7 +510,7 @@ To get the inverse kinematics of this robot, a top view and side view are consid
    :width: 500
    :alt: Top view diagram of the robot
 
-*Top view diagram of the robot*
+*Fig 5: Top view diagram of the robot*
 
 From this top view, the following can be expressed:
 
@@ -503,11 +524,14 @@ and
    :width: 300
    :alt: Task E Equation 2
 
+Derivation for |θ2| & |θ3|, Arm Bent Upwards [2]_ [3]_ [4]_
+-------------------------------------------------------------
+
 .. image:: img/diagram_side_view.png
    :width: 500
    :alt: Side view diagram of the robot
 
-*Side view diagram of the robot with arm bent upwards*
+*Fig 6: Side view diagram of the robot with arm bent upwards*
 
 From this side view, the following can be expressed:
 
@@ -551,14 +575,14 @@ Which is included in the final equation for |θ3|:
    :width: 300
    :alt: Task E Equation 9
 
-Derivation for Arm Bent Downwards |q2| [5]_
+Derivation for |θ2| & |θ3|, Arm Bent Downwards [5]_
 --------------------------------------------
 
 .. image:: img/diagram_side_view_2.png
    :width: 500
    :alt: Side view diagram of the robot
 
-*Side view diagram of the robot with arm bent downwards*
+*Fig 7: Side view diagram of the robot with arm bent downwards*
 
 When the arm is bent the other way (as shown above), equations (7) and (9) are altered, giving:
 
@@ -625,11 +649,7 @@ The robot can be treated as a planar two link robot, being rotated about ``z0`` 
 Therefore, for any point there is only one ``q0`` value which satisfies the point.
 The two configurations are stored together as columns in matrix ``q``.
 
-There are however two different sets of equations that were derived to find the set of angles.
-The output of them is ultimately the same, but the equations are formulated slightly differently, as reflected in the code blocks below.
-**UPDATE DESCRIPTION FOR THIS**
-
-Original Code Block:
+Original code to complete:
 
 .. code-block:: python
    :linenos:
@@ -651,115 +671,118 @@ Original Code Block:
    
    q = [q_a, q_b]
 
-Solved Code Block with Formulation 1:
+The following code implements the derivation to obtain both IK solutions:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 4-12, 14,15, 17,18, 20,21, 23
+   :emphasize-lines: 4-10, 12,13, 15,16, 18, 19, 21
 
-   q_a = np.zeros(3)
-   q_b = np.zeros(3)
+   q_a = np.zeros(3)             # Variables ending in _a represent values for the first possible solution, and _b the second.
+   q_b = np.zeros(3)             # Initialise joint angle arrays for the two solutions.
 
-   theta_1 = np.arctan2(yP, xP)
+   theta_1 = np.arctan2(yP, xP)  # The following lines compute the variable values for equations 1-11, for both cases.
    r_1 = sqrt(xP**2 + yP**2)
    r_2 = zP - l1
    phi_2 = np.arctan2(r_2, r_1)
    r_3 = sqrt(r_1**2 + r_2**2)
    phi_1 = np.arccos((l3**2 - l2**2 - r_3**2) / (-2 * l2 * r_3))
-   theta_2 = phi_2 - phi_1
    phi_3 = np.arccos((r_3**2 - l2**2 - l3**2) / (-2 * l2 * l3))
-   theta_3 = pi - phi_3
 
-   q_a[0] = theta_1 #np.arctan2(yP,xP)
-   q_b[0] = theta_1 #np.arctan2(yP,xP)
+   q_a[0] = theta_1              # Theta 1 value from case 1.
+   q_b[0] = theta_1              # Value is identical to case 1, as demonstrated in the note above.
 
-   q_a[2] = pi-phi_3
-   q_b[2] = -pi+phi_3 
+   q_a[2] = pi-phi_3             # Theta 3 value from case 1.
+   q_b[2] = -pi+phi_3            # Theta 3 value from case 2.
 
-   q_a[1] = phi_2-phi_1
-   q_b[1] = phi_2+phi_1
+   q_a[1] = phi_2-phi_1          # Theta 2 value from case 1.
+   q_b[1] = phi_2+phi_1          # Theta 2 value from case 2.
    
-   q = [q_a, q_b]
+   q = [q_a, q_b]                # Return the calculated joint angles and poses in an array, as required by the function.
 
-Solved Code Block with Formulation 2:
+.. Note::
 
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
-
-   q_a = np.zeros(3)
-   q_b = np.zeros(3)
-
-   theta_1 = np.arctan2(yP, xP)
-   r_1 = sqrt(xP**2 + yP**2)
-   r_2 = zP - l1
+   The IK validation uses a ``.csv`` file containing test points, but the originally provided points were found to contain errors, so we tried an additional derivation method and compared the results to make sure our first derivation was in fact producing the correct output.
    
-   D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
+   Source code implementing the additional derivation is shown below.
+   This evidence was used to feed back to the tutor team and correct the test points.
+
+   .. code-block:: python
+      :linenos:
+      :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
+
+      q_a = np.zeros(3)    # Variables ending in _a represent values for the first possible solution, and _b the second.
+      q_b = np.zeros(3)    # Initialise joint angle arrays for the two solutions.
+
+      theta_1 = np.arctan2(yP, xP)     # The following lines compute the variable values required by the alternative derivation.
+      r_1 = sqrt(xP**2 + yP**2)
+      r_2 = zP - l1
+      
+      D=(r_1**2+r_2**2-l2**2-l3**2)/(2*l2*l3)
+      
+      q_a[0] = theta_1       # Theta 1 value from derivation 1.
+      q_b[0] = theta_1       # Value is identical to solution 1, as demonstrated in the note above.
+
+      q_a[2] = np.arctan2(sqrt(1-D**2),D)       # Alternative theta 3, case 1 value from another derivation.
+      q_b[2] = np.arctan2(-sqrt(1-D**2),D)      # Alternative theta 3, case 2 value from another derivation.
+      
+      q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))     # Alternative theta 2, case 1 value from another derivation.
+      q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))     # Alternative theta 2, case 2 value from another derivation.
+      
+      q = [q_a, q_b]    # Return the calculated joint angles and poses in an array, as required by the function.
+
+   Both methods produce the same values, and pass the corrected IK test, so we can successfully validate them.
+
+   For further confirmation that these methods produce the correct output, a simple program was coded than runs a test point through the IK solver, then back through the FK function to validate that the pose is the same as the input.
    
-   q_a[0] = theta_1 #np.arctan2(yP,xP)
-   q_b[0] = theta_1 #np.arctan2(yP,xP)
+   *Note: We know the FK solver is valid from Task C.
+   This was also used as evidence to confirm the error in the initially provided CSV file of test points.*
 
-   q_a[2] = np.arctan2(sqrt(1-D**2),D)
-   q_b[2] = np.arctan2(-sqrt(1-D**2),D)
-   
-   q_a[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_a[2]),l2+l3*cos(q_a[2]))
-   q_b[1] = np.arctan2(r_2,r_1)-np.arctan2(l3*sin(q_b[2]),l2+l3*cos(q_b[2]))
-   
-   q = [q_a, q_b]
+   .. code-block:: python
+      :linenos:
 
-Either formulation is acceptable and correct.
+      elif task=="test":                                 # Was the "test" flag passed in when running the program.
+         point = [0.2, 0.5, 0.7]                         # "Random" test point.
 
-To further test if both of these equations are correct, a Forward Kinematics Tester was coded to validate the outut.
-This was also used to confirm the error in the test points.
+         joint_angles = Robot.getIK(point)[0]            # Obtain joint angles through IK
+         test_point_1 = Robot.getFK(joint_angles[0])     # Robot pose that solution 1 produces.
+         test_point_2 = Robot.getFK(joint_angles[1])     # Robot pose that solution 2 produces.
 
-.. code-block:: python
-   :linenos:
+      print(point, test_point_1, test_point_2)           # Verify by eye that these 3 points are the same. If they are, the IK is valid.
 
-   elif task=="test":
-      point = [0.2, 0.5, 0.7]
+   .. code-block:: python
+      :linenos:
 
-      joint_angles = Robot.getIK(point)[0]
-      test_point_1 = Robot.getFK(joint_angles[0])
-      test_point_2 = Robot.getFK(joint_angles[1])
+      tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']   # Add "test" flag to list of tasks.
 
-   print(point, test_point_1, test_point_2) 
+   Original incorrect test points:
 
-.. code-block:: python
-   :linenos:
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
+   +=======+=======+=======+=======+=======+=======+=======+=======+=======+
+   | 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0.5   | -0.5  |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.75  | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 
-   tasks = ['fk', 'ws', 'ik', 'dk', 'full', 'test']
+   Corrected test points:
 
-The original method used was based on comparing values in a ``.csv`` file, but this method may be prone to errors such as the one found below.
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
+   +=======+=======+=======+=======+=======+=======+=======+=======+=======+
+   | 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0     | -0.5  |
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
+   | 1.75  | 0     | 1     | 0     | -0.505| 1.011 | 0     | 0.505 | -1.011|
+   +-------+-------+-------+-------+-------+-------+-------+-------+-------+
 
-Original incorrect test points:
-
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
-+=======+=======+=======+=======+=======+=======+=======+=======+=======+
-| 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0.5   | -0.5  |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.75  | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-
-Corrected test points:
-
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| x     | y     | z     | q1    | q2    | q3    | q1    | q2    | q3    |
-+=======+=======+=======+=======+=======+=======+=======+=======+=======+
-| 2     | 0     | 1     | 0     | 0     | 0     | 0     | 0     | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 0     | 0     | 3     | 0     | 1.571 | 0     | 0     | 1.571 | 0     |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.648 | 0.9   | 0.521 | 0.5   | -0.5  | 0.5   | 0.5   | 0     | -0.5  |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 1.75  | 0     | 1     | 0     | -0.505| 1.011 | 0     | 0.505 | -1.011|
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-
-To validate the Inverse Kinematics model with corrected test points, run:
+To validate the Inverse Kinematics model with the test points, run:
 
 .. code-block:: python
    :linenos:
@@ -784,7 +807,7 @@ Task G: Computing the Jacobian
 
 The Jacobian is a matrix of first order partial derivatives, in this case of ``x``, ``y`` and ``z`` (columns) with respect to ``q1``, ``q2``, and ``q3`` (rows).
 This allows task space velocity to be calculated from joint space velocities, as shown in the relationship below.
-This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation in the code provided.
+This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation.
 
 .. code-block:: python
    :linenos:
@@ -813,34 +836,32 @@ This can be simplified using ``J_11``, ``J_12``… ``J_33`` notation in the code
       x_dot = np.matmul(self.Jacobian, q_dot)
       return x_dot
 
-To dervie the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
+To derive the elements, we can compare the definition of the Jacobian to expansions of the kinematics equations provided.
 The Jacobian, for this case, can be written as:
 
 .. image:: img/jacobian.png
    :width: 299
 
-*Jacobian definition* [1]_
+*Definition 5: Jacobian* [1]_
 
-With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian) as shown:
+With the provided equations, these can be expanded to isolate the different ``q_dot`` multipliers (elements in the Jacobian). This is shown in the expanded kinematics equations below:
 
 .. image:: img/jacobian_equations.png
    :width: 500
-
-*Kinematics equations expanded*
    
-Upon inspection, these equations reveal the definitions of J_11, J_12... and can be used to define the matrix in the code below, with red green and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
+Upon inspection, these equations reveal the definitions of ``J_11``, ``J_12``... and can be used to define the matrix in the code below, with red, green, and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
 
 .. code-block:: python
    :linenos:
    :emphasize-lines: 7-9, 11-13, 15-17
 
    def getDK(self, q, q_dot):
-      q0, q1, q2 = q
+      q0, q1, q2 = q                                  # Unpack the q and self.links arrays for convenience.
       l1, l2, l3 = self.links
       
       ################################################ TASK 7
 
-      J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)
+      J_11=-(l1*cos(q1)+l2*cos(q1+q2))*sin(q0)        # Compute each element of the Jacobian matrix, as defined in the derivation above.
       J_21=(l1*cos(q1)+l2*cos(q1+q2))*cos(q0)
       J_31=0
       
@@ -852,13 +873,13 @@ Upon inspection, these equations reveal the definitions of J_11, J_12... and can
       J_23=-(l2*sin(q1+q2))*sin(q0)
       J_33=l2*cos(q1+q2)
       
-      self.Jacobian = np.array([[J_11, J_12, J_13],
+      self.Jacobian = np.array([[J_11, J_12, J_13],   # Create a matrix using the above elements.
                                  [J_21, J_22, J_23],
                                  [J_31, J_32, J_33]])
-      x_dot = np.matmul(self.Jacobian, q_dot)
+      x_dot = np.matmul(self.Jacobian, q_dot)          # Calculates end effector velocity vector by multiplying the Jacobian with the joint velocity vector.
       return x_dot
 
-To validate the jacobian, run:
+To validate the Jacobian, run:
 
 .. code-block:: python
    :linenos:
@@ -866,7 +887,7 @@ To validate the jacobian, run:
    cd Desktop/DE3Robotics/src/coursework_1/src
    python3 kinematics.py dk
 
-The IK model runs successfully if the following message appears:
+The DK model runs successfully if the following message appears:
 
 .. code-block:: python
    :linenos:
@@ -881,32 +902,33 @@ Robot Control
 Task H: Tuning Controller Gains
 -----------------------------------------------
 
-The robot arm uses a simple PID controller to reach desired joint positions.
+The robot arm uses a simple PID controller to reach the desired joint positions.
 
 .. image:: img/pid.png
    :width: 497
 
-*PID controller definition for torque output* [1]_
+*Definition 6: PID controller for torque output* [1]_
 
 PID Controller Explanation
 ---------------------------------------------------------------
 
-The PID controller that is being used is broken up into 3 terms, a proportional, derivative and integral term.
+The PID controller being used is broken up into 3 terms; a proportional, derivative and integral term.
 PID gains are reactive and make up what is known as ‘feedback’ control [6]_, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
 The proportional term on its own is measuring the difference between the achieved joint angle and desired joint angle - this is defined as the error - and then multiplied by a scalar gain value Kp.
 It is a measure of ‘system stiffness’ and determines the amount of restoring force needed to overcome simple positional error, with the proportional aspect resulting from the Kp term multiplier.
 This will determine how much correction should occur at the output.
-The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop [7]_.
+The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can potentially be destructive given the control system is closed loop [7]_ .
 The video below demonstrates this in action for the robotic arm.
-
-
-**P only video**
 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1rka11c9npSWNzV7mlrXrqpwd0ejSi4zH/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Video 1: Example of just P controller*
 
 Given that the response is based on previous error, the moving average can also cause issues with oscillation.
 Using this controller type on its own can also result in a major drawback of offset, this is when there is a sustained error built up over time that cannot be removed by the P on its own.
@@ -917,13 +939,15 @@ The integral term in the controller is determining the sum of error over time of
 This is ideal when the system is experiencing static loads and can be seen that when used, has little to no effect in improving a well defined P controller.
 This is specific to this simulation scenario as there is no static load.
 
-**PI video**
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/12OzNvLl_kGkr62jAek1EM2aiLzsqw7PI/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Example PD controller*
 
 Finally, the part of the system that will reduce the oscillations and overshoots caused by the P term, the derivative control [9]_ . 
 This calculates the velocity of the error, which is the same as the difference between the desired joint velocity and achieved joint velocity.
@@ -936,14 +960,15 @@ An example of this can be seen in the video below where a purposefully aggressiv
    If ``Kp`` is increased it will minimise the error more quickly and aggressively, which can be useful for handling against external disturbances, however too high and during movements it will overshoot and result in oscillation (a potentially destructive phenomenon for the robotic arm.) 
    ``Kd`` is used to prevent this and act as a ‘brake’ to the system, but too much of this and the robot will struggle to reach its desired location, so it must be increased with caution.
 
-
-**PID with good D video**
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1LTqJd79TCwN7U531D_uA9pme66MgPibh/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Example of full PID*
 
 Implementation
 --------------
@@ -979,13 +1004,13 @@ To begin with, all values are set to 0.
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}     # Define p, i and d values for this joint.
+   joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController                  # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
    joint_2_position_controller:
@@ -994,7 +1019,7 @@ To begin with, all values are set to 0.
       pid: {p: 0, i: 0, d: 0, i_clamp_max: 1000, i_clamp_min: 1000}
 
 To test the robotic arm the following lines should be run. 
-To run the robot with updated values, first close all instances of Gazebo, re-open Gazebo and run the ``kinematics.py full`` code again.
+To run the robot with updated PID values, follow the above method and run the ``kinematics.py full`` code again.
 
 .. code-block:: python
    :linenos:
@@ -1024,7 +1049,8 @@ To effectively tune the gains of the robotic arm such that it follows the trajec
 This can be accessed by using the ``rqt`` command in the terminal and then selecting *Plugins* → *Visualization* → *Plot*, then typing ``/DES3R/joint_0_position_controller/state/error``. 
 Then repeating this for each ``joint_1_position_controller`` and ``joint_2_position_controller``.
 
-**Screenshots for rqt visualization.**
+.. image:: img/rqt.png
+   :width: 300
 
 There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [10]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
@@ -1043,13 +1069,17 @@ The steps used are summarised below.
    Therefore, D should be increased cautiously. 
    The video below demonstrates this.
 
-   **Video with too much D**
-
 .. raw:: html
 
-    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
-    </div
+   <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+      <iframe src="https://drive.google.com/file/d/1vohFpeS7VF_hNJAqXjmSp3kg7R_fH8QN/preview" width="640" height="480"></iframe>
+   </div
+      
+======
+
+*Example of Kd set too high*
+
+
 
 The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
@@ -1057,18 +1087,18 @@ For further insight, please view the embedded simulation video that demonstrates
 Due to computing limits, the identical PID values will be processed for each joint controller initially during the test methods. 
 Following this, hyper-parameter tuning can then be considered to optimise the result for each joint controller if required.
 
-
 Table of Results
 ----------------
 
-.. image:: _images/TaskHTable.png
+.. image:: img/TaskHTable.png
    :width: 900
 
 *Task H PID Results Table*
 
+There was no obvious reason to individually tune joints so the values for all controllers could be kept the same for simplicity sake in control - this may not be the case for where the load is increased on specific joints.
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
 
-.. image:: _images/TuningTable.png
+.. image:: img/TuningTable.png
    :width: 700
 
 *PID Tuning Table* [11]_
@@ -1111,13 +1141,13 @@ Final Results
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------       # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                         # Final PID values for 0.01kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController                  # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 110, i: 0, d: 90}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 110, i: 0, d: 90}                                        # Define p, i and d values for this joint.
+   joint_1_position_controller:                                         # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController                  # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 110, i: 0, d: 90}
    joint_2_position_controller:
@@ -1131,8 +1161,12 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1M3zKruD8aL2gYgifIs7t-wkUNCW_5i0_/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Task H results*
 
 ------------------------------
 Task I: Adapting the Robot Arm
@@ -1161,7 +1195,7 @@ The ``ee_mass`` variable contains this information on line 16 as highlighted. Ch
    <xacro:property name="ee_length" value="0.04"/>
    <xacro:property name="ee_side" value="0.02"/>
 
-   <xacro:property name="ee_mass" value="30"/> # END EFFECTOR MASS CHANGED HERE, ONLY LINE CHANGED FOR THIS TASK.
+   <xacro:property name="ee_mass" value="30"/> # End effector mass defined here, no other lines changed for this task.
 
    <xacro:property name="link_length_0" value="${link_length_0_init-case_length}"/>
    <xacro:property name="link_length_1" value="${link_length_1_init-case_radius}"/>
@@ -1183,8 +1217,12 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1v-9kEdmb4pujtKrijLh4NKcjAT9SiQiH/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Task I results*
 
 ---------------------------------
 Task J: Adapting Controller Gains
@@ -1196,10 +1234,16 @@ The initial starting values used are based on the previous values obtained.
 Table of Results
 ----------------
 
-.. image:: _images/TaskJTable.png
+.. image:: img/TaskJTable.png
    :width: 900
 
 *Task J PID Results Table* [14]_   
+
+Hyper tuning was explored for joints 1 and 2 as the load acting on them increased due to the increased mass of the end effector. 
+This is highligted well in the video.
+A value of 5000 was applied to joint 2, whilst joint 1 and joint 0 were kept at 3500. 
+It clearly benefited the robotic arm doing this, as it reduced the 'droop' experienced by the final link, however to keep further tuning simple, values were made identical again for further iterations.
+
 
 Final Results
 -------------
@@ -1216,13 +1260,13 @@ Final Results
       type: joint_state_controller/JointStateController
       publish_rate: 100  
    
-   # Position Controllers ---------------------------------------
-   joint_0_position_controller:
-      type: effort_controllers/JointPositionController
+   # Position Controllers ---------------------------------------    # Note: PID values are identical for each joint.
+   joint_0_position_controller:                                      # Final PID values for 30kg end effector mass, Task J.
+      type: effort_controllers/JointPositionController               # The values are p=3250, i=0, d=1600.
       joint: joint_0
-      pid: {p: 3250, i: 0, d: 1600}
-   joint_1_position_controller:
-      type: effort_controllers/JointPositionController
+      pid: {p: 3250, i: 0, d: 1600}                                  # Define p, i and d values for this joint.
+   joint_1_position_controller:                                      # Note: i_clamp_max and i_clamp_min are set here such that the i value
+      type: effort_controllers/JointPositionController               # can be set and is not clamped to 0, as is the default behaviour in ROS.
       joint: joint_1
       pid: {p: 3250, i: 0, d: 1600}
    joint_2_position_controller:
@@ -1240,8 +1284,12 @@ Video Results
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/15s1TPCJru349MUU-lZx6lY2YIy1BYJMC/preview" width="640" height="480"></iframe>
     </div
+
+=====
+
+*Task J results*
 
 -----------------
 Supporting Videos
@@ -1262,7 +1310,7 @@ Full Simulations
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1JOPqCoLd7fvLnHGrHJNjEhJRbDciuPba/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1FKHNNQ953DjILROMgBm2bznpT5S7EpHU/preview" width="640" height="480"></iframe>
     </div
 
 Detailed Step-by-step Code Explanation Video
@@ -1271,7 +1319,7 @@ Detailed Step-by-step Code Explanation Video
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1ZfTbdnwyOicxQVv5SndT5aMMX2w02Mv_/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1S8u39y-hh95IlLO-t3of_ZcpE3gOOLmG/preview" width="640" height="480"></iframe>
     </div
    
 ==========
