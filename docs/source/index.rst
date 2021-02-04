@@ -1035,7 +1035,7 @@ It communicates at a frequency of 100 Hz, where the ``kinematics.py`` file is se
 
    def sendCommands(self,q):
 
-         #print("SENDING JOINT VALUES ", q)
+         print("SENDING JOINT VALUES ", q)
          rate = rospy.Rate(100) #Hz
          for i in range(3):
 
@@ -1051,6 +1051,8 @@ Then repeating this for each ``joint_1_position_controller`` and ``joint_2_posit
 
 .. image:: img/rqt.png
    :width: 300
+
+*Image 1: Screenshot of RQT window*
 
 There are a number of methods that can be used to tune the controller, with a common and simple heuristic-based method being Ziegler-Nichols [19]_.
 This can be done by measuring the step-response of the system and first finding ``Kp``, then using that to find ``Kd`` and ``Ki``.
