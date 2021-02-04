@@ -1081,8 +1081,6 @@ The steps used are summarised below.
 
 *Video 4: Example of Kd set too high*
 
-
-
 The table below summarises the process and outputs seen. 
 For further insight, please view the embedded simulation video that demonstrates each output.
 
@@ -1092,10 +1090,10 @@ Following this, hyper-parameter tuning can then be considered to optimise the re
 Table of Results
 ----------------
 
+*Table 2: Task H PID Results*
+
 .. image:: img/TaskHTable.png
    :width: 900
-
-*Task H PID Results Table*
 
 There was no obvious reason to individually tune joints so the values for all controllers could be kept the same for simplicity sake in control - this may not be the case for where the load is increased on specific joints.
 The table below helps to summarise the effects of increasing the PID parameters, and ultimately helped feed into the tuning process when visually determining the next iteration needed to improve the control.
