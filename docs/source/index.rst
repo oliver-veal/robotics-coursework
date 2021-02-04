@@ -387,7 +387,7 @@ Task D: Checking if a point is in the workspace
 -----------------------------------------------
 
 To convert coordinates from task space to joint space, the geometric inverse kinematics of the robot arm must be calculated.
-The diagram demonstrates the home position of the robot arm.
+Figure 3 illustrates the home position of the robot arm.
 In the home position, the first link |l0|, is along the |z0| axis of the frame, and the second and third link (|l1|, |l2| respectively) are defined along the |y0| plane, meaning joint angles (|q0|, |q1| and |q2|) are measured relative to this.
 
 Before computing the inverse kinematics of the arm, we must check if a given point is inside its reachable workspace. This is defined by a spherical shell centered on the end of its first link.
@@ -396,7 +396,7 @@ Before computing the inverse kinematics of the arm, we must check if a given poi
    :width: 300
    :alt: Diagram of reachable space
 
-*Diagram of reachable workspace*. [5]_
+*Fig 3: Diagram of reachable workspace*. [5]_
 
 Deriving the Reachable Workspace [6]_
 -------------------------------------
@@ -448,7 +448,7 @@ The ``r_max`` and ``r_min`` are defined as:
 .. image:: img/task_d.png
    :width: 252
 
-*definitions of variables* [7]_
+*Definition 4* [7]_
 
 Therefore, ``r_max`` and ``r_min`` are defined in the code as shown below and the ``**2`` is removed in the if statement to remove the terms being squared twice.
 
@@ -502,7 +502,7 @@ Derivation for |θ1| angle
    :width: 500
    :alt: Diagram of robot with reference frames and angles
 
-*Diagram of robot with D-H conventional reference axes and angles*
+*Fig 4: Robot with D-H conventional reference axes and angles*
 
 To get the inverse kinematics of this robot, a top view and side view are considered.
 
@@ -510,7 +510,7 @@ To get the inverse kinematics of this robot, a top view and side view are consid
    :width: 500
    :alt: Top view diagram of the robot
 
-*Top view diagram of the robot*
+*Fig 5: Top view diagram of the robot*
 
 From this top view, the following can be expressed:
 
@@ -531,7 +531,7 @@ Derivation for Arm Bent Upwards [8]_ [9]_ [10]_
    :width: 500
    :alt: Side view diagram of the robot
 
-*Side view diagram of the robot with arm bent upwards*
+*Fig 6: Side view diagram of the robot with arm bent upwards*
 
 From this side view, the following can be expressed:
 
@@ -582,7 +582,7 @@ Derivation for Arm Bent Downwards [11]_
    :width: 500
    :alt: Side view diagram of the robot
 
-*Side view diagram of the robot with arm bent downwards*
+*Fig 7: Side view diagram of the robot with arm bent downwards*
 
 When the arm is bent the other way (as shown above), equations (7) and (9) are altered, giving:
 
