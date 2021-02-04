@@ -851,7 +851,7 @@ With the provided equations, these can be expanded to isolate the different ``q_
 .. image:: img/jacobian_equations.png
    :width: 500
    
-Upon inspection, these equations reveal the definitions of J_11, J_12... and can be used to define the matrix in the code below, with red green and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
+Upon inspection, these equations reveal the definitions of ``J_11``, ``J_12``... and can be used to define the matrix in the code below, with red, green, and blue indicating the ``q0_dot``, ``q1_dot`` and ``q2_dot`` components respectively.
 
 .. code-block:: python
    :linenos:
