@@ -706,8 +706,6 @@ The following code implements the derivation to obtain both IK solutions:
    Source code implementing the additional derivation is shown below.
    This evidence was used to feed back to the tutor team and correct the test points.
 
-   The following code implements an alternative derivation (not shown here) to validate and compare the solutions from the previous method:
-
    .. code-block:: python
       :linenos:
       :emphasize-lines: 4-6, 8, 10,11, 13,14, 16,17, 19
@@ -916,12 +914,12 @@ The robot arm uses a simple PID controller to reach desired joint positions.
 PID Controller Explanation
 ---------------------------------------------------------------
 
-The PID controller that is being used is broken up into 3 terms, a proportional, derivative and integral term.
+The PID controller being used is broken up into 3 terms; a proportional, derivative and integral term.
 PID gains are reactive and make up what is known as ‘feedback’ control [15]_, where the measured output of the system is used to enable better control such that it follows the desired trajectory.
 The proportional term on its own is measuring the difference between the achieved joint angle and desired joint angle - this is defined as the error - and then multiplied by a scalar gain value Kp.
 It is a measure of ‘system stiffness’ and determines the amount of restoring force needed to overcome simple positional error, with the proportional aspect resulting from the Kp term multiplier.
 This will determine how much correction should occur at the output.
-The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can be potentially destructive given the closed loop [16]_.
+The issue with only P being active, is that when Kp is too high, it will result in oscillations of the system that can potentially be destructive given the control system is closed loop [16]_ .
 The video below demonstrates this in action for the robotic arm.
 
 .. raw:: html
