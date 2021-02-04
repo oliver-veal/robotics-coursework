@@ -1079,7 +1079,7 @@ The steps used are summarised below.
       
 ======
 
-*Example of Kd set too high*
+*Video 4: Example of Kd set too high*
 
 
 
