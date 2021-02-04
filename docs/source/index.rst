@@ -1060,7 +1060,7 @@ Alternatively, for the purpose of this report, it can be done through trial and 
 It is performed similarly to the order of explanation in this report.
 The steps used are summarised below.
 
-1. Set all gains to zero
+1. Set all gains to zero.
 2. Increase Kp until the controller output oscillates at a constant rate. It should continue to be increased such that the response should increase more quickly without the system becoming unstable.
 3. Once Kp response is fast enough, Ki is now increased with small steps to ensure the effects are seen. The goal of increasing Ki is to reduce the steady state errors. If there are no steady state errors and primarily overshoot and oscillation, you can skip to tuning Kd.
 4. With Kp and Ki set with minimal steady state error and consistent oscillation, Kd can be used for dampening effects. Increasing Kd will decrease overshoot of the system. The ramp rate should be monitored to ensure that Kd is not tuned too high, such that the desired trajectory is still achieved. Increase this till the system is stable and overshoot and oscillation is minimised. System tuning complete.
@@ -1103,8 +1103,8 @@ The table below helps to summarise the effects of increasing the PID parameters,
 .. image:: img/TuningTable.png
    :width: 700
 
-After visually understanding the output of the PID controller it was found that proportional gain was increased till there was steady state oscillation.
-Once the proportional gain was sufficient, the derivative gain was increased till it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
+After visually understanding the output of the PID controller it was found that proportional gain was increased until there was steady state oscillation.
+Once the proportional gain was sufficient, the derivative gain was increased until it removed the oscillation and overshoot, but stopping at the point where it prevents P from reaching the desired end state.
 P was then incremented again to see if it made a positive difference to the rise time.
 Given this was the case, D was again incremented until the error was minimised.
 No steady-state error was identified, therefore no integral gain was required.
