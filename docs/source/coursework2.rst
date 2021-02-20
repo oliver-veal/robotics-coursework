@@ -8,5 +8,7 @@
    :caption: Contents:
 
 ==========================================================
-Welcome to DE3 Robotics Group 1 Coursework 2 Documentation
+Coursework 2
 ==========================================================
+
+Stuff goes here.
