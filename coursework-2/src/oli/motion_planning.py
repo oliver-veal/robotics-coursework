@@ -3,6 +3,9 @@ from numpy import genfromtxt
 from scipy.ndimage import convolve
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial.distance import cdist
+from skimage import data
+from skimage.feature import corner_harris, corner_subpix, corner_peaks
+from scipy.ndimage.morphology import binary_dilation
 
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
@@ -304,16 +307,37 @@ class MotionPlanner():
         num_zeros = np.count_nonzero(self.pixel_map == 0)
         p = N_points * step**2 / (num_zeros)
 
-        mask = np.ones([7, 7])
-        pmap = convolve(self.pixel_map, mask)
+
+        square = np.zeros([10, 10])
+        square[4:8, 4:8] = 1
+        square[4:8, 0:4] = 1
+        
+        square.astype(int)
+        print(square)
+
+        #print(corner_peaks(corner_harris(square), min_distance=1))
+        corners = corner_peaks(corner_harris(square), min_distance=1)
+        print(np.flip(corners, axis=1))
+
+        bigger_map = binary_dilation(self.pixel_map, np.ones((3, 3)))
+
+        bigger_map.astype(int)
+
+        coords = corner_peaks(corner_harris(bigger_map), min_distance=1, threshold_rel=0.002)
+        #accepted_points = corner_subpix(bigger_map, coords, window_size=20)
+        accepted_points = np.flip(coords, axis=1)
 
 
-        accepted_points = []
-        for y in range(0, len(self.pixel_map), step):
-            row = self.pixel_map[y]
-            for x in range(0, len(row), step):
-                if row[x] == 0 and np.random.uniform(0, 1) < pmap[y, x]:
-                    accepted_points.append([x, y])
+        #mask = np.ones([7, 7])
+        #pmap = convolve(self.pixel_map, mask)
+
+
+        #accepted_points = []
+        #for y in range(0, len(self.pixel_map), step):
+        #    row = self.pixel_map[y]
+        #    for x in range(0, len(row), step):
+        #        if row[x] == 0 and np.random.uniform(0, 1) < pmap[y, x]:
+        #            accepted_points.append([x, y])
         
         
         print(len(accepted_points), p)
@@ -342,7 +366,7 @@ class MotionPlanner():
         ############################################################### TASK E i
         # Choose your minimum and maximum distances to produce a suitable graph
         mindist = 0.0
-        maxdist = 20.0
+        maxdist = 20000000.0
         
         # Calculate a distance matrix between every node to every other node
         distances = cdist(points, points)
@@ -372,7 +396,7 @@ class MotionPlanner():
                     
                     if collision:
                         # if there is a collision, plot the edge in red
-                        plt.plot([pxA[0, 0], pxB[0, 0]], [pxA[0, 1], pxB[0, 1]], c='r')
+                        #plt.plot([pxA[0, 0], pxB[0, 0]], [pxA[0, 1], pxB[0, 1]], c='r')
                         pass
                     else:
                         # if there is no collision, add the node in range to the array of nodes that have no collisions
@@ -400,11 +424,12 @@ class MotionPlanner():
     def check_collisions(self, pointA, pointB):
         ############################################################### TASK E ii     
         # Calculate the distance between the two point
-        distance = 0.5
+        distanceVector = pointB - pointA
+        distance = np.linalg.norm(distanceVector)
         # Calculate the UNIT direction vector pointing from pointA to pointB
-        direction = np.array([1.0, 0.0])
+        direction = distanceVector / distance
         # Choose a resolution for collision checking
-        resolution = 5.0   # resolution to check collision to in m
+        resolution = 0.5   # resolution to check collision to in m
         
         # Create an array of points to check collisions at
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
@@ -424,7 +449,7 @@ class MotionPlanner():
         
         # Create a dataframe of unvisited nodes
         # Initialise each cost to a very high number
-        initial_cost = 5.0  # Set this to a suitable value
+        initial_cost = 1000000.0  # Set this to a suitable value
         
         unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
         unvisited.set_index('Node', inplace=True)
@@ -465,7 +490,7 @@ class MotionPlanner():
                 if next_node_name not in visited.index.values:  # if we haven't visited this node before
                     
                     # update this to calculate the cost of going from the initial node to the next node via the current node
-                    next_cost_trial = 1234  # set this to calculate the cost of going from the initial node to the next node via the current node
+                    next_cost_trial = current_cost + edge_cost# set this to calculate the cost of going from the initial node to the next node via the current node
                     next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
                     
                     # if it costs less to go the next node from the current node, update then next node's cost and the path to get there

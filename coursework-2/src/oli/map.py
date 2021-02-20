@@ -77,7 +77,7 @@ def expand_map(img, robot_width):
     img_small = binary_dilation(img, robot_mask)
     
     robot_mask_big = np.ones((robot_px, robot_px))
-    circle_array(robot_mask_big, robot_px / 2) 
+    #circle_array(robot_mask_big, robot_px / 2) 
     img_big = binary_dilation(img, robot_mask_big)
 
     mask = np.ones([3, 3])
@@ -98,7 +98,7 @@ def expand_map(img, robot_width):
     #plt.imshow(final & img_big, vmin=0, vmax=1, origin='lower')
     #plt.show()
     
-    return final 
+    return img_big 
                         
             
     
