@@ -7,9 +7,9 @@
    :maxdepth: 2
    :caption: Contents:
 
-========================================================
-Welcome to DE3 Robotics Group 1 Coursework Documentation
-========================================================
+==========================================================
+Welcome to DE3 Robotics Group 1 Coursework 1 Documentation
+==========================================================
 
 We (Shafae Ali, Oscar Jones, Oscar Leclercq, Oliver Veal) have decided to create a readthedocs page for our coursework submissions instead of a Google Drive or Word document. This way this documentation can be used for teaching ROS at any point in the future, as well as have integrated code blocks and interactive videos.
 For the purpose of archiving the document, we will be submitting in PDF and HTML formats.
