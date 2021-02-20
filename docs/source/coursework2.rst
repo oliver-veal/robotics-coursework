@@ -30,23 +30,18 @@ Open Terminator to input commands and run different services or files.
 C-Space Map
 ==================
 
--------------------------------
-Task A: C-Space Dilation
--------------------------------
+----------------------------------------
+Task Ai : C-Space Dilation, Square Mask
+----------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
-Part i - Square Mask
-----------------------------
-
-To make the D-H table, the reference
-
-
-Part ii - Circular Mask
-----------------------------
+-------------------------------------------
+Task Aii : C-Space Dilation, Circular Mask
+-------------------------------------------
 
 To make the D-H table, the reference
 
@@ -54,56 +49,47 @@ To make the D-H table, the reference
 Waypoint Navigation
 ====================
 
---------------------------------
-Task B: Adding Waypoints by Hand
---------------------------------
+----------------------------------------------------
+Task Bi: Adding Waypoints by Hand, Creating the Path
+----------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
-Part i - Creating the Path
-----------------------------
 
-To make the D-H table, the reference
+-------------------------------------------------------------
+Task Bii: Adding Waypoints by Hand, Shortest Path Calculation
+-------------------------------------------------------------
 
-
-Part ii - Shortest Path Calculation
-------------------------------------
-
-To make the D-H table, the reference
+This task initialises the Denavit-Hartenberg, D-H, table.
 
 ==========================
 Potential Field Algorithm
 ==========================
 
----------------------------------------------------
-Task C: Implementing the Potential Field Algorithm
----------------------------------------------------
+---------------------------------------------------------------------------
+Task Ci: Implementing the Potential Field Algorithm, General Implementation
+---------------------------------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
-Part i - General Implementation
----------------------------------------
+---------------------------------------------------------------------------
+Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
+---------------------------------------------------------------------------
 
-To make the D-H table, the reference
-
-
-Part ii - Custom Implementation
-------------------------------------
-
-To make the D-H table, the reference
+This task initialises the Denavit-Hartenberg, D-H, table.
 
 ==========================
 Probabilistic Road Map
 ==========================
 
 ---------------------------------------------------
-Task D: Randomly Sampling from the Map
+Task Di: Randomly Sampling from the Map
 ---------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
@@ -111,59 +97,44 @@ The table contains all the necessary information to orientate each link of the r
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
-Part i - Random Sampling
----------------------------------------
+---------------------------------
+Task Dii: Harris Corner Detection
+---------------------------------
 
-To make the D-H table, the reference
+This task initialises the Denavit-Hartenberg, D-H, table.
 
+-----------------------------------------------------------------
+Task Ei: Creating the Graph, Tuning Distances for Creating Edges
+-----------------------------------------------------------------
 
-Part ii - Harris Corner Detection
-------------------------------------
+This task initialises the Denavit-Hartenberg, D-H, table.
 
-To make the D-H table, the reference
+---------------------------------------------------------
+Task Eii: Creating the Graph, Tuning Edge Collision Check
+---------------------------------------------------------
 
----------------------------------------------------
-Task E: Creating the Graph
----------------------------------------------------
+This task initialises the Denavit-Hartenberg, D-H, table.
+
+-------------------------------------------------------------
+Task Eiii: Creating the Graph, Completing an Incomplete Graph
+-------------------------------------------------------------
+
+This task initialises the Denavit-Hartenberg, D-H, table.
+
+------------------------------------------------
+Task Fi: Dijkstra's Algorithm, Creating the Path
+------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
-Part i - Tuning Distances for Creating Edges
----------------------------------------------
-
-To make the D-H table, the reference
-
-
-Part ii - Tuning Edge Collision Check
---------------------------------------
-
-To make the D-H table, the reference
-
-
-Part iii - Completing an Incomplete Graph
-------------------------------------------
-
-To make the D-H table, the reference
-
------------------------------
-Task F: Dijkstra's Algorithm
------------------------------
+----------------------------------------------------
+Task Fii: Dijkstra's Algorithm, Planning Algorithms
+----------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
-
-Part i - Creating the Path
----------------------------------------------
-
-To make the D-H table, the reference
-
-
-Part ii - Planning Algorithm Types
---------------------------------------
-
-To make the D-H table, the reference
