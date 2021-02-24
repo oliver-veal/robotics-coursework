@@ -443,50 +443,73 @@ Another case would be that of non-convex obstacles (for example a "bowl" or "ban
 Probabilistic Road Map
 ==========================
 
----------------------------------------------------
-Task Di: Randomly Sampling from the Map
----------------------------------------------------
+----------------------------------------
+Task D i: Randomly Sampling from the Map
+----------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
----------------------------------
-Task Dii: Harris Corner Detection
----------------------------------
+----------------------------------
+Task D ii: Harris Corner Detection
+----------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 
 -----------------------------------------------------------------
-Task Ei: Creating the Graph, Tuning Distances for Creating Edges
+Task E i: Creating the Graph, Tuning Distances for Creating Edges
 -----------------------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 
----------------------------------------------------------
-Task Eii: Creating the Graph, Tuning Edge Collision Check
----------------------------------------------------------
+----------------------------------------------------------
+Task E ii: Creating the Graph, Tuning Edge Collision Check
+----------------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 
--------------------------------------------------------------
-Task Eiii: Creating the Graph, Completing an Incomplete Graph
--------------------------------------------------------------
+--------------------------------------------------------------
+Task E iii: Creating the Graph, Completing an Incomplete Graph
+--------------------------------------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
+From PRM to Visibility Graph
+----------------------------
 
-------------------------------------------------
-Task Fi: Dijkstra's Algorithm, Creating the Path
-------------------------------------------------
+A randomly generated graph is likely not the optimal route to the goal, and may not even find a route under certain conditions.
+For example, the narrow passage between the central obstacle and the upper is often undiscovered, as well as other areas of the map.
+Increasing the number of points can help, but there are more optimal approaches.
 
-This task initialises the Denavit-Hartenberg, D-H, table.
-The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
-As the robot moves, the D-H table is updated.
-The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+From the experimenting in manually placing waypoints, seeing the routes proposed by the potential fields, and from intuition, the shortest route to the goal is often found by traversing the corners of the obstacles.
+Some intuitive rules can be applied to justify this:
+
+- The fastest way across an open area is in a straight line, it will never be faster to zigzag
+- Therefore, points in open space can be considered redundant
+- The fastest way to get around an obstacle is to go to it’s corner, turn and carry on. This can be visualised by pulling a piece of string taught with an obstacle in the way.
+- Therefore, you are left with only corners.
+
+With this logic, a more optimal PRM algorithm would make sure to place more points around obstacle vertices, ensuring all the essential points were covered to find a route to the goal.
+By extension of this logic, what if only the corners were plotted? To test this, a corner detection algorithm was written to identify and place points only at vertices.
+The resulting graph takes a fraction of the time to compute given the far fewer points, and is guaranteed to give the best chance of finding the best route. This turns the PRM method into an optimal method, and shows the path we initially used in the manual waypoints section.
+
+Dijakstra’s algorithm can then be used to find the shortest path (discussed later).
+
+.. image:: img/corners.png
+   :width: 500
+   :alt: methods_comp_annot
+
+
+-------------------------------------------------
+Task F i: Dijkstra's Algorithm, Creating the Path
+-------------------------------------------------
+
+Shafae first section:
+
+Oscar extra:
 
 ----------------------------------------------------
-Task Fii: Dijkstra's Algorithm, Planning Algorithms
+Task F ii: Dijkstra's Algorithm, Planning Algorithms
 ----------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
