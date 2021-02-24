@@ -129,7 +129,7 @@ Upon inspection, we can see that ``pos_force_magnitude`` must equal 1 for the gi
 This makes the positive force directly proportional to the direction to the goal, unaffected by distance.
 ``K_att`` in line 12 is the constant that will need tuning.
 
-Analytical Derivation of Positive Force
+Analytical Derivation of Negative Force
 ---------------------------------------
 
 A similar method to above can be used for the negative force.
