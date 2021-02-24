@@ -315,9 +315,11 @@ If we could create a more ideal algorithm that could get around the limitations 
 .. important::
    **As such, we propose the following modifications to the Potential Fields Algorithm:**
 
-   - Normalise the "mass" of each object by only considering the edges of the obstacle to provide a repulsive force (Implementation of this is detailed below).
-   - Take an average of the top 50 largest repulsive force contributions by magnitude.
-   - Make the positive and negative scalar parameters equal.
+   #. Normalise the "mass" of each object by only considering the edges of the obstacle to provide a repulsive force (Implementation of this is detailed below).
+   #. Take an average of the top 50 largest repulsive force contributions by magnitude.
+   #. Make the positive and negative scalar parameters equal.
+
+**1. Normalising the mass (edge detection):**
 
 To consider only the edges of obstacles, run an edge detection algorithm over the expanded map. Or, equivalently, when creating the C-space map; create two maps, one dilating the obstacles using a mask 2px less wide than required, and another using the full width mask, then take the XOR of the two maps. XOR will only keep ``1`` values where they exist on the fully expanded map, but not on the less expanded map, i.e. the edges. An example of this process in action is shown below:
 
@@ -325,10 +327,9 @@ TODO Example of edge detection using XOR.
 
 The idea behind taking the average of the top n largest force contributions comes from this `this <https://medium.com/@rymshasiddiqui/path-planning-using-potential-field-algorithm-a30ad12bdb08>`_ article, in which the author describes their method as using a max function on the negative forces from each obstacle, essentially considering only the repulsive force from the most repulsive object. We improve on this idea by not just taking the largest value, but an average of the n largest values, where n is a tunable parameter. The reason for doing this becomes apparent when looking at a very narrow section. When only taking the max, the effect is to produce a force near the the central line between obstacles that "oscillates" very rapidly between pointing in one direction or the other, primarly because it can only consider repulsion from one obstacle pixel at a time, and as the force falloff is linear, this will always be the closest pixel. In this simple case, averaging the force from the objects on both sides produces a much smoother path for the robot to follow; the the effects of being repelled by two close-by but opposing forces "cancels out". The effects of changing this average parameter are shown below:
 
-**Effects of Tuning the Top N Average Parameter**
+**Effects of Tuning the Top-N Average Parameter**
 
 TODO
-
 
 **Downsides and Considerations**
 
@@ -336,7 +337,7 @@ Some consideration would need to be given to some edge cases with this algorithm
 
 Consider for example consider the case of a single point obstacle close to a "wall" (line) of obstacle pixels. It is possible in this case to encounter the same problem as when just taking a global average of all pixel forces, that is, the repulsive force from the single pixel does not contribute enough to the average to avoid the robot from crashing into it.
 
-Another case would be that of non-convex obstacles (for example a "bowl" or "banana" type shape. ------- TODO Expand on this
+Another case would be that of non-convex obstacles (for example a "bowl" or "banana" type shape). ------- TODO Expand on this
 
 ==========================
 Probabilistic Road Map
