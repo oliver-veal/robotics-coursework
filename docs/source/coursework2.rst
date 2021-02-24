@@ -288,6 +288,50 @@ A value of 40 was found to be optimal, with deviation either side not making muc
 Task C ii: Implementing the Potential Field Algorithm, Custom Implementation
 ----------------------------------------------------------------------------
 
+Square Inverse Square Fall-off
+------------------------------
+An intuitive next step is to raise the power of the falloff of the repulsive force.
+This helps the robot by ignoring far away points and only providing repulsion when it is very close to obstacles.
+This avoids the issue of preventing the robot from moving through gaps, and allows the attractive force to be predominant in most spaces, only when very close to an obstacle does the repulsive force take effect.
+We implemented a simple square fall off by squaring the distance_to_obstacle variable.
+Using another iterative field plot testing approach, we found these coefficients to provide a clear path:
+
+``K_att = 3``
+``K_rep = 350``
+
+.. image:: img/sqr_12_350.png
+   :width: 500
+   :alt: hollow_search
+
+.. image:: img/sqr_12_350_path.jpg
+   :width: 500
+   :alt: hollow_search
+
+**video of path**
+
+Again, Deniro follows the path as expected and reaches the goal.
+
+Observations
+------------
+
+While this method provided a valid solution, it is worth discussing the optimality.
+As we observed by manually plotting waypoints, this route is not the shortest.
+Deniro should have turned right around the table and two chairs instead of left.
+We can see from the potential fields however, that in this position the goal is more vertically than horizontally distant from deniro (i.e the direction vector is greater than 45 degrees).
+This might be the reason that deniro chose the up-most path instead of turning right, as the direction vector pointed more up than right.
+In such a case, it is difficult for the potential fields algorithm to know which route will be shorter.
+
+However, comparing the solution in part (i) to (ii), we can see that the (ii) solution is more optimal for shortest distance.
+The part (i) solution pushes deniro to the nearest path before continuing to the goal, even if that means going backwards.
+The (ii) solution does not do this, but does instead push deniro towards the goal right up until obstacles, which he then follows around the edge.
+
+See the figures below, where the (i) solution takes deniro left, and then right along the path, whereas (ii) takes deniro straight up towards the opening to the goal.
+
+.. image:: img/part_ii_comp.png
+   :width: 500
+   :alt: hollow_search
+
+
 ..
    Part ii
    As mentioned, sometimes we require more complex potential fields to achieve better performance from
