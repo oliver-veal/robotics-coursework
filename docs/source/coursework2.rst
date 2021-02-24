@@ -278,12 +278,15 @@ Another approach which keeps the inverse falloff but may offer better results in
 This was implemented by sorting the influence of each pixel and summing only the greatest x number.
 Using this method, deniro had much better success in making it to the goal.
 
+.. tip::
+   Click on an image to bring up a full-resolution version of it!
+
 .. image:: img/hollow_search.png
-   :width: 500
+   :width: 340
    :alt: hollow_search
 
 .. image:: img/hollow_search_path.jpg
-   :width: 500
+   :width: 340
    :alt: hollow_search
 
 As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
@@ -307,11 +310,11 @@ Using another iterative field plot testing approach, we found these coefficients
 ``K_rep = 350``
 
 .. image:: img/sqr_12_350.png
-   :width: 500
+   :width: 340
    :alt: hollow_search
 
 .. image:: img/sqr_12_350_path.jpg
-   :width: 500
+   :width: 340
    :alt: hollow_search
 
 **video of path**
