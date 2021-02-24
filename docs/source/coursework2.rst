@@ -38,7 +38,7 @@ C-Space Map
 ==================
 
 ----------------------------------------
-Task Ai : C-Space Dilation, Square Mask
+Task A i : C-Space Dilation, Square Mask
 ----------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
@@ -47,7 +47,7 @@ As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
 -------------------------------------------
-Task Aii : C-Space Dilation, Circular Mask
+Task A ii : C-Space Dilation, Circular Mask
 -------------------------------------------
 
 To make the D-H table, the reference
@@ -56,9 +56,9 @@ To make the D-H table, the reference
 Waypoint Navigation
 ====================
 
-----------------------------------------------------
-Task Bi: Adding Waypoints by Hand, Creating the Path
-----------------------------------------------------
+-----------------------------------------------------
+Task B i: Adding Waypoints by Hand, Creating the Path
+-----------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
@@ -66,9 +66,9 @@ As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
 
--------------------------------------------------------------
-Task Bii: Adding Waypoints by Hand, Shortest Path Calculation
--------------------------------------------------------------
+--------------------------------------------------------------
+Task B ii: Adding Waypoints by Hand, Shortest Path Calculation
+--------------------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 
@@ -77,7 +77,7 @@ Potential Field Algorithm
 ==========================
 
 ---------------------------------------------------------------------------
-Task Ci: General Implementation of the Potential Field Algorithm
+Task C i: General Implementation of the Potential Field Algorithm
 ---------------------------------------------------------------------------
 
 Analytical Derivation of Positive Force
@@ -284,9 +284,9 @@ This boundary is almost equidistant between obstacles, and at which point is whe
 This approach introduces another parameter; the number of nearby obstacle pixels to sum.
 A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
 
----------------------------------------------------------------------------
-Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Task C ii: Implementing the Potential Field Algorithm, Custom Implementation
+----------------------------------------------------------------------------
 
 ..
    Part ii
