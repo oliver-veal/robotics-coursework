@@ -279,6 +279,9 @@ Another approach which keeps the inverse falloff but may offer better results in
 This was implemented by sorting the influence of each pixel and summing only the greatest x number.
 Using this method, deniro had much better success in making it to the goal.
 
+.. tip::
+   Click on an image to bring up a full-resolution version of it!
+
 .. image:: img/hollow_search.png
    :width: 340
    :alt: hollow_search
