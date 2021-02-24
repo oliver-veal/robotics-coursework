@@ -7,6 +7,13 @@
    :maxdepth: 2
    :caption: Contents:
 
+..
+   .. figure:: img/diagram_side_view_2.png
+      :width: 500
+      :alt: map to buried treasure
+
+      Figure 2: This is the caption of the figure (a simple paragraph).
+
 ==========================================================
 Welcome to DE3 Robotics Group 1 Coursework 2 Documentation
 ==========================================================
