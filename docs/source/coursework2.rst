@@ -223,7 +223,34 @@ By superposing the graphs in your head, you can see in which x and y directions 
 
 Vector Fields
 -------------
-A vector field plot was then considered. This plot, known in pyplot as a “quiver”, plots vectors on a map at discrete intervals. This shows the direction of the force and magnitude, and allows us to see much more clearly how deniro would be driven at each point in the map.
+A vector field plot was then considered.
+This plot, known in pyplot as a “quiver”, plots vectors on a map at discrete intervals.
+This shows the direction of the force and magnitude, and allows us to see much more clearly how deniro would be driven at each point in the map.
+
+.. image:: img/lin_vector.png
+   :width: 500
+   :alt: lin_vector
+
+Starting at the start, you can follow the vectors and see that deniro would be driven straight into the right obstacle.
+
+These maps are much faster to generate than watching deniro run in the simulation, and provide much more insightful ideas on how the parameters affect the potential fields.
+
+Method
+------
+After running a few sets of parameters to gain some intuition, we saw that the repulsive force would need to be much greater than the attractive.
+We also had an idea for the orders of magnitude to test.
+
+We defined an initial parameter search area of 1 < k_att < 50 and 50 < k_rep < 1000.
+These values were iterated over in steps of 2 and 50 respectively, with the plotted results from each saved out at a high resolution of 300 dpi with the used parameters in the file name.
+We could then run through the plots and choose the one with the best behaviour, and identify the parameters.
+
+This exercise ended up showing that no combination of the parameters produced a valid path for deniro to reach the target.
+The trend was that increasing the attractive force was necessary to have the final vectors point to the goal, but this led deniro into obstacles.
+Increasing the negative force to help deniro avoid obstacles ended up pushing deniro away from the centre of mass of the obstacles, i.e away from the middle of the room.
+This makes intuitive sense, as the sum function is adding ALL the obstacle pixels, even those in the middle of the obstacles. This gave large obstacles a disproportionately large influence over smaller, equally close obstacles.
+This also highlights that the inverse fall off was not steep enough to neglect far away points.
+Deniro was either pushed away from the centre of the room, or pulled in a straight line towards the goal,regardless of his position in the room.
+This could suggest that the influence of the negative force was felt almost equally to the attractive force, with both fields have wide influences and summing uniformly over the map, instead of having different levels of influences dependant on position.
 
 ---------------------------------------------------------------------------
 Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
