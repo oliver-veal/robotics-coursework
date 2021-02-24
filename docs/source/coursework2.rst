@@ -240,7 +240,7 @@ Method
 After running a few sets of parameters to gain some intuition, we saw that the repulsive force would need to be much greater than the attractive.
 We also had an idea for the orders of magnitude to test.
 
-We defined an initial parameter search area of 1 < k_att < 50 and 50 < k_rep < 1000.
+We defined an initial parameter search area of ``1 < k_att < 50`` and ``50 < k_rep < 1000``.
 These values were iterated over in steps of 2 and 50 respectively, with the plotted results from each saved out at a high resolution of 300 dpi with the used parameters in the file name.
 We could then run through the plots and choose the one with the best behaviour, and identify the parameters.
 
@@ -249,8 +249,40 @@ The trend was that increasing the attractive force was necessary to have the fin
 Increasing the negative force to help deniro avoid obstacles ended up pushing deniro away from the centre of mass of the obstacles, i.e away from the middle of the room.
 This makes intuitive sense, as the sum function is adding ALL the obstacle pixels, even those in the middle of the obstacles. This gave large obstacles a disproportionately large influence over smaller, equally close obstacles.
 This also highlights that the inverse fall off was not steep enough to neglect far away points.
-Deniro was either pushed away from the centre of the room, or pulled in a straight line towards the goal,regardless of his position in the room.
+Deniro was either pushed away from the centre of the room, or pulled in a straight line towards the goal, regardless of his position in the room.
 This could suggest that the influence of the negative force was felt almost equally to the attractive force, with both fields have wide influences and summing uniformly over the map, instead of having different levels of influences dependant on position.
+
+Remedy: Hollow obstacles
+------------------------
+
+We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
+We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
+This method on it’s own was still not enough to produce a path to the goal.
+
+.. image:: img/outlines.png
+   :width: 500
+   :alt: outlines
+
+While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room.
+
+Remedy: Search area
+-------------------
+Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
+This was implemented by sorting the influence of each pixel and summing only the greatest x number.
+Using this method, deniro had much better success in making it to the goal.
+
+.. image:: img/hollow_search.png
+   :width: 500
+   :alt: hollow_search
+
+.. image:: img/hollow_search_path.jpg
+   :width: 500
+   :alt: hollow_search
+
+As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
+This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses k_att and k_rep coefficients which are equal to each other; 20 was used in this test.
+This approach introduces another parameter; the number of nearby obstacle pixels to sum.
+A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
 
 ---------------------------------------------------------------------------
 Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
