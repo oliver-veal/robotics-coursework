@@ -260,26 +260,31 @@ Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
    path taken when following your own waypoints? If it is better, why do you think it is better? If it is worse,
    why do you think it is worse?
 
-Observations from using a linear falloff function:
- - In order to gain sufficient repulsion from nearby objects, a large ``K_rep`` value is needed, which overwhelms any effect of the positive force. It is extremely difficult or impossible to balance the two forces with a linear falloff.
- - The linear falloff means that distant objects that should have a small contribution to the negative force experienced in a given location actually contribute a much larger force than would be ideal. This can result in being pushed away from the centre of mass (the centre of the map in this roughly symmetrical case) rather than pushed away from local obstacles only.
- - Using a steeper falloff (e.g. quadratic or inverse square, like real gravitaional falloff) with a smaller overall coefficient means that strong forces are experienced close to objects, and in open space the predominant force is the positive attraction to the goal. This means the robots gets "stuck" in a gravitaion well more rarely and can make more confident progress. It also makes the robot much less likely to just "plough" straight into obstacles due to the unbalances positive/negative forces, and shows stable behaviour (i.e. finds a valid path) for a much greater combination of parameters.
+**Observations from using linear falloff of repulsive forces:**
 
-If we could hypothesise a more ideal algorithm that could get around these limitations, we would like it to have the following features:
- - Contributions from very distant objects are negligable or zero.
- - We should never crash into obstacles, even if there is thereforce no valid path (it doesn't matter if the robot follows a path to the goal if it crashes on the way there).
- - The positive force should be able to be "felt" on all parts of the map in roughly the same magnitude.
+- In order to gain sufficient repulsion from nearby objects, a large ``K_rep`` value is needed, which overwhelms any effect of the positive force. It is extremely difficult or impossible to balance the two forces with a linear falloff.
+- The linear falloff means that distant objects that should have a small contribution to the negative force experienced in a given location actually contribute a much larger force than would be ideal. This can result in being pushed away from the centre of mass (the centre of the map in this roughly symmetrical case) rather than pushed away from local obstacles only.
+- Using a steeper falloff (e.g. quadratic [inverse square] like real gravitaional falloff) with a smaller ``K_rep`` coefficient means that strong forces are experienced close to objects, and in open space the predominant force is the positive attraction to the goal. This means the robots gets "stuck" in a gravitaion well more rarely and can make more confident progress. It also makes the robot much less likely to just "plough" straight into obstacles due to the unbalanced positive/negative forces, and shows stable behaviour (i.e. finds a valid path) for a much greater range of parameters.
 
-As such, we propose the following modifications to the Potential Fields Algorithm:
+If we could create a more ideal algorithm that could get around the limitations of using a linear negative force falloff with an average of every obstacle pixel force, we would like it to have the following features:
 
- - Normalise the "mass" of each object by only considering the edges of the obstacle to provide a repulsive force (Implementation of this is detailed below).
- - Take an average of the top 40 largest force contributions by magnitude.
- - Make the positive and negative scalar parameters equal.
+- Contributions from very distant objects are negligable or zero.
+- We should never crash into obstacles, even if as a result, there is no valid path -> it doesn't matter if the robot follows a path to the goal if it crashes on the way there.
+- The positive force should be able to be "felt" on all parts of the map in roughly the same magnitude.
 
-How to consider only the edges of obstacles:
-In effect: Run an edge detection algorithm over the expanded map to keep only the edges of obstacles. Or, equivalently, when creating the C-space map; dilate the obstacles by 1px less than required, then dilate using the full width mask, then take the XOR of the two maps. XOR will only keep 1 values where they exist on the fully expanded map, but not the less expanded map, i.e. the edges.
 
-The idea behind taking the average of the top n largest force contributions comes from this (https://medium.com/@rymshasiddiqui/path-planning-using-potential-field-algorithm-a30ad12bdb08) article, in which the author describes their method as using a max function on the negative forces from each obstacle, essentially considering only the repulsive force from the most repulsive object. We improve on this idea by not just taking the largest value, but an average of the n largest values, where n is a tunable parameter. The idea behind taking the average can be seen when looking at a very narrow section. When only taking the max, the effect is to produce a force near the the central line between obstacles that "oscillates" very rapidly between pointing in one direction or the other, primarly because it can only consider repulsion from one object at a time. In this simple case, averaging the force from the objects only both sides product a much smoother path for the robot to follow, the the effects of being repelled by two close by but opposing forces "cancels out". The effects of changing this average parameter are discussed below:
+.. important::
+   **As such, we propose the following modifications to the Potential Fields Algorithm:**
+
+   - Normalise the "mass" of each object by only considering the edges of the obstacle to provide a repulsive force (Implementation of this is detailed below).
+   - Take an average of the top 50 largest repulsive force contributions by magnitude.
+   - Make the positive and negative scalar parameters equal.
+
+To consider only the edges of obstacles, run an edge detection algorithm over the expanded map. Or, equivalently, when creating the C-space map; create two maps, one dilating the obstacles using a mask 2px less wide than required, and another using the full width mask, then take the XOR of the two maps. XOR will only keep ``1`` values where they exist on the fully expanded map, but not on the less expanded map, i.e. the edges. An example of this process in action is shown below:
+
+TODO Example of edge detection using XOR.
+
+The idea behind taking the average of the top n largest force contributions comes from this `this <https://medium.com/@rymshasiddiqui/path-planning-using-potential-field-algorithm-a30ad12bdb08>`_ article, in which the author describes their method as using a max function on the negative forces from each obstacle, essentially considering only the repulsive force from the most repulsive object. We improve on this idea by not just taking the largest value, but an average of the n largest values, where n is a tunable parameter. The reason for doing this becomes apparent when looking at a very narrow section. When only taking the max, the effect is to produce a force near the the central line between obstacles that "oscillates" very rapidly between pointing in one direction or the other, primarly because it can only consider repulsion from one obstacle pixel at a time, and as the force falloff is linear, this will always be the closest pixel. In this simple case, averaging the force from the objects on both sides produces a much smoother path for the robot to follow; the the effects of being repelled by two close-by but opposing forces "cancels out". The effects of changing this average parameter are shown below:
 
 **Effects of Tuning the Top N Average Parameter**
 
