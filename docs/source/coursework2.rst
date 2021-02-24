@@ -226,6 +226,7 @@ By superposing the graphs in your head, you can see in which x and y directions 
 
 Vector Fields
 -------------
+
 A vector field plot was then considered.
 This plot, known in pyplot as a “quiver”, plots vectors on a map at discrete intervals.
 This shows the direction of the force and magnitude, and allows us to see much more clearly how deniro would be driven at each point in the map.
@@ -294,10 +295,6 @@ This boundary is almost equidistant between obstacles, and at which point is whe
 This approach introduces another parameter; the number of nearby obstacle pixels to sum.
 A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
 
-----------------------------------------------------------------------------
-Task C ii: Implementing the Potential Field Algorithm, Custom Implementation
-----------------------------------------------------------------------------
-------------------------
 Square Inverse Square Fall-off
 ------------------------------
 An intuitive next step is to raise the power of the falloff of the repulsive force.
