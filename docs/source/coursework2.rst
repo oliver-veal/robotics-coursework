@@ -38,7 +38,7 @@ C-Space Map
 ==================
 
 ----------------------------------------
-Task Ai : C-Space Dilation, Square Mask
+Task A i : C-Space Dilation, Square Mask
 ----------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
@@ -47,7 +47,7 @@ As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
 -------------------------------------------
-Task Aii : C-Space Dilation, Circular Mask
+Task A ii : C-Space Dilation, Circular Mask
 -------------------------------------------
 
 To make the D-H table, the reference
@@ -56,9 +56,9 @@ To make the D-H table, the reference
 Waypoint Navigation
 ====================
 
-----------------------------------------------------
-Task Bi: Adding Waypoints by Hand, Creating the Path
-----------------------------------------------------
+-----------------------------------------------------
+Task B i: Adding Waypoints by Hand, Creating the Path
+-----------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
@@ -66,9 +66,9 @@ As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
 
--------------------------------------------------------------
-Task Bii: Adding Waypoints by Hand, Shortest Path Calculation
--------------------------------------------------------------
+--------------------------------------------------------------
+Task B ii: Adding Waypoints by Hand, Shortest Path Calculation
+--------------------------------------------------------------
 
 This task initialises the Denavit-Hartenberg, D-H, table.
 
@@ -77,7 +77,7 @@ Potential Field Algorithm
 ==========================
 
 ---------------------------------------------------------------------------
-Task Ci: General Implementation of the Potential Field Algorithm
+Task C i: General Implementation of the Potential Field Algorithm
 ---------------------------------------------------------------------------
 
 Analytical Derivation of Positive Force
@@ -129,7 +129,7 @@ Upon inspection, we can see that ``pos_force_magnitude`` must equal 1 for the gi
 This makes the positive force directly proportional to the direction to the goal, unaffected by distance.
 ``K_att`` in line 12 is the constant that will need tuning.
 
-Analytical Derivation of Positive Force
+Analytical Derivation of Negative Force
 ---------------------------------------
 
 A similar method to above can be used for the negative force.
@@ -258,6 +258,86 @@ This could suggest that the influence of the negative force was felt almost equa
 ---------------------------------------------------------------------------
 Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
 ---------------------------------------------------------------------------
+
+Remedy: Hollow obstacles
+------------------------
+
+We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
+We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
+This method on it’s own was still not enough to produce a path to the goal.
+
+.. image:: img/outlines.png
+   :width: 500
+   :alt: outlines
+
+While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room.
+
+Remedy: Search area
+-------------------
+Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
+This was implemented by sorting the influence of each pixel and summing only the greatest x number.
+Using this method, deniro had much better success in making it to the goal.
+
+.. image:: img/hollow_search.png
+   :width: 500
+   :alt: hollow_search
+
+.. image:: img/hollow_search_path.jpg
+   :width: 500
+   :alt: hollow_search
+
+As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
+This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses k_att and k_rep coefficients which are equal to each other; 20 was used in this test.
+This approach introduces another parameter; the number of nearby obstacle pixels to sum.
+A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
+
+----------------------------------------------------------------------------
+Task C ii: Implementing the Potential Field Algorithm, Custom Implementation
+----------------------------------------------------------------------------
+------------------------
+Square Inverse Square Fall-off
+------------------------------
+An intuitive next step is to raise the power of the falloff of the repulsive force.
+This helps the robot by ignoring far away points and only providing repulsion when it is very close to obstacles.
+This avoids the issue of preventing the robot from moving through gaps, and allows the attractive force to be predominant in most spaces, only when very close to an obstacle does the repulsive force take effect.
+We implemented a simple square fall off by squaring the distance_to_obstacle variable.
+Using another iterative field plot testing approach, we found these coefficients to provide a clear path:
+
+``K_att = 3``
+``K_rep = 350``
+
+.. image:: img/sqr_12_350.png
+   :width: 500
+   :alt: hollow_search
+
+.. image:: img/sqr_12_350_path.jpg
+   :width: 500
+   :alt: hollow_search
+
+**video of path**
+
+Again, Deniro follows the path as expected and reaches the goal.
+
+Observations
+------------
+
+While this method provided a valid solution, it is worth discussing the optimality.
+As we observed by manually plotting waypoints, this route is not the shortest.
+Deniro should have turned right around the table and two chairs instead of left.
+We can see from the potential fields however, that in this position the goal is more vertically than horizontally distant from deniro (i.e the direction vector is greater than 45 degrees).
+This might be the reason that deniro chose the up-most path instead of turning right, as the direction vector pointed more up than right.
+In such a case, it is difficult for the potential fields algorithm to know which route will be shorter.
+
+However, comparing the solution in part (i) to (ii), we can see that the (ii) solution is more optimal for shortest distance.
+The part (i) solution pushes deniro to the nearest path before continuing to the goal, even if that means going backwards.
+The (ii) solution does not do this, but does instead push deniro towards the goal right up until obstacles, which he then follows around the edge.
+
+See the figures below, where the (i) solution takes deniro left, and then right along the path, whereas (ii) takes deniro straight up towards the opening to the goal.
+
+.. image:: img/part_ii_comp.png
+   :width: 500
+   :alt: hollow_search
+
 
 ..
    Part ii
