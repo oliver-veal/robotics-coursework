@@ -508,6 +508,44 @@ Shafae first section:
 
 Oscar extra:
 
+Optimising Dijkstra's Algorithm with Corner Detection
+-----------------------------------------------------
+
+Using the corner detection implemented in E ii, Dijakstra’s algorithm can be run to find the optimal path in this "visibility graph".
+This implementation produced the following result, with path length 17.17m, slightly shorter than the manual waypoints length.
+
+.. image:: img/corners_dj.png
+   :width: 340
+   :alt: corners_dj
+
+.. image:: img/corners_dj_optimal.png
+   :width: 340
+   :alt: corners_dj_optimal
+
+
+.. code-block::
+   
+   Visited nodes
+                           Cost   Previous
+   Node                                    
+                        0.000000           
+   [ 0. -6.]            0.000000           
+   [ 1.40625 -7.59375]  2.125460  [ 0. -6.]
+   [-1.59375 -7.59375]  2.253903  [ 0. -6.]
+   [ 1.90625 -7.21875]  2.262552  [ 0. -6.]
+   --------------------------------
+   Results
+   Goal node:  [8. 8.]
+   Optimal cost:  17.169956534321248
+   Optimal path:
+   [[ 0.      -6.     ]
+   [ 1.90625 -3.96875]
+   [ 6.03125 -1.09375]
+   [ 7.78125  4.78125]
+   [ 8.       8.     ]]
+
+This implementation was useful for validating the combination of Dijakstra’s algorithm with our corner detection, as it agrees with our manual waypoints optimal route.
+
 ----------------------------------------------------
 Task F ii: Dijkstra's Algorithm, Planning Algorithms
 ----------------------------------------------------
