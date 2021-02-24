@@ -190,6 +190,9 @@ If xi is defined as “the unit vector from the robot to obstacle”, then 1/di 
 
 This makes the negative force inversely proportional to the distance from the robot to the sum of each obstacle pixel
 
+.. important::
+   This type of force falloff is a **linear** falloff.
+
 Implementation
 --------------
 
@@ -214,11 +217,11 @@ The magnitude could be split into x and y components and plotted separately, whi
 By superposing the graphs in your head, you can see in which x and y directions deniro would be pushed, gaining more understanding, however this is still not optimal.
 
 .. image:: img/heat_map_x.png
-   :width: 500
+   :width: 340
    :alt: heat_map_x
 
 .. image:: img/heat_map_y.png
-   :width: 500
+   :width: 340
    :alt: heat_map_y
 
 Vector Fields
@@ -251,38 +254,6 @@ This makes intuitive sense, as the sum function is adding ALL the obstacle pixel
 This also highlights that the inverse fall off was not steep enough to neglect far away points.
 Deniro was either pushed away from the centre of the room, or pulled in a straight line towards the goal, regardless of his position in the room.
 This could suggest that the influence of the negative force was felt almost equally to the attractive force, with both fields have wide influences and summing uniformly over the map, instead of having different levels of influences dependant on position.
-
-Remedy: Hollow obstacles
-------------------------
-
-We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
-We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
-This method on it’s own was still not enough to produce a path to the goal.
-
-.. image:: img/outlines.png
-   :width: 500
-   :alt: outlines
-
-While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room.
-
-Remedy: Search area
--------------------
-Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
-This was implemented by sorting the influence of each pixel and summing only the greatest x number.
-Using this method, deniro had much better success in making it to the goal.
-
-.. image:: img/hollow_search.png
-   :width: 500
-   :alt: hollow_search
-
-.. image:: img/hollow_search_path.jpg
-   :width: 500
-   :alt: hollow_search
-
-As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
-This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses k_att and k_rep coefficients which are equal to each other; 20 was used in this test.
-This approach introduces another parameter; the number of nearby obstacle pixels to sum.
-A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
 
 ---------------------------------------------------------------------------
 Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
@@ -338,6 +309,39 @@ Some consideration would need to be given to some edge cases with this algorithm
 Consider for example consider the case of a single point obstacle close to a "wall" (line) of obstacle pixels. It is possible in this case to encounter the same problem as when just taking a global average of all pixel forces, that is, the repulsive force from the single pixel does not contribute enough to the average to avoid the robot from crashing into it.
 
 Another case would be that of non-convex obstacles (for example a "bowl" or "banana" type shape). ------- TODO Expand on this
+
+Remedy: Hollow obstacles
+------------------------
+
+We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
+We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
+This method on it’s own was still not enough to produce a path to the goal.
+
+.. image:: img/outlines.png
+   :width: 500
+   :alt: outlines
+
+While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room.
+
+Remedy: Search area
+-------------------
+Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
+This was implemented by sorting the influence of each pixel and summing only the greatest x number.
+Using this method, deniro had much better success in making it to the goal.
+
+.. image:: img/hollow_search.png
+   :width: 500
+   :alt: hollow_search
+
+.. image:: img/hollow_search_path.jpg
+   :width: 500
+   :alt: hollow_search
+
+As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
+This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses k_att and k_rep coefficients which are equal to each other; 20 was used in this test.
+This approach introduces another parameter; the number of nearby obstacle pixels to sum.
+A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
+
 
 ==========================
 Probabilistic Road Map
