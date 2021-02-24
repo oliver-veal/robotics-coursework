@@ -183,6 +183,40 @@ If xi is defined as “the unit vector from the robot to obstacle”, then 1/di 
 
 This makes the negative force inversely proportional to the distance from the robot to the sum of each obstacle pixel
 
+Implementation
+--------------
+
+Running the code with the initial coefficients led deniro to crash into the table ahead.
+To gain a better understanding of the influence of the potential field forces, we implemented different visualisation methods and chose the most useful to help iterate the paramters.
+These methods began with making a clone of the “potential” function. Instead of using deniro’s position to calculate its own direction vector and returning an updated position, the function was nested inside for loops to iterate over every location in the room.
+For each location, the vector direction was calculated.
+This allows us to see at each location how deniro would react, and plot his expected path from the goal (sum of positive and negative forces).
+
+Heat Map
+--------
+
+Our first idea was to plot heat maps of the forces experienced. This method was useful as a proof of concept, however there were some limitations when collapsing down the data to 3D (x, y, colour value).
+This meant only one metric could be plotted.
+Plotting magnitude of force shows relative strength but loses direction and positive / negative sign, but does give an idea of whether the edges are detected or whether deniro would run into obstacles.
+
+.. image:: img/heat_map_mag.png
+   :width: 500
+   :alt: heat_map_mag
+
+The magnitude could be split into x and y components and plotted separately, which also allows positive and negative values to be seen.
+By superposing the graphs in your head, you can see in which x and y directions deniro would be pushed, gaining more understanding, however this is still not optimal.
+
+.. image:: img/heat_map_x.png
+   :width: 500
+   :alt: heat_map_x
+
+.. image:: img/heat_map_y.png
+   :width: 500
+   :alt: heat_map_y
+
+Vector Fields
+-------------
+A vector field plot was then considered. This plot, known in pyplot as a “quiver”, plots vectors on a map at discrete intervals. This shows the direction of the force and magnitude, and allows us to see much more clearly how deniro would be driven at each point in the map.
 
 ---------------------------------------------------------------------------
 Task Cii: Implementing the Potential Field Algorithm, Custom Implementation
