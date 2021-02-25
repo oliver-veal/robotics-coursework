@@ -438,9 +438,9 @@ Line 23 defines the negative force.
 
 We can see that xi/di in the equation is stored in ``obstacle_force`` in the code. ``obstacle_force`` is defined in the line above as ``force_direction * force_magnitude``.
 
-If xi is defined as “the unit vector from the robot to obstacle”, then 1/di must be ``force_magnitude``. Given that di is defined as “the distance from the roboto to the obstacle”, this means in the ``force_magnitude`` definition, we should use ``1 / distance_to_obstacle``.
+If xi is defined as “the unit vector from the robot to obstacle”, then 1/di must be ``force_magnitude``. Given that di is defined as “the distance from the robot to the obstacle”, this means in the ``force_magnitude`` definition, we should use ``1 / distance_to_obstacle``.
 
-This makes the negative force inversely proportional to the distance from the robot to the sum of each obstacle pixel
+This makes the negative force inversely proportional to the distance from the robot to the sum of each obstacle pixel.
 
 .. important::
    This type of force falloff is a **linear** falloff.
@@ -449,17 +449,17 @@ Implementation
 --------------
 
 Running the code with the initial coefficients led deniro to crash into the table ahead.
-To gain a better understanding of the influence of the potential field forces, we implemented different visualisation methods and chose the most useful to help iterate the paramters.
+To gain a better understanding of the influence of the potential field forces, we implemented different visualisation methods and chose the most useful to help iterate the parameters.
 These methods began with making a clone of the “potential” function. Instead of using deniro’s position to calculate its own direction vector and returning an updated position, the function was nested inside for loops to iterate over every location in the room.
 For each location, the vector direction was calculated.
-This allows us to see at each location how deniro would react, and plot his expected path from the goal (sum of positive and negative forces).
+This allows us to see at each location how DE NIRO would react, and plot his expected path from the goal (sum of positive and negative forces).
 
 Heat Map
 --------
 
 Our first idea was to plot heat maps of the forces experienced. This method was useful as a proof of concept, however there were some limitations when collapsing down the data to 3D (x, y, colour value).
 This meant only one metric could be plotted.
-Plotting magnitude of force shows relative strength but loses direction and positive / negative sign, but does give an idea of whether the edges are detected or whether deniro would run into obstacles.
+Plotting magnitude of force shows relative strength but loses direction and positive / negative sign, but does give an idea of whether the edges are detected or whether DE NIRO would run into obstacles.
 
 .. image:: img/heat_map_mag.png
    :width: 500
@@ -468,7 +468,7 @@ Plotting magnitude of force shows relative strength but loses direction and posi
 *Figure 9: Heat Map*
 
 The magnitude could be split into x and y components and plotted separately, which also allows positive and negative values to be seen.
-By superposing the graphs in your head, you can see in which x and y directions deniro would be pushed, gaining more understanding, however this is still not optimal.
+By superposing the graphs in your head, you can see in which x and y directions DE NIRO would be pushed, gaining more understanding, however this is still not optimal.
 
 .. image:: img/heat_map_x.png
    :width: 340
@@ -1169,7 +1169,7 @@ Dijkstra’s algorithm is defined as a one-to-many planning algorithm or a SSSP 
 The advantages of a one-to-many planning algorithm is that:
 If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
 
-The main advantage of Dijkstra’s algorithm is the relatively low complexity that makes it close to linear. It has a complexity of O(V + E . log(V)), where V is the number of nodes and E is the number of edges. [5]_ Given that E equals close to V^2, the complexity is O (V +V^2 . log(V)). There are however motion planning algorithms with even lower complexity than this.
+The main advantage of Dijkstra’s algorithm is the relatively low complexity that makes it close to linear. It has a complexity of *O(V + Elog(V))*, where *V* is the number of nodes and *E* is the number of edges. [5]_ Given that *E* equals close to *V*:sup:`2`, the complexity is *O(V +* *V*:sup:`2`\ *log(V))*. There are however motion planning algorithms with even lower complexity than this.
 
 It is fairly straightforward to implement and a common algorithm for motion planning.
 
@@ -1177,12 +1177,12 @@ The issue comes in when changing the start point, so if from the goal node, you 
 
 A* is a one-to-one planning algorithm that is more efficient than Dijkstra’s when focusing on the path between two specific nodes. It utilises an admissible heuristic that provides an estimate of the distance between nodes in the graph and the goal node. A particular example of this is to use Manhattan distances which uses grid coordinates for each node. There are however multiple heuristics that can be adopted. The benefit of this is that it favours nodes which get closer to the goal node, meaning that all nodes do not need to be evaluated. [7]_
 
-Each time moving from one node to another, an estimate of the distance remaining from the destination will help in informing the next move. If the graph was a map of the world, then the straight line distance can be calculated from the longitude and latitude of each point. A* is an enhancement of Dijkstra’s algorithm, except it has added heuristics to inform the next move. For example if the Euclidean distance is provided between each node and the goal node, and this is stated as Heuristic distance H. Then a second value of cost from the starting node is given, where cost is G (the same as in Dijkstra’s). Then a simple heuristic would be f = G + H. Instead of choosing the node with the lowest cost, like in Dijkstra’s, instead the node with the lowest f value would be selected. This is iterated further similar to Dijkstra’s but the end result is that every vertex need not be visited. As the graph scales up, the saving in time and computation is more pronounced, which is why A* is the desired motion plan when using one-to-one planning (starting node and goal node). Again, the heuristic is arbitrary and can be adapted for the situation accordingly.
+Each time moving from one node to another, an estimate of the distance remaining from the destination will help in informing the next move. If the graph was a map of the world, then the straight line distance can be calculated from the longitude and latitude of each point. A* is an enhancement of Dijkstra’s algorithm, except it has added heuristics to inform the next move. For example if the Euclidean distance is provided between each node and the goal node, and this is stated as Heuristic distance H. Then a second value of cost from the starting node is given, where cost is *G* (the same as in Dijkstra’s). Then a simple heuristic would be *f = G + H*. Instead of choosing the node with the lowest cost, like in Dijkstra’s, instead the node with the lowest f value would be selected. This is iterated further similar to Dijkstra’s but the end result is that every vertex need not be visited. As the graph scales up, the saving in time and computation is more pronounced, which is why A* is the desired motion plan when using one-to-one planning (starting node and goal node). Again, the heuristic is arbitrary and can be adapted for the situation accordingly.
 
 A summary of A* pathfinding algorithm is provided here:
    * A* finds the shortest path between two vertices
    * A* does not typically have to visit all vertices
-   * A* selects the node with the lowest f value where f = G + H. The cost, G, is the same as Dijkstra’s Algorithm, whereas H is a heuristic relevant to A* that can be defined in many ways, e.g. Euclidean Distance. The node with the lowest f value is selected until the goal node is reached.
+   * A* selects the node with the lowest *f* value where *f = G + H*. The cost, *G*, is the same as Dijkstra’s Algorithm, whereas *H* is a heuristic relevant to A* that can be defined in many ways, e.g. Euclidean Distance. The node with the lowest *f* value is selected until the goal node is reached.
    * The better the heuristic, the quicker the path can be found without visiting all nodes
    * The heuristic is typically problem specific
    * A* will always find a solution if one exists
