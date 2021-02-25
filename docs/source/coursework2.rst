@@ -1345,6 +1345,13 @@ Detailed Step-by-step Code Explanation Video
         <iframe src="https://drive.google.com/file/d/1eqUKlKpkjGhpRzDSjI3D2m0nTbimJcIs/preview" width="640" height="480"></iframe>
     </div
 
+=====
+
+.. image:: img/deniro.png
+   :width: 500
+   :alt: corners_dj_optimal
+
+
 ==========
 References
 ==========
