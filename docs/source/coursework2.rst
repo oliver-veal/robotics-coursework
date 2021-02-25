@@ -390,39 +390,6 @@ Consider for example consider the case of a single point obstacle close to a "wa
 
 Another case would be that of non-convex obstacles (for example a "bowl" or "banana" type shape). ------- TODO Expand on this
 
-Remedy: Hollow obstacles
-------------------------
-
-We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
-We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
-This method on it’s own was still not enough to produce a path to the goal.
-
-.. image:: img/outlines.png
-   :width: 500
-   :alt: outlines
-
-While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room.
-
-Remedy: Search area
--------------------
-Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
-This was implemented by sorting the influence of each pixel and summing only the greatest x number.
-Using this method, deniro had much better success in making it to the goal.
-
-.. image:: img/hollow_search.png
-   :width: 500
-   :alt: hollow_search
-
-.. image:: img/hollow_search_path.jpg
-   :width: 500
-   :alt: hollow_search
-
-As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
-This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses k_att and k_rep coefficients which are equal to each other; 20 was used in this test.
-This approach introduces another parameter; the number of nearby obstacle pixels to sum.
-A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
-
-
 ==========================
 Probabilistic Road Map
 ==========================
@@ -440,7 +407,61 @@ The D-H table is a convenient way to store this information as the transformatio
 Task Dii: Harris Corner Detection
 ---------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
+(Stuff for Cii to avoid merge conflicts)
+Method 1: Inverse Square falloff
+Adv:
+- When far from any obstacles, almost no repulsive force is experienced.
+- This means that when in free space, the robot will make a "B-line" towards the goal.
+- When encountering an object, the obstacle essentially has a thin "force-field" around it, preventing collisions while maintaining close to the optimal path.
+
+Disadv:
+- Does not handle non-convex obstacles well; easy to get stuck inside them as the repulsive force is very local and doesn't take into account the wider surroundings.
+- Essentially a "greedy" algorithm therefore (although not exactly in the traditional sense). Can product close to an optimal path but can be confounded easily as well.
+
+Use cases:
+- When you need a shorter path
+- When all or most of your important obstacles are convex hulls
+- When you don't care how close the robot comes to the obstacles
+
+Method 2: Linear Falloff with Mass Normalisation and Top-N Average
+Adv:
+- Potentially a "smoother" path with fewer rapid turns (if the avg is tuned correctly)
+- Deals with narrow passages extremely smoothly
+- Better at dealing with non-convex obstacles as forces from futher away can have more impact, giving some situations a wider perception of the environment
+- Keeps the robots as far away from obstacles as possible while making good progress towards the goal.
+
+Disadv:
+- Usually a longer path, due to the path being more geometrically centered between obstacles (doesn't tend to "B-line" towards the goal, but remain between obstacles)
+
+
+Use cases:
+- If you need to keep the robot further away from obstacles
+- For example an RC boat where the water becomes shallow near obstacles (shores of islands for instance) so the ideal path should be more centrered.
+
+**Discussion**
+
+
+
+**Method 1: Pseudo Edge Detection**
+
+One method would be to loop over every pixel in the map (or to save some computation time, some step size e.g. every 5 pixels) and take a sample of N points around the pixel in some shape (e.g. a loose grid with 2px spacing). Then take an average of the sampled values (e.g. 20 nearby pixels sampled, 8 of the are obstacle pixels, ``1``, and 12 of them are not, ``0``, giving an average value of 8/20 = 0.4), and multiply by some global probablity of placing a point at a given pixel (e.g. we want around ``N=100`` sampled points in total, and there are 320 * 320 = 102'400 pixels, so at each pixel the probabilty of placing a point there is 100 / 102'400). In total we will have fewer than our chosen number of sample points due to the obstacle probabilty multiplier, but we can account for this by increasing ``N``. Overall this method will have the effect of sampling more points near to the edges of obstacles, and especially if there is a small gap, given that we choose an appropriate sampling kernel.
+
+What we have essentially done with this method is perform a convolution of the C-space map with a kernel of our choosing to create a "probabilty of sampling a point" map, then sampling that map to produce points for the PRM algorithm. The effect of this approach will be to reduce the number of points in open space, and increase the grouping of points around edges. This will help shorten the length of the path the algorithm produces, as well as deal better with narrow passages, as it can be shown that for an optimal path, each node in the graph will always lie on an edge (or for convex polygons, a corner) of an obstacle. This is explained in the following note:
+
+.. note::
+   **The optimal (shortest) path will always lie along the visiblity graph of the C-space map:**
+
+**Method 1a: Edge Detection**
+
+Alternatively, using an equavalent probabilistic sampling method by iterating over all the pixels in the map, but using the output of an edge detection filter implemented using SciPy or OpenCV would achieve slightly more optimal results, perhaps even more efficiently due the the optimisation of the functions in the mentioned libraries. You could also skip many iterations early by not bothering to probabilistically sample any points if they are a ``0`` in the output of the edge detection (i.e. not an edge).
+
+**Method 2: Corner Detection**
+
+As a result of the observation that for a map consisting of convex polygons (or at least, shapes with straight edges and sharp or filleted corners) such as the one in this coursework, the shortest path will always be along the visibility graph for the map. The points on the graph can be selected by using a corner detection filter on the C-space map, such as one implemented in ScyPi or OpenCV.
+
+.. note::
+   A caveat of only using corner detection to select points is that there are some cases of arrangements of obstacles where you will also need a point along the edge of an obstacle, not just on the corner, to create a proper visibility graph, or at last find a valid path. While this isn't the case for our relatively simple C-space map, it could be beneficial to combine both methods, that is, use corner detection to find the corners of shapes, then use edge detection to randomly sample points along the edges of the shapes as well. This way when it comes to creating the graph, it is more likely that a near-optimal and valid path can be created.
+
 
 -----------------------------------------------------------------
 Task Ei: Creating the Graph, Tuning Distances for Creating Edges
