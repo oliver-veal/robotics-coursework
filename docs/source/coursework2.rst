@@ -1249,7 +1249,7 @@ This implementation produced the following result, with path length 17.17m, slig
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 1
+   :emphasize-lines: 12
 
    Visited nodes
                            Cost   Previous
@@ -1289,11 +1289,12 @@ Task F ii: Dijkstra's Algorithm, Planning Algorithms
 Dijkstra’s algorithm is defined as a one-to-many planning algorithm or a SSSP (Single Source Shortest Path) where it is able to find the shortest distance from the starting node to every other node in the graph. This is clearly seen in the example run through of a general use of Dijkstra’s.
 
 The advantages of a one-to-many planning algorithm is that:
-If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
 
-The main advantage of Dijkstra’s algorithm is the relatively low complexity that makes it close to linear. It has a complexity of *O(V + Elog(V))*, where *V* is the number of nodes and *E* is the number of edges. [5]_ Given that *E* equals close to *V*:sup:`2`, the complexity is *O(V +* *V*:sup:`2`\ *log(V))*. There are however motion planning algorithms with even lower complexity than this.
+* If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
 
-It is fairly straightforward to implement and a common algorithm for motion planning.
+* Relatively low complexity that makes it close to linear. It has a complexity of *O(V + Elog(V))*, where *V* is the number of nodes and *E* is the number of edges. [5]_ Given that *E* equals close to *V*:sup:`2`, the complexity is *O(V +* *V*:sup:`2`\ *log(V))*. There are however motion planning algorithms with even lower complexity than this.
+
+* It is fairly straightforward to implement and a common algorithm for motion planning.
 
 The issue comes in when changing the start point, so if from the goal node, you want to calculate a new goal node, the entire graph would need to be recalculated. This means that with changing starting points, the entire graph needs to be recalculated. In most motion planning problems, it is unlikely that Dijkstra will be beneficial as the starting node rarely stays the same. Dijkstra’s algorithm is not optimal and actually quite inefficient if the starting node is changing frequently. To find the shortest distance from two specific points only (starting node and goal node), A* is a better algorithm to utilise. [6]_
 
