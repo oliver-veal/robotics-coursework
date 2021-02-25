@@ -334,9 +334,9 @@ To complete the code, we can compare the definitions of the forces to the equati
    :width: 200
    :alt: Robot Diagram
 
-*Fig x: Definition for force of attraction*
+*Equation 1: Definition for force of attraction*
 
-Line 15 in the above code corresponds to equation x. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
+Line 15 in the above code corresponds to equation 1. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
 
 +--------+---------------------------+-----------------------------+
 | Term   | Variable                  | Description                 |
@@ -391,7 +391,7 @@ A similar method to above can be used for the negative force.
    :width: 200
    :alt: Robot Diagram
 
-*Fig x: Equation for force of repulsion*
+*Equation 2: Equation for force of repulsion*
 
 Line 23 defines the negative force.
 
@@ -438,6 +438,8 @@ Plotting magnitude of force shows relative strength but loses direction and posi
    :width: 500
    :alt: heat_map_mag
 
+*Figure 9: Heat Map*
+
 The magnitude could be split into x and y components and plotted separately, which also allows positive and negative values to be seen.
 By superposing the graphs in your head, you can see in which x and y directions deniro would be pushed, gaining more understanding, however this is still not optimal.
 
@@ -449,6 +451,8 @@ By superposing the graphs in your head, you can see in which x and y directions 
    :width: 340
    :alt: heat_map_y
 
+*Figure 10, 11: Heat Map X component (left), Heat Map Y component (right)*
+
 Vector Fields
 -------------
 
@@ -459,6 +463,8 @@ This shows the direction of the force and magnitude, and allows us to see much m
 .. image:: img/lin_vector.png
    :width: 500
    :alt: lin_vector
+
+*Figure 12: Vector Field Map*
 
 .. tip::
    Click on an image to bring up a full-resolution version of it!
@@ -517,7 +523,7 @@ Paramters used below: ``K_att = 1.5   K_rep = -16``
    :width: 500
    :alt: lin_vector
 
-
+*Figure 13: Setting repulsive force as attractive vector field map*
 
 -----------------------------------------------------------------
 Task C ii: Custom Implementation of the Potential Field Algorithm
@@ -559,6 +565,8 @@ Paramters used below: ``K_att = 20   K_rep = 20``
    :width: 340
    :alt: outlines
 
+*Figure 14, 15: Hollow obstacle map (left) and Hollow Obstacle map with vector field plot (right)*
+
 .. note::
    The vector lines in this plot have been normalised as their magnitudes vary greatly. This would also be implemented in the robot control.
 
@@ -586,6 +594,8 @@ The idea behind taking the average of the top n largest force contributions come
    :width: 340
    :alt: hollow_search
 
+*Figure 16, 17: Hollow obstacle map (left) and Hollow obstacle map with vector field plot (right)*
+
 As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
 This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing DeNiro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses ``k_att`` and ``k_rep`` coefficients which are equal to each other; 20 was used in this test.
 This approach introduces another parameter; the number of nearby obstacle pixels to sum.
@@ -599,7 +609,7 @@ Consider for example consider the case of a single point obstacle close to a "wa
 
 To solve this issue, a more robust falloff function could be used that causes the repulsive force's magnitude to be extremely large when very close to an obstacle pixel, no matter the overall size of the obstacle:
 
-Method 3: Square Inverse Square Falloff
+Method 3: Square Inverse Falloff
 ----------------------------------------
 An intuitive next step is to raise the power of the falloff of the repulsive force.
 This helps the robot by ignoring points further away and only providing repulsion when it is very close to obstacles.
@@ -616,9 +626,10 @@ Paramters used below: ``K_att = 3  K_rep = 350``
    :width: 340
    :alt: hollow_search
 
+*Figure 18, 19: Square inverse falloff vector map (left) and Square inverse falloff vector map with path (right)*
+
 .. note::
    This method can be applied with hollow obstacles as well and provides similar results.
-
 
 We then decided to test this route with DeNiro in Gazebo.
 We recorded the DeNiro simulation and overlaid the vector field plot to validate if DeNiro follows the path as expected.
@@ -631,7 +642,6 @@ The results illustrate perfectly how DeNiro follows the expected path and reache
     </div
 
 =====
-
 
 Observations
 ------------
@@ -652,6 +662,8 @@ See the figures below, where the **Method 2** solution takes DeNiro left, and th
 .. image:: img/methods_comp_annot.png
    :width: 500
    :alt: methods_comp_annot
+
+*Figure 20: Method 2 (right), Method 3 (left)*
 
 Method Comparison
 -----------------
@@ -707,7 +719,7 @@ To generate a probabilistic roadmap, we first sample the whole map area randomly
    :width: 500
    :alt: di_prm_illustration
 
-*Example of randomly sampled points on a map before and after being marked as viable.* [1]_
+*Figure 21: Example of randomly sampled points on a map before and after being marked as viable.* [1]_
 
 The random points are generated by the code below:
 
@@ -739,7 +751,7 @@ With 100 points, here is how the distribution turned out, which can be visually 
    :width: 250
    :alt: prm_1m_Crop
 
-*Randomly distributed points for PRM marked as rejected or not*
+*Figure 22: Randomly distributed points for PRM marked as rejected or not*
 
 ----------------------------------
 Task D ii: Harris Corner Detection
@@ -799,37 +811,37 @@ The following values were tested:
    :width: 250
    :alt: C2TE_MIN0MAX20
 
-*Default Min 0 Max 20 - overly dense graph, completely unusable*
+*Figure 23: Default Min 0 Max 20 - overly dense graph, completely unusable*
 
 .. image:: img/C2TE_MIN2MAX3.png
    :width: 250
    :alt: C2TE_MIN2MAX3
 
-*Min 2 Max 3 - Graph has good density but sparse in some areas as minimum distance is likely too high*
+*Figure 24: Min 2 Max 3 - Graph has good density but sparse in some areas as minimum distance is likely too high*
 
 .. image:: img/C2TE_MIN1MAX3.png
    :width: 250
    :alt: C2TE_MIN1MAX3
 
-*Min 1 Max 3 - Improved graph but density could be increased by reducing* ``mindist`` *and increasing* ``maxdist``.
+*Figure 25: Min 1 Max 3 - Improved graph but density could be increased by reducing* ``mindist`` *and increasing* ``maxdist``.
 
 .. image:: img/C2TE_MIN0_5MAX3_5.png
    :width: 250
    :alt: C2TE_MIN0_5MAX3_5
 
-*Min 0.5 Max 3.5 - Improved graph, but density could be increased, therefore increase* ``maxdist``.
+*Figure 26: Min 0.5 Max 3.5 - Improved graph, but density could be increased, therefore increase* ``maxdist``.
 
 .. image:: img/C2TE_MIN0_5MAX3_8.png
    :width: 250
    :alt: C2TE_MIN0_5MAX3_8
 
-*Min 0.5 Max 3.8 - Ideal max value selected, good density of edges for long distances, but short distances between nodes could still be improved for more edge options when creating motion plan, decrease* ``mindist``.
+*Figure 27: Min 0.5 Max 3.8 - Ideal max value selected, good density of edges for long distances, but short distances between nodes could still be improved for more edge options when creating motion plan, decrease* ``mindist``.
 
 .. image:: img/C2TE_MIN0_2MAX3_8.png
    :width: 250
    :alt: C2TE_MIN0_2MAX3_8
 
-*Min 0.2 Max 3.8 - Ideal graph with good overall edge density.*
+*Figure 28: Min 0.2 Max 3.8 - Ideal graph with good overall edge density.*
 
 
 ----------------------------------------------------------
@@ -867,43 +879,43 @@ Different resolutions were tested to see their effectiveness for removing edges.
    :width: 250
    :alt: C2TE_RES5
 
-*5 - Does not capture any information along the edge as the step is larger than the maximum distance, therefore all edges colliding with objects still present.*
+*Figure 29: 5 - Does not capture any information along the edge as the step is larger than the maximum distance, therefore all edges colliding with objects still present.*
 
 .. image:: img/C2TE_RES3.png
    :width: 250
    :alt: C2TE_RES3
 
-*3 - Detects very few obstacles but not all, likely due to the step size being close to* ``maxdist`` *value.*
+*Figure 30: 3 - Detects very few obstacles but not all, likely due to the step size being close to* ``maxdist`` *value.*
 
 .. image:: img/C2TE_RES2.png
    :width: 250
    :alt: C2TE_RES2
 
-*2 - Captures more edges, but still not suitable step size (resolution) for shorter distances.*
+*Figure 31: 2 - Captures more edges, but still not suitable step size (resolution) for shorter distances.*
 
 .. image:: img/C2TE_RES1.png
    :width: 250
    :alt: C2TE_RES1
 
-*1 - Majority of edges detected in this, but would not be suitable for shorter distances which may occur in a different iteration (given that points are generated randomly).*
+*Figure 32: 1 - Majority of edges detected in this, but would not be suitable for shorter distances which may occur in a different iteration (given that points are generated randomly).*
 
 .. image:: img/C2TE_RES0_5.png
    :width: 250
    :alt: C2TE_RES0_5
 
-*0.5 - Improved result from previous iteration, but would be more robust to decrease to hypothesised value of 0.16m.*
+*Figure 33: 0.5 - Improved result from previous iteration, but would be more robust to decrease to hypothesised value of 0.16m.*
 
 .. image:: img/C2TE_RES0_16.png
    :width: 250
    :alt: C2TE_RES0_16
 
-*0.0625 - Highest possible resolution to check along a line by checking across each pixel.*
+*Figure 34: 0.0625 - Highest possible resolution to check along a line by checking across each pixel.*
 
 .. image:: img/C2TE_RES0_16_2.png
    :width: 250
    :alt: C2TE_RES0_16_2
 
-*0.0625, zoomed in - taking a closer look at one of the edges, it is clear that the resolution is highly effective and has now produced a suitable graph with no collision with obstacles.*
+*Figure 35: 0.0625, zoomed in - taking a closer look at one of the edges, it is clear that the resolution is highly effective and has now produced a suitable graph with no collision with obstacles.*
 
 Another parameter that could be used to remove edges or potentially create edges in the first place, such as in the first task, would be to optimise the path for Robot DeNiro. The robot is non-holonomic and must rotate its wheels in opposite directions to spin on the spot. Therefore, one potential option that could be used to improve the motion plan would be to reject any edges with large changes in direction. This could be implemented by comparing unit direction vectors and defining a maximum allowable change in direction. Although this may not be the shortest distance, it could potentially be more efficient for Robot DeNiro to traverse. Once the suitable graph would be created based on this, the same process of Dijkstra’s algorithm to find the shortest path would be implemented. This process could be likened to implementing *motion primitives* that limit the allowable angles that can be used.
 
@@ -930,11 +942,13 @@ With this logic, a more optimal PRM algorithm would make sure to place more poin
 By extension of this logic, what if only the corners were plotted? To test this, a corner detection algorithm was written to identify and place points only at vertices.
 The resulting graph takes a fraction of the time to compute given the far fewer points, and is guaranteed to give the best chance of finding the best route. This turns the PRM method into an optimal method, and shows the path we initially used in the manual waypoints section.
 
-Dijakstra’s algorithm can then be used to find the shortest path (discussed later).
+Dijkstra’s algorithm can then be used to find the shortest path (discussed later).
 
 .. image:: img/corners.png
    :width: 500
    :alt: methods_comp_annot
+
+*Figure 36: Corner Detection*
 
 -------------------------------------------------
 Task F i: Dijkstra's Algorithm, Creating the Path
@@ -954,12 +968,15 @@ General algorithm for Dijkstra’s [4]_:
    :width: 300
    :alt: Fi_D0
 
+*Figure 37, 38: Node Key (left) and Initial Graph (right)*
+
 1. Mark the initial node costs from the starting node, e.g. A has a distance of 0. The rest are unvisited so set them with an extremely high value, e.g. 1,000,000 or 1e6. This has been marked in the example. Also establish a list of all visited and unvisited nodes. 
 
    .. image:: img/Fi_D1.png
       :width: 300
       :alt: Fi_D1
 
+*Figure 39: Dijkstra Step 1*
 
 2. Visit the node which has the lowest cost from the start and update the visited nodes dataframe. Mark the previous node from which the cost was calculated from to get to the visited node. In the example, A has the lowest cost, so it is added as a visited node. 
 
@@ -967,6 +984,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D2
 
+*Figure 40: Dijkstra Step 2*
 
 3. Examine the unvisited neighbours of the current node and mark the cost to go to them from the starting node, including the node's traversed to get to them. If the new cost is less than the previous cost, update it with the new cost, if it is greater than the previous cost, then leave the value unchanged. In the example, it is the edge cost from A to B, C and D respectively with all values updated. 
 
@@ -974,6 +992,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D3
 
+*Figure 41: Dijkstra Step 3*
 
 4. Repeat steps 2 - 3 until all unvisited nodes have been visited. In the example, B has the lowest cost so is marked as visited. Its unvisited neighbours are C and E, with the value of C lower than before, therefore updated from 4 to 3. 
 
@@ -981,6 +1000,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D4
 
+*Figure 42: Dijkstra Step 4, algorithm complete and repeats, further steps specfic to problem shown*
 
 5. The smallest cost is now C, so it is marked as a visited node. The neighbouring nodes are evaluated, F, and it is found that the cost from the starting node is 8, i.e. 3 + 5 = 8. 
 
@@ -988,6 +1008,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D5
 
+*Figure 43: Dijkstra Step 5*
 
 6. The smallest cost is E, so i marked as a visite dnode. Its neighbouring node F, has an updated cost from 8 to 7. 
 
@@ -995,6 +1016,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D6
 
+*Figure 44: Dijkstra Step 6*
 
 7. D has the smallest cost so is visited next and the visited nodes list is updated. The neighbouring nodes are evaluated and it is found that no cost is lowered. 
 
@@ -1002,6 +1024,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D7
 
+*Figure 45: Dijkstra Step 7*
 
 8. The final node left to visit is F. This means all nodes have now been visited and the **ALGORITHM IS COMPLETE**. The number of steps required will depend on the number of nodes to evaluate. 
 
@@ -1009,6 +1032,7 @@ General algorithm for Dijkstra’s [4]_:
       :width: 300
       :alt: Fi_D8
 
+*Figure 46: Dijkstra Step 8*
 
 This is the general theory and can vary slightly depending on implementation. The Python implementation for this in ``motion_planning.py`` is explained in the code block below.
 
@@ -1032,6 +1056,8 @@ Although Dijkstra’s did provide the optimal shortest path, it only did this wi
 .. image:: img/C2TE_DJIKSTRA_1.png
       :width: 250
       :alt: C2TE_DJIKSTRA_1
+
+*Figure 47: Dijkstra shortest path based on randomly distributed points*      
 
 The path is clearly not as optimal as it relies on the random distribution of points generated by the PRM algorithm implemented. Dijkstra provides locally optimal choices at each stage to find the global optimum. Although close in this case, it could’ve been complete if the points generated were different and hence the path. To generate a more optimal route using Dijkstra’s, we instead used corner detection to produce the points.
 
@@ -1057,6 +1083,7 @@ This implementation produced the following result, with path length 17.17m, slig
    :width: 340
    :alt: corners_dj_optimal
 
+*Figure 48, 49: Graph generated with corner detection (left) and Corner Detection with Dijkstra shortest path (right)* 
 
 .. code-block::
    
