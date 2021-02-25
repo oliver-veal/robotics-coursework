@@ -661,7 +661,7 @@ The idea behind taking the average of the top n largest force contributions come
    :width: 680
    :alt: Tuning Avg40
 
-*Figure 16a, 16b, 16c, 16d: Effects of changing the Average parameter, smoothing out the field lines flow between obstacles. 16e shows the flow lines of the final avg=40 parameter*
+*Figure 16a, 16b, 16c, 16d: Effects of changing the Average parameter, smoothing out the field lines between obstacles. 16e shows the flow lines of the final avg=40 parameter, giving an optimal amount of smoothing*
 
 **Valid Paths Produced By This Method**
 
