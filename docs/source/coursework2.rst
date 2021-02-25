@@ -1034,7 +1034,7 @@ The reason this is required is that distance and direction are evaluated in ``ed
    :linenos:
    :emphasize-lines: 1
    
-    resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
+   resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
 
    edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2)) # Creates points along direction vector to check for collisions
    # This creates an array of points from Point A till point B and utilises the unit direction vector specified and interpolates points along it in step sizes of variable resolution
