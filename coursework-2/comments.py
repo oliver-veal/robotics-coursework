@@ -260,27 +260,154 @@ def generate_random_points(self, N_points):
 ##################################################################################
 #                                   TASK E.i  
 ##################################################################################
+def create_graph(self, points):
+    # Choose your minimum and maximum distances to produce a suitable graph
+    mindist = 0.2
+    maxdist = 3.8
 
+    # Calculate a distance matrix between every node to every other node
+    distances = cdist(points, points)
 
+    # Create two dictionaries
+    graph = {}  # dictionary of each node, and the nodes it connects to
+    distances_graph = {}    # dictionary of each node, and the distance to each node it connects to
+
+    plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')  # setup a plot of the map
+
+            
+    for i in range(points.shape[0]):    # loop through each node
+        points_in_range = points[(distances[i] >= mindist) & (distances[i] <= maxdist)]     # get nodes an acceptable distance of the current node
+        distances_in_range = distances[i, (distances[i] >= mindist) & (distances[i] <= maxdist)]    # get the corresponding distances to each of these nodes
+
+    if points_in_range.shape[0] > 0:    # if there are any nodes in an acceptable range
+        # set up arrays of nodes with edges that don't collide with obstacles, and their corresponding distances
+        collision_free_points = np.empty((1, 2))
+        collision_free_distances = np.empty((1, 1))
 
 ##################################################################################
 #                                   TASK E.ii   
 ##################################################################################
 
+def check_collisions(self, pointA, pointB):
+    ############################################################### TASK E ii     
+    # Calculate the distance between the two point
+    distanceVector = pointB - pointA
+    distance = np.linalg.norm(distanceVector)
+    # Calculate the UNIT direction vector pointing from pointA to pointB
+    direction = distanceVector / distance
+    # Choose a resolution for collision checking
+    resolution = 0.5   # resolution to check collision to in m
 
+    # Create an array of points to check collisions at
+    edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
+    # Convert the points to pixels
+    edge_pixels = self.map_position(edge_points)
 
-##################################################################################
-#                                   TASK E.iii   
-##################################################################################
-
-
+    for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
+        collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
+        if collision == 1:
+            return True     # if there's a collision, immediately return True
+    return False    # if it's got through every pixel as hasn't returned yet, return False
 
 ##################################################################################
 #                                   TASK F.i   
 ##################################################################################
 
+def dijkstra(self, graph, edges):
+    ############################################################### TASK F
+    goal_node = goal
+    nodes = list(graph.keys())
+    
+    # Create a dataframe of unvisited nodes
+    # Initialise each cost to a very high number
+    initial_cost = 1000000.0  # Set this to a suitable value
+    
+    unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
+    unvisited.set_index('Node', inplace=True)
+    # Set the first node's cost to zero
+    unvisited.loc[[str(initial_position)], ['Cost']] = 0.0
+    
+    # Create a dataframe of visited nodes (it's empty to begin with)
+    visited = pd.DataFrame({'Node':[''], 'Cost':[0.0], 'Previous':['']})
+    visited.set_index('Node', inplace=True)
+    
+    # Take a look at the initial dataframes
+    print('--------------------------------')
+    print('Unvisited nodes')
+    print(unvisited.head())
+    print('--------------------------------')
+    print('Visited nodes')
+    print(visited.head())
+    print('--------------------------------')
+    print('Running Dijkstra')
+    
+    # Dijkstra's algorithm!
+    # Keep running until we get to the goal node
+    while str(goal_node) not in visited.index.values:
+        
+        # Go to the node that is the minimum distance from the starting node
+        current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
+        current_node_name = current_node.index.values[0]    # the node's name (string)
+        current_cost = current_node['Cost'].values[0]       # the distance from the starting node to this node (float)
+        current_tree = current_node['Previous'].values[0]   # a list of the nodes visited on the way to this one (string)
+        
+        connected_nodes = graph[current_node.index.values[0]]   # get all of the connected nodes to the current node (array)
+        connected_edges = edges[current_node.index.values[0]]   # get the distance from each connected node to the current node   
+        
+        # Loop through all of the nodes connected to the current node
+        for next_node_name, edge_cost in zip(connected_nodes, connected_edges):
+            next_node_name = str(next_node_name)    # the next node's name (string)
+            
+            if next_node_name not in visited.index.values:  # if we haven't visited this node before
+                
+                # update this to calculate the cost of going from the initial node to the next node via the current node
+                next_cost_trial = current_cost + edge_cost# set this to calculate the cost of going from the initial node to the next node via the current node
+                next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
+                
+                # if it costs less to go the next node from the current node, update then next node's cost and the path to get there
+                if next_cost_trial < next_cost:
+                    unvisited.loc[[next_node_name], ['Cost']] = next_cost_trial
+                    unvisited.loc[[next_node_name], ['Previous']] = current_tree + current_node_name    # update the path to get to that node
+        
+        unvisited.drop(current_node_name, axis=0, inplace=True)     # remove current node from the unvisited list
 
-
-##################################################################################
-#                                   TASK F.ii   
-##################################################################################
+        visited.loc[current_node_name] = [current_cost, current_tree]   # add current node to the visited list
+        
+    print('--------------------------------')
+    print('Unvisited nodes')
+    print(unvisited.head())
+    print('--------------------------------')
+    print('Visited nodes')
+    print(visited.head())
+    print('--------------------------------')
+    
+    optimal_cost = visited.loc[[str(goal_node)], ['Cost']].values[0][0]  # Optimal cost (float)
+    optimal_path = visited.loc[[str(goal_node)], ['Previous']].values[0][0]  # Optimal path (string)
+    
+    # Convert the optimal path from a string to an actual array of waypoints to travel to
+    string_waypoints = optimal_path[1:-1].split('][')
+    optimal_waypoints = np.array([np.fromstring(waypoint, sep=' ') for waypoint in string_waypoints])
+    optimal_waypoints = np.vstack((optimal_waypoints, goal))    # add the goal as the final waypoint
+    
+    print('Results')
+    print('Goal node: ', str(goal_node))
+    print('Optimal cost: ', optimal_cost)
+    print('Optimal path:\n', optimal_waypoints)
+    print('--------------------------------')
+    
+    # Plotting
+    optimal_pixels = self.map_position(optimal_waypoints)
+    plt.plot(optimal_pixels[:, 0], optimal_pixels[:, 1], c='b')
+    
+    deniro_pixel = self.map_position(initial_position)
+    goal_pixel = self.map_position(goal)
+    
+    plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+    plt.scatter(deniro_pixel[0, 0], deniro_pixel[0, 1], c='w')
+    plt.scatter(goal_pixel[0, 0], goal_pixel[0, 1], c='g')
+    
+    plt.show()
+    
+    # Setup the waypoints for normal waypoint navigation
+    self.waypoints = optimal_waypoints
+    self.waypoint_index = 0
