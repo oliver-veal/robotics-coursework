@@ -283,7 +283,7 @@ In the video below, DE NIRO can be seen taking path 3
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1cmUM8Awz4a6WJBK_ps9FwyYkRjAA53Ca/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1twsgJB-kqUNAoHOsTLywkcE6qACjRCXt/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -489,7 +489,7 @@ We could then run through the plots and choose the one with the best behaviour, 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1C0FReoqC88jh8Qm9eV_xRpVuDoknIFaz/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1tqUvK0on35QSPMDzstVAfpqYWt2NAPAT/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -632,7 +632,7 @@ The results illustrate perfectly how DeNiro follows the expected path and reache
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1UlxBHZKN9hT8sUV-oPiHWM3WJCalQpwS/preview" width="640" height="480"></iframe>
     </div
 
 
@@ -1061,7 +1061,7 @@ The path is clearly not as optimal as it relies on the random distribution of po
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1xkdDy6k7mvBvuL7CXOmvn1GdD-2BU8Xg/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/10w3FbqMnS3NXy5h8tQpkSedDcyaFWIXU/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -1110,7 +1110,7 @@ This implementation was useful for validating the combination of Dijakstra’s a
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1aTEHT9rzB-BCMKe2YtuuixUtTVI1F9d5/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1y2AYz-xE3eEvjTvHvaVphATXUzxnOzO1/preview" width="640" height="480"></iframe>
     </div
 
 ======
@@ -1154,7 +1154,7 @@ Short Video of Achievements
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1K6aFzmTIcEtJk1uIpwosfEYtMwy4TYOz/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1dp81LAS6IN5G6l0CYj76G0T04QE1ZupZ/preview" width="640" height="480"></iframe>
     </div
 
 Full Simulations
@@ -1163,7 +1163,7 @@ Full Simulations
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1FKHNNQ953DjILROMgBm2bznpT5S7EpHU/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1xZJxBFIPxv3QqpfDWKQqLdDXu8W8mjRi/preview" width="640" height="480"></iframe>
     </div
 
 Detailed Step-by-step Code Explanation Video
@@ -1172,7 +1172,7 @@ Detailed Step-by-step Code Explanation Video
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1S8u39y-hh95IlLO-t3of_ZcpE3gOOLmG/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1eqUKlKpkjGhpRzDSjI3D2m0nTbimJcIs/preview" width="640" height="480"></iframe>
     </div
 
 ==========
