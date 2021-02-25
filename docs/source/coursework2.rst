@@ -86,10 +86,18 @@ Scipy’s ``binary_dilation`` function expands the map using this array by traci
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR A PART I
-   :emphasize-lines: 1
+   :emphasize-lines: 6
 
-   #insert final code
+   def expand_map(img, robot_width):
+    robot_px = int(robot_width * scale)   # size of the robot in pixels x axis
+    ############################################################### TASK A
+    # SQUARE MASK
+    # create a square array of ones of the size of the robot
+    robot_mask = np.ones((robot_px, robot_px)) # Creates a 2D array of size robot_px * robot_px of ones
+
+    expanded_map = binary_dilation(img, robot_mask) # Dilate the obstacle map by the square mask and return the result.
+    
+    return expanded_map
 
 Result:
 -------
@@ -126,9 +134,29 @@ The array is visually displayed below:
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR A PART II
+   :emphasize-lines: 3, 5-9, 18
 
-   #insert final code
+   def circle_array(arr, r): # Basic implementation of a quantised "circle"
+      width = len(arr) # What dimension is our square input array?
+      offset = math.ceil(-(width / 2)) + (0.5 if width % 2 == 0 else 0) # This offset value accounts for i, j coords ranging from 0 -> i 
+                                                                        # and the circle having its origin at 0, 0 and ranging from -r, r
+      r2 = r**2 
+      for i in range(width):
+         for j in range(width): # Loop over the 2D array
+               if (i+offset)**2 + (j+offset)**2 > r2: # Circle equation x^2 + y^2 = r^2. If left > right, then we are in an array element outside of the circle, so set it's value to 0.
+                  arr[i][j] = 0
+
+   def expand_map(img, robot_width):
+      robot_px = int(robot_width * scale)   # size of the robot in pixels x axis
+      ############################################################### TASK A
+      # SQUARE MASK
+      robot_mask = np.ones((robot_px, robot_px))
+      
+      # CIRCULAR MASK
+      circle_array(robot_mask, robot_px / 2) # Since circle_array modifies its input array in-place, we simply run it through the function
+      expanded_map = binary_dilation(img, robot_mask) # Dilate the map using the circular mask.
+      
+      return expanded_map 
 
 Result:
 -------
@@ -143,43 +171,55 @@ Result:
 Waypoint Navigation
 ====================
 
-----------------------------------
-Task B: Adding Waypoints by Hand
-----------------------------------
+-------------------------------------------------------------------
+Task Bi & Task Bii: Adding Waypoints by Hand & Calculating Distance
+-------------------------------------------------------------------
 
 Manual waypoint planning enables quick visualizations of the shortest routes by visual inspection, looking at the expanded c-space map. It was quickly obvious that going from corner to corner of obstacles would be the shortest paths as this means going in direct, straight lines when in empty space between obstacles (further explanation of this is given in Task E, Part iii).  3 routes were tried with this method.
 Points were chosen on the pixel map and converted to world coordinates using the function ``self.world_position()``, as shown in the code below.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 1,7
-   :caption: FINAL COMMENTED CODE FOR CONVERTING COORDINATES
+   :emphasize-lines: 4, 7-9
 
-   p1 = self.world_position(np.array([191,104]))
-   p2 = self.world_position(np.array([265,141]))
-   p3 = self.world_position(np.array([292,237]))
-       
-   waypoints = np.array([
-   [0,-6],
-   p1[0],
-   p2[0],
-   p3[0],
-   [8,8]
-   ])
+   def setup_waypoints(self):
+      ############################################################### TASK B
+      # Create an array of waypoints for the robot to navigate via to reach the goal    
+      waypoints = np.array([[1.97, -3.78], [5.97, -1.28],  [7.78, 4.59]]) # Waypoints were converted manually to world coords an listed in this array
 
-   #UPDATE WITH FINAL, COMMENTED CODE
+      # Automatic conversion with the world_position function is also possible and would be as follows:
+      #p1 = self.world_position(np.array([191,104]))
+      #p2 = self.world_position(np.array([265,141]))
+      #p3 = self.world_position(np.array([292,237]))
+      #waypoints = np.array([p1[0],p2[0],p3[0]])
+
+      waypoints = np.vstack([initial_position, waypoints, self.goal]) # Add in the start position and goal to the list of waypoints to make a complete path
+      pixel_waypoints = self.map_position(waypoints) # Convert the waypoints to map coords
+      
+      print('Waypoints:\n', waypoints) # Print for convenience in testing
+      print('Waypoints in pixel coordinates:\n', pixel_waypoints)
+      
+      self.waypoints = waypoints # Sets the global values for Gazebo to access
+      self.waypoint_index = 0
 
 The coordinates of DE NIRO’s starting position and destination were given as (0,-6) and (8,8) respectively (or (162,66) and (290,290) in pixel coordinates).
 
 To compare the lengths of different routes, we used the following line of code which calculates the hypotenuse from one point to the other then sums:
 
 .. code-block:: python
-   :caption: FINAL COMMENTED CODE FOR CALCULATING PATH LENGTHS
-   :emphasize-lines: 1
+   :linenos:
+   :emphasize-lines: 5-8
 
-   distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
+   def setup_waypoints(self):
+   ... 
 
-   #UPDATE WITH FINAL, COMMENTED CODE
+    # A quick function to calculate the length of the path
+    total_len = 0 # Initilise a counter variable
+    for i in range(len(waypoints) - 1): # For each waypoint (we don't include the last waypoint here because in the next line we take to the distance to the next waypoint, so we would get an IndexOutOfBounds exception)
+        total_len += sqrt((waypoints[i + 1][0] - waypoints[i][0])**2 + (waypoints[i + 1][1] - waypoints[i][1])**2) # Add the distance from this waypoint to the next waypoint to the total
+    print(total_len)
+    
+    ...
 
 Results:
 --------
@@ -230,60 +270,12 @@ Total length of path 3: **17.2m**
 
 Path 3 gave the shortest distance.
 
-All code used to implement it is shown below, using the mentioned ``self.world_position()`` function and the distance calculation we wrote.
-
-.. code-block:: python
-   :linenos:
-   :caption: FINAL COMMENTED CODE FOR TASK B COMBINED
-   :emphasize-lines: 1
-   
-    def setup_waypoints(self):
-        ############################################################### TASK B
-        # Create an array of waypoints for the robot to navigate via to reach the goal
-        
-        p1 = self.world_position(np.array([191,104]))
-        p2 = self.world_position(np.array([265,141]))
-        p3 = self.world_position(np.array([292,237]))
-       
-        waypoints = np.array([
-        
-        [0,-6],
-        p1[0],
-        p2[0],
-        p3[0],
-        [8,8]
-        ])  # fill this in with your waypoints
-        
-        print(self.world_position(np.array([191,104])))
-                                  
-        distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
-        
-        print(distance)
-
-        waypoints = np.vstack([initial_position, waypoints, self.goal])
-        pixel_goal = self.map_position(self.goal)
-        pixel_waypoints = self.map_position(waypoints)
-        
-        print('Waypoints:\n', waypoints)
-        print('Waypoints in pixel coordinates:\n', pixel_waypoints)
-        
-        # PlottingS
-        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-        plt.scatter(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
-        plt.plot(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
-        plt.show()
-        
-        self.waypoints = waypoints
-        self.waypoint_index = 0
-
-   #UPDATE WITH FINAL, COMMENTED CODE
-
 In the video below, DE NIRO can be seen taking path 3
 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1cmUM8Awz4a6WJBK_ps9FwyYkRjAA53Ca/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1twsgJB-kqUNAoHOsTLywkcE6qACjRCXt/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -316,9 +308,9 @@ To complete the code, we can compare the definitions of the forces to the equati
    pos_force_direction = goal_vector / distance_to_goal
       
    # potential function
-   pos_force_magnitude =     # your code here!
+   pos_force_magnitude = 1  ### By inspection, this part of equation (3) is just a constant
    # tuning parameter
-   K_att =      # tune this parameter to achieve desired results
+   K_att =      # This parameter is tuned in the Parameter Tuning section
       
    # positive force
    positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
@@ -329,7 +321,7 @@ To complete the code, we can compare the definitions of the forces to the equati
 
 *Equation 1: Definition for force of attraction*
 
-Line 15 in the above code corresponds to equation 1. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
+Line 15 in the above code corresponds to Equation 1. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
 
 +--------+---------------------------+-----------------------------+
 | Term   | Variable                  | Description                 |
@@ -371,9 +363,9 @@ A similar method to above can be used for the negative force.
    force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
       
    # potential function
-   force_magnitude =   # your code here!
+   force_magnitude = -(1/distance_to_obstacle)   # By inspection, this is the part of equation (2), or p(x) = -1/x. 
    # tuning parameter
-   K_rep =   # tune this parameter to achieve desired results
+   K_rep =   # This parameter is tuned in the Parameter Tuning section
       
    # force from an individual obstacle pixel
    obstacle_force = force_direction * force_magnitude
@@ -467,20 +459,93 @@ Starting at the start, you can follow the vectors and see that DE NIRO would be 
 
 These maps are much faster to generate than watching DE NIRO run in the simulation, and provide much more insightful ideas on how the parameters affect the potential fields.
 
-Parameter tuning
+Parameter Tuning
 ----------------
 After running a few sets of parameters to gain some intuition, we saw that the repulsive force would need to be much greater than the attractive.
 We also had an idea for the orders of magnitude to test.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 4,5
+   :emphasize-lines: 8,9
 
    def potential_field(self):
-      ############################################################### TASK C ELITE VERISON
-      
-      for i in range(1,50,2):
-         for j in range(50,1000,50):
+         ######################## TASK C Parameter Iterator
+         #
+         # Brief explanation: What we are doing here is looping over each pixel in the C-space map and calculating the force
+         #                    DeNiro would experience there. We then plot the force vectors to a quiver plot using MatPlotLib
+         #                    an iterate over a range of K_att & K_rep values to test and visualise their effect.
+         
+         for i in range(1,50,2):           # We iterate over a reasonable range of K_rep and K_att values to test
+            for j in range(50,1000,50):
+               
+               print(i,j)                  # Print the current parameter combination we are testing for convenience
+         
+               deniro_position = np.array([0, 0]) # Reset deniro position so we don't accidentally use the global value
+                  
+               map_array_x_combined = [] # Initialise some lists to hold force vectors at each pixel location on the C-space map
+               map_array_y_combined = [] # T
+                  
+               resolution = 10 # Step size for iterating over each pixel in the map. We don't want to sample every pixel to save some time.
+                  
+               window = int(320/resolution) # Set up values for proper iteration with a step size of 10
+                  
+               start = -window # Iteration limits in pixel coordinates
+               end = window
+                  
+               factor = end/8 # Conversion ratio from pixel coordinates to world coordinates
+                  
+               for y in range(start,end): # Loop over rows in pixel_map. Only sample every [resolution = 10] rows
+                  map_array_x_combined_row = [] # Stores rows of 
+                  map_array_y_combined_row = []
+                     
+                  for x in range(start,end): # Loop over columns in a single row of pixel_map. Only sample every [resolution = 10] pixels
+                     deniro_position = np.array([x/factor,y/factor])
+                  
+                     ###### Begin potential_field function from motion_planning.py ######
+                     goal_vector = goal - deniro_position
+                     distance_to_goal = np.linalg.norm(goal_vector)
+                     pos_force_direction = goal_vector / distance_to_goal
+                           
+                     pos_force_magnitude = 1           # By inspection, this part of equation (3) is just a constant
+                     K_att = i                         # The positive force scalar parameter to be tuned
+                     positive_force = K_att * pos_force_direction * pos_force_magnitude
+                     
+                     obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
+                     obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
+                     obstacle_positions = self.world_position(obstacle_pixel_coordinates)
+                     
+                     obstacle_vector = obstacle_positions - deniro_position 
+                     distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))
+                     force_direction = obstacle_vector / distance_to_obstacle
+                     
+                     force_magnitude = -(1/distance_to_obstacle)   # By inspection, this is the part of equation (2), or p(x) = -1/x. 
+                     K_rep = j                         # The negative force scalar parameter to be tuned
+                     
+                     obstacle_force = force_direction * force_magnitude
+                     negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
+                     ###### End potential_field function from motion_planning.py ######
+                     
+                     map_array_x_combined_row.append(negative_force[0] + positive_force[0])
+                     map_array_y_combined_row.append(negative_force[1] + positive_force[1])
+
+                  map_array_x_combined.append(map_array_x_combined_row) # Having looped over every row, combine all rows into a single 2D array to be plotted.
+                  map_array_y_combined.append(map_array_y_combined_row)
+               
+               com_map_x = np.array(map_array_x_combined) # Convert sampled force vectors to an np array to be plotted.
+               com_map_y = np.array(map_array_y_combined)
+
+               U = com_map_x # x component of force vector to plot
+               V = com_map_y # y component
+
+               plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower', cmap='Greys') # Plots the C-space map
+               
+               res_over_2 = resolution/2 # To account for the coordinate space being +-
+               
+               X, Y = np.meshgrid(np.arange(0, 320, res_over_2), np.arange(0,320, res_over_2)) # Creates a 2D array of cartesian coordinates properly scaled to account for our step size of [resolution = 10].
+
+               plt.quiver(X,Y,U,V,angles='xy', scale_units='xy', scale=0.2) # Overlays force vectors onto plot of C-space map
+               plt.savefig("linear_K_att:"+ str(K_att) + " K_rep:" + str(K_rep) + ".png", dpi=300) # Saves the plot to the disk with a useful title containing the K_att and K_rep params
+               plt.clf() # Clears figure for next iteration
 
 
 Using the new function descibed above, we defined an initial parameter search area of ``1 < k_att < 50`` and ``50 < k_rep < 1000``.
@@ -490,7 +555,7 @@ We could then run through the plots and choose the one with the best behaviour, 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1C0FReoqC88jh8Qm9eV_xRpVuDoknIFaz/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1tqUvK0on35QSPMDzstVAfpqYWt2NAPAT/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -609,6 +674,57 @@ Consider, for example, the case of a single point obstacle close to a "wall" (li
 
 To solve this issue, a more robust falloff function could be used that causes the repulsive force's magnitude to be extremely large when very close to an obstacle pixel, no matter the overall size of the obstacle:
 
+**Code Implementation of Method 1 + 2**
+
+.. code-block:: python
+   :linenos:
+
+   def potential_field(self): 
+    ############################################################### TASK C
+    complete = False
+
+    goal_vector = goal - deniro_position
+    distance_to_goal = np.linalg.norm(goal_vector)
+    pos_force_direction = goal_vector / distance_to_goal
+    
+    pos_force_magnitude = 1 # By inspection, this part of equation (3) is just a constant
+    K_att = 1 # For the method it seems the best results are when the K params are equal, and because we normalise the output force, it may as well be 1
+    
+    positive_force = K_att * pos_force_direction * pos_force_magnitude
+    
+    obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
+    obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
+    obstacle_positions = self.world_position(obstacle_pixel_coordinates)
+    
+    obstacle_vector = obstacle_positions - deniro_position
+    distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))
+    force_direction = obstacle_vector / distance_to_obstacle
+    
+    force_magnitude = -1 / (distance_to_obstacle) # By inspection, this is the part of equation (2), or p(x) = -1/x. 
+    # NOTE To implement Method 3 this line would be: force_magnitude = -1 / (distance_to_obstacle ** 2)
+    K_rep = 1 # For the method it seems the best results are when the K params are equal, and because we normalise the output force, it may as well be 1
+    
+    obstacle_force = force_direction * force_magnitude
+
+    #################################################### Implementation of Methods 1 and 2
+    mags = np.linalg.norm(obstacle_force, axis=1) # Get all the magnitudes of the negative forces
+    avg = 40                                      # How many of the largest magnitudes should we average over? Top-N Avg, this is the N
+    ind = np.argpartition(mags, -avg)[-avg:]      # argpartition gives you the top N values from a list, without sorting the whole list, so it is slightly faster than sorting first then sampling with array indices
+
+    negative_force = K_rep * np.sum(obstacle_force[ind], axis=0) / avg # Implementation of Top-N Avg, sum up the top 40 obstacles forces, then divide by 40
+    ####################################################
+    
+    vref = positive_force + negative_force
+    vref = vref / np.linalg.norm(vref)
+
+    if distance_to_goal < 0.05:
+        vref = np.array([[0, 0]])
+        complete = True
+
+    vref = np.reshape(vref, (-1, 2)) # Sometime there was a weird error where the vref array was the wrong shape so this is a bodge fix
+
+    return vref, complete
+
 Method 3: Square Inverse Falloff
 ----------------------------------------
 An intuitive next step is to raise the power of the falloff of the repulsive force.
@@ -631,14 +747,29 @@ Parameters used below: ``K_att = 3  K_rep = 350``
 .. note::
    This method can be applied with hollow obstacles as well and provides similar results.
 
+<<<<<<< HEAD
 We then decided to test this route with DE NIRO in Gazebo.
 We recorded the DE NIRO simulation and overlaid the vector field plot to validate if DE NIRO follows the path as expected.
 The results illustrate perfectly how DE NIRO follows the expected path and reaches the goal.
+=======
+**Code Implementation of Method 3**
+
+.. code-block::
+   :linenos:
+
+   force_magnitude = -1 / (distance_to_obstacle ** 2) # Inverse square falloff
+
+**Testing**
+
+We then decided to test this route with DeNiro in Gazebo.
+We recorded the DeNiro simulation and overlaid the vector field plot to validate if DeNiro follows the path as expected.
+The results illustrate perfectly how DeNiro follows the expected path and reaches the goal.
+>>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1UlxBHZKN9hT8sUV-oPiHWM3WJCalQpwS/preview" width="640" height="480"></iframe>
     </div
 
 
@@ -722,25 +853,35 @@ The random points are generated by the code below:
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR RANDOM GENERATION OF POINTS
+   :emphasize-lines: 8
 
-   #insert final code
+   def generate_random_points(self, N_points):
+    N_accepted = 0  # number of accepted samples
+    accepted_points = np.empty((1, 2))  # empty array to store accepted samples
+    rejected_points = np.empty((1, 2))  # empty array to store rejected samples
+    
+    while N_accepted < N_points:    # keep generating points until N_points have been accepted
+    
+        points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
+        pixel_points = self.map_position(points)    # get the point locations on our map
 
 They are then iterated through and marked as a "1" in the rejection array by the code below:
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR REJECTING POINTS
+   :emphasize-lines: 2
 
-   i=0
-   for point in pixel_points:
-      if self.pixel_map[int(point[1]),int(point[0])] == 1:
-         print("rejected")
-         rejected[i] = 1
-      i += 1
-   
-   #UPDATE WITH FINAL, COMMENTED CODE
-
+   ########
+   rejected = np.array([self.pixel_map[point[1], point[0]] for point in pixel_points])
+   # This task can be done in a one-liner:
+   # Define the rejected array as either 1 if the corresponding point is rejected, or 0 if the point is accepted.
+   # A point is accepted if it's corresponding location in the pixel map is not an obstacle.
+   # What's nice is that the obstacle values 0, 1 correspond directly with a point being rejected 0, 1
+   #######
+   new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
+   new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
+   accepted_points = np.vstack((accepted_points, new_accepted_points))
+   rejected_points = np.vstack((rejected_points, new_rejected_points))
 
 With 100 points, here is how the distribution turned out, which can be visually confirmed to have marked rejected points correctly.
 
@@ -761,7 +902,13 @@ One method would be to loop over every pixel in the map (or, to save some comput
 What we have essentially done with this method is perform a convolution of the C-space map with a kernel of our choosing to create a "probabilty of sampling a point" map, then sampling that map to produce points for the PRM algorithm. The effect of this approach will be to reduce the number of points in open space, and increase the grouping of points around edges. This will help shorten the length of the path the algorithm produces, as well as deal better with narrow passages, as it can be shown that for an optimal path, each node in the graph will always lie on an edge (or for convex polygons, a corner) of an obstacle. This is explained in the following note:
 
 .. note::
-   **The optimal (shortest) path will always lie along the visiblity graph of the C-space map:**
+   **The optimal (shortest) path will always lie along the visiblity graph of the C-space map.**
+   Some intuitive rules can be applied to justify this:
+
+   - The fastest way across an open area is in a straight line, it will never be faster to zigzag
+   - Therefore, points in open space can be considered redundant
+   - The fastest way to get around an obstacle is to go to it’s corner, turn and carry on. This can be visualised by pulling a piece of string taught with an obstacle in the way.
+   - Therefore, you are left with only corners.
 
 **Method 1b: Edge Detection**
 
@@ -774,6 +921,29 @@ As a result of the observation that, for a map consisting of convex polygons (or
 .. note::
    A caveat of only using corner detection to select points is that there are some cases of arrangements of obstacles where you will also need a point along the edge of an obstacle, not just on the corner, to create a proper visibility graph, or at last find a valid path. While this isn't the case for our relatively simple C-space map, it could be beneficial to combine both methods, that is, use corner detection to find the corners of shapes, then use edge detection to randomly sample points along the edges of the shapes as well. This way when it comes to creating the graph, it is more likely that a near-optimal and valid path can be created.
 
+.. code-block:: python
+   :linenos:
+
+   ######
+   # While code implementation for this task is not a requirement, here is a basic implementation of creating a route graph using corner detection in SciPy
+   ######
+
+   def generate_random_points(self, N_points):
+      #NOTE This corner detection method works best when the robot_mask from map.py is a square, not a circle, as the C-space map is produces has sharp corners
+      accepted_points = np.empty((1, 2)) # Initialise accepted points
+
+      bigger_map = binary_dilation(self.pixel_map, np.ones((3, 3))) # Slightly expand the C-space map to give some "breathing room" around obstacles (sometimes a valid path cannot be found otherwise)
+      bigger_map.astype(int) # Convert to ints for the corner detection function
+
+      ##### from skimage.feature import corner_harris, corner_subpix, corner_peaks
+      coords = corner_peaks(corner_harris(bigger_map), min_distance=1, threshold_rel=0.002) # Perform corner detection on the C-space map and return a list of points
+      #accepted_points = corner_subpix(bigger_map, coords, window_size=20)   # Optional subpixel corner detection, not used in the case of a rectangular map
+      accepted_points = np.flip(coords, axis=1) # The resulting points are in col, row form rather than x, y so we flip them around
+
+      world_points = self.world_position(accepted_points) # calculate the position of the accepted points in world coordinates
+      world_points = np.vstack((initial_position, world_points, goal)) # add DE NIRO's position to the beginning of these points, and the goal to the end
+
+      return world_points
 
 -----------------------------------------------------------------
 Task E i: Creating the Graph, Tuning Distances for Creating Edges
@@ -790,6 +960,15 @@ Maximum Distance
    * Too Low - If this value is excessively low, then the graph will miss nodes to connect to that would be effective for travelling large distances and instead lead to discontinuity in the graph. This creates an issue for producing a complete motion plan, but can be easily resolved by increasing incrementally.
 
 In summary, too few edges and the algorithm will fail to create a complete path that can be traversed from the starting point to the goal, too many edges and the number of edges to evaluate for collision increases, resulting in unnecessary computation as most edges would be rejected anyway and visualizing the graph becomes far more difficult. Hence correctly tuning  min/max distances for creating edges is crucial for creating a graph suitable for evaluating to create a motion plan.
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 3-4
+   
+   def create_graph(self, points):
+      # Choose your minimum and maximum distances to produce a suitable graph
+      mindist = 0.2
+      maxdist = 3.8
 
 An iterative method was used to choose the values until a suitable graph was generated. 
 
@@ -840,7 +1019,6 @@ The following values were tested:
 
 *Figure 28: Min 0.2 Max 3.8 - Ideal graph with good overall edge density.*
 
-
 ----------------------------------------------------------
 Task E ii: Creating the Graph, Tuning Edge Collision Check
 ----------------------------------------------------------
@@ -849,28 +1027,34 @@ With a graph, all invalid edges must be removed before creating a motion plan. T
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR CALCULATING UNIT DIRECTION OF VECTOR
+   :emphasize-lines: 2-3
 
-   vector_B_to_A = pointB - pointA
-   distance = np.linalg.norm(vector_B_to_A)
-   direction = vector_B_to_A / distance
+   vector_A_to_B = pointB - pointA # Calculate the direction vector from point A to point B
+   distance = np.linalg.norm(vector_A_to_B) # Calculate the vector norm which is the Euclidean distance from A to B 
+   direction = vector_A_to_B / distance # Divide the direction by the distance to find the unit direction vector
 
-   #UPDATE WITH FINAL, COMMENTED CODE
 
 The reason this is required is that distance and direction are evaluated in ``edge_points``. This variable creates an array of points to check collisions at from ``pointA`` in the direction to ``pointB``, until it reaches the end distance, and the number of points it checks in between is dictated by ``resolution`` - which is the next parameter to tune. The number of points along the direction is given by ``arrange(start, stop, step)`` with the starting value at 0 and the end as ``distance`` to ``pointB``, and values interpolated between these are defined by a step size named ``resolution``. This is why ``resolution`` is important to tune, as if it is too large, then there will not be enough points along the edge to measure for collision, meaning that it may skip past obstacles along the edge. Ideally this value is numerically low thus providing a *high* resolution. The ``reshape`` allows the variables to be multiplied and added in a suitable array form.
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR EDGE_POINTS
+   :emphasize-lines: 1
+   
+    resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
 
-   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2))
+   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2)) # Creates points along direction vector to check for collisions
+   # This creates an array of points from Point A till point B and utilises the unit direction vector specified and interpolates points along it in step sizes of variable resolution
+   # as defined by np.arange. A value of 0.0625 specifies the smallest check possible in m which checks every pixel in the grid.
 
-   #UPDATE WITH FINAL, COMMENTED CODE
-
+<<<<<<< HEAD
 These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True``, thus causing it to be unsuitable for use in the map.
 Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effects, and results are shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however, given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
+=======
+These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
+Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
+>>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
 
-**Resolutions tested:**
+**Resolutions Tested:**
 
 .. image:: img/C2TE_RES5.png
    :width: 250
@@ -927,13 +1111,15 @@ A randomly generated graph is likely not the optimal route to the goal, and may 
 For example, the narrow passage between the central obstacle and the upper is often undiscovered, as well as other areas of the map.
 Increasing the number of points can help, but there are more optimal approaches.
 
+<<<<<<< HEAD
 From experimenting with manually placing waypoints, seeing the routes proposed by the potential fields, and from intuition, the shortest route to the goal is often found by traversing the corners of the obstacles.
 Some intuitive rules can be applied to justify this:
+=======
+From the experimenting in manually placing waypoints, seeing the routes proposed by the potential fields, and from intuition, the shortest route to the goal is often found by traversing the corners of the obstacles.
+>>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
 
-- The fastest way across an open area is in a straight line, it will never be faster to zigzag
-- Therefore, points in open space can be considered redundant
-- The fastest way to get around an obstacle is to go to it’s corner, turn and carry on. This can be visualised by pulling a piece of string taught with an obstacle in the way.
-- Therefore, you are left with only corners.
+.. note::
+   The reason why this is the case (for maps with convex polygons) is explain in the note in `Task D ii: Harris Corner Detection`_.
 
 With this logic, a more optimal PRM algorithm would make sure to place more points around obstacle vertices, ensuring all the essential points were covered to find a route to the goal.
 By extension of this logic, what if only the corners were plotted? To test this, a corner detection algorithm was written to identify and place points only at vertices.
@@ -945,7 +1131,7 @@ Dijkstra’s algorithm can then be used to find the shortest path (discussed lat
    :width: 500
    :alt: methods_comp_annot
 
-*Figure 36: Corner Detection*
+*Figure 36: Corner Detection.* This image was generated using the corner detection code from Task Dii.
 
 -------------------------------------------------
 Task F i: Dijkstra's Algorithm, Creating the Path
@@ -1031,19 +1217,16 @@ General algorithm for Dijkstra’s [4]_:
 
 *Figure 46: Dijkstra Step 8*
 
-This is the general theory and can vary slightly depending on implementation. The Python implementation for this in ``motion_planning.py`` is explained in the code block below.
-
-.. code-block:: python
-   :linenos:
-   :caption: CODE?
-
-   #UPDATE WITH FINAL, COMMENTED CODE
+This is the general theory and can vary slightly depending on implementation. The Python implementation for this has already been done in ``motion_planning.py`` and is explained in the source code.
+The only two variables to edit to enable functionality are ``initial_cost`` and ``next_cost_trial`` which relates to step 1 in the explanation above and step 4 (where the cost of node C is updated as a lower total cost was found) respectively.
 
 The second part of the task is straightforward as it asks to find the cost of going from the initial node to the next node via the current node. This is the equivalent of the general explanation, which is to keep track and update the cost from the starting node to the neighbouring nodes through the current node, only if the cost is lower. Initial to current node is defined by ``current_cost`` and neighbouring node cost between current node is defined by ``edge cost``, therefore the total cost is stated as:
 
 .. code-block:: python
+   :linenos:
+   :emphasize-lines: 1
 
-   next_cost_trial = current_cost + edge_cost
+   next_cost_trial = current_cost + edge_cost # This updates the cost by adding the current best path cost to the edge weight
 
 This is iterated from every neighbouring point until the graph is complete and a motion plan is generated.
 
@@ -1056,12 +1239,12 @@ Although Dijkstra’s did provide the optimal shortest path, it only did this wi
 
 *Figure 47: Dijkstra shortest path based on randomly distributed points*      
 
-The path is clearly not as optimal as it relies on the random distribution of points generated by the PRM algorithm implemented. Dijkstra provides locally optimal choices at each stage to find the global optimum. Although close in this case, it could have been complete if the points generated were different and hence the path. To generate a more optimal route using Dijkstra’s, we instead used corner detection to produce the points.
+The path is clearly not as optimal as it relies on the random distribution of points generated by the PRM algorithm implemented. Dijkstra provides locally optimal choices at each stage to find the global optimum. Although close in this case, it could have been completely different if the points generated were different. To generate a more optimal route using Dijkstra’s, we instead used corner detection to produce the points.
 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1xkdDy6k7mvBvuL7CXOmvn1GdD-2BU8Xg/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/10w3FbqMnS3NXy5h8tQpkSedDcyaFWIXU/preview" width="640" height="480"></iframe>
     </div
 
 =======
@@ -1084,8 +1267,10 @@ This implementation produced the following result, with path length 17.17m, slig
 
 *Figure 48, 49: Graph generated with corner detection (left) and Corner Detection with Dijkstra shortest path (right)* 
 
-.. code-block::
-   
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 12
+
    Visited nodes
                            Cost   Previous
    Node                                    
@@ -1110,7 +1295,7 @@ This implementation was useful for validating the combination of Dijkstra’s al
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1aTEHT9rzB-BCMKe2YtuuixUtTVI1F9d5/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1y2AYz-xE3eEvjTvHvaVphATXUzxnOzO1/preview" width="640" height="480"></iframe>
     </div
 
 ======
@@ -1124,11 +1309,12 @@ Task F ii: Dijkstra's Algorithm, Planning Algorithms
 Dijkstra’s algorithm is defined as a one-to-many planning algorithm or a SSSP (Single Source Shortest Path) where it is able to find the shortest distance from the starting node to every other node in the graph. This is clearly seen in the example run through of a general use of Dijkstra’s.
 
 The advantages of a one-to-many planning algorithm is that:
-If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
 
-The main advantage of Dijkstra’s algorithm is the relatively low complexity that makes it close to linear. It has a complexity of *O(V + Elog(V))*, where *V* is the number of nodes and *E* is the number of edges. [5]_ Given that *E* equals close to *V*:sup:`2`, the complexity is *O(V +* *V*:sup:`2`\ *log(V))*. There are however motion planning algorithms with even lower complexity than this.
+* If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
 
-It is fairly straightforward to implement and a common algorithm for motion planning.
+* Relatively low complexity that makes it close to linear. It has a complexity of *O(V + Elog(V))*, where *V* is the number of nodes and *E* is the number of edges. [5]_ Given that *E* equals close to *V*:sup:`2`, the complexity is *O(V +* *V*:sup:`2`\ *log(V))*. There are however motion planning algorithms with even lower complexity than this.
+
+* It is fairly straightforward to implement and a common algorithm for motion planning.
 
 The issue comes in when changing the start point so that if, from the goal node, you want to calculate a new goal node, the entire graph would need to be recalculated. This means that with changing starting points, the entire graph needs to be recalculated. In most motion planning problems, it is unlikely that Dijkstra will be beneficial as the starting node rarely stays the same. Dijkstra’s algorithm is not optimal and actually quite inefficient if the starting node is changing frequently. To find the shortest distance from two specific points only (starting node and goal node), A* is a better algorithm to utilise. [6]_
 
@@ -1154,7 +1340,7 @@ Short Video of Achievements
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1K6aFzmTIcEtJk1uIpwosfEYtMwy4TYOz/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1dp81LAS6IN5G6l0CYj76G0T04QE1ZupZ/preview" width="640" height="480"></iframe>
     </div
 
 Full Simulations
@@ -1163,7 +1349,7 @@ Full Simulations
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1FKHNNQ953DjILROMgBm2bznpT5S7EpHU/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1xZJxBFIPxv3QqpfDWKQqLdDXu8W8mjRi/preview" width="640" height="480"></iframe>
     </div
 
 Detailed Step-by-step Code Explanation Video
@@ -1172,7 +1358,7 @@ Detailed Step-by-step Code Explanation Video
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1S8u39y-hh95IlLO-t3of_ZcpE3gOOLmG/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/1eqUKlKpkjGhpRzDSjI3D2m0nTbimJcIs/preview" width="640" height="480"></iframe>
     </div
 
 ==========
