@@ -963,9 +963,9 @@ With a graph, all invalid edges must be removed before creating a motion plan. T
    :linenos:
    :emphasize-lines: 2-3
 
-   vector_B_to_A = pointB - pointA
-   distance = np.linalg.norm(vector_B_to_A)
-   direction = vector_B_to_A / distance
+   vector_A_to_B = pointB - pointA # Calculate the direction vector from point A to point B
+   distance = np.linalg.norm(vector_A_to_B) # Calculate the vector norm which is the Euclidean distance from A to B 
+   direction = vector_A_to_B / distance # Divide the direction by the distance to find the unit direction vector
 
 
 The reason this is required is that distance and direction are evaluated in ``edge_points``. This variable creates an array of points to check collisions at from ``pointA`` in the direction to ``pointB``, until it reaches the end distance, and the number of points it checks in between is dictated by ``resolution`` - which is the next parameter to tune. The number of points along the direction is given by ``arrange(start, stop, step)`` with the starting value at 0 and the end as ``distance`` to ``pointB``, and values interpolated between these are defined by a step size named ``resolution``. This is why ``resolution`` is important to tune, as if it is too large, then there will not be enough points along the edge to measure for collision, meaning that it may skip past obstacles along the edge. Ideally this value is numerically low thus providing a *high* resolution. The ``reshape`` allows the variables to be multiplied and added in a suitable array form.
@@ -973,11 +973,15 @@ The reason this is required is that distance and direction are evaluated in ``ed
 .. code-block:: python
    :linenos:
    :emphasize-lines: 1
+   
+    resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
 
-   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2))
+   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2)) # Creates points along direction vector to check for collisions
+   # This creates an array of points from Point A till point B and utilises the unit direction vector specified and interpolates points along it in step sizes of variable resolution
+   # as defined by np.arange. A value of 0.0625 specifies the smallest check possible in m which checks every pixel in the grid.
 
 These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
-Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
+Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
 
 **Resolutions Tested:**
 
