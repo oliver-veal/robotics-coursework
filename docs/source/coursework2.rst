@@ -793,6 +793,15 @@ Maximum Distance
 
 In summary, too few edges and the algorithm will fail to create a complete path that can be traversed from the starting point to the goal, too many edges and the number of edges to evaluate for collision increases resulting in unnecessary computation as most edges would be rejected anyway and visualizing the graph becomes far more difficult. Hence correctly tuning  min/max distances for creating edges is crucial for creating a graph suitable for evaluating to create a motion plan.
 
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 3-4
+   
+   def create_graph(self, points):
+      # Choose your minimum and maximum distances to produce a suitable graph
+      mindist = 0.2
+      maxdist = 3.8
+
 An iterative method was used to choose the values until a suitable graph was generated. 
 
 Method:
@@ -842,7 +851,6 @@ The following values were tested:
 
 *Figure 28: Min 0.2 Max 3.8 - Ideal graph with good overall edge density.*
 
-
 ----------------------------------------------------------
 Task E ii: Creating the Graph, Tuning Edge Collision Check
 ----------------------------------------------------------
@@ -851,25 +859,20 @@ With a graph, all invalid edges must be removed before creating a motion plan. T
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR CALCULATING UNIT DIRECTION OF VECTOR
-   :emphasize-lines: 1
+   :emphasize-lines: 2-3
 
    vector_B_to_A = pointB - pointA
    distance = np.linalg.norm(vector_B_to_A)
    direction = vector_B_to_A / distance
 
-   #UPDATE WITH FINAL, COMMENTED CODE
 
 The reason this is required is that distance and direction are evaluated in ``edge_points``. This variable creates an array of points to check collisions at from ``pointA`` in the direction to ``pointB``, until it reaches the end distance, and the number of points it checks in between is dictated by ``resolution`` - which is the next parameter to tune. The number of points along the direction is given by ``arrange(start, stop, step)`` with the starting value at 0 and the end as ``distance`` to ``pointB``, and values interpolated between these are defined by a step size named ``resolution``. This is why ``resolution`` is important to tune, as if it is too large, then there will not be enough points along the edge to measure for collision, meaning that it may skip past obstacles along the edge. Ideally this value is numerically low thus providing a *high* resolution. The ``reshape`` allows the variables to be multiplied and added in a suitable array form.
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR EDGE_POINTS
    :emphasize-lines: 1
 
    edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2))
-
-   #UPDATE WITH FINAL, COMMENTED CODE
 
 These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
 Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
@@ -1035,14 +1038,8 @@ General algorithm for Dijkstra’s [4]_:
 
 *Figure 46: Dijkstra Step 8*
 
-This is the general theory and can vary slightly depending on implementation. The Python implementation for this in ``motion_planning.py`` is explained in the code block below.
-
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 1
-   :caption: CODE?
-
-   #UPDATE WITH FINAL, COMMENTED CODE
+This is the general theory and can vary slightly depending on implementation. The Python implementation for this has already been done in ``motion_planning.py`` and is explained in the source code.
+The only two variables to edit to enable functionality are ``initial_cost`` and ``next_cost_trial`` which relates to step 1 in the explanation above and step 4 (where the cost of node C is updated as a lower total cost was found) respectively.
 
 The second part of the task is straightforward as it asks to find the cost of going from the initial node to the next node via the current node. This is the equivalent of in the general explanation which is to keep track and update the cost from the starting node to the neighbouring nodes through the current node, only if the cost is lower. Initial to current node is defined by ``current_cost`` and neighbouring node cost between current node is defined by ``edge cost``, therefore the total cost is stated as:
 
@@ -1050,7 +1047,7 @@ The second part of the task is straightforward as it asks to find the cost of go
    :linenos:
    :emphasize-lines: 1
 
-   next_cost_trial = current_cost + edge_cost
+   next_cost_trial = current_cost + edge_cost # This updates the cost by adding the current best path cost to the edge weight
 
 This is iterated from every neighbouring point until the graph is complete and a motion plan is generated.
 
