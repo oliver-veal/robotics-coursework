@@ -209,39 +209,149 @@ def potential_field(self):
 ##################################################################################
 #                                   TASK D.i   
 ##################################################################################
+def generate_random_points(self, N_points):
+    N_accepted = 0  # number of accepted samples
+    accepted_points = np.empty((1, 2))  # empty array to store accepted samples
+    rejected_points = np.empty((1, 2))  # empty array to store rejected samples
+    
+    while N_accepted < N_points:    # keep generating points until N_points have been accepted
+    
+        points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
+        pixel_points = self.map_position(points)    # get the point locations on our map
 
+        ########
+        rejected = np.array([self.pixel_map[point[1], point[0]] for point in pixel_points])
+        # This task can be done in a one-liner:
+        # Define the rejected array as either 1 if the corresponding point is rejected, or 0 if the point is accepted.
+        # A point is accepted if it's corresponding location in the pixel map is not an obstacle.
+        # What's nice is that the obstacle values 0, 1 correspond directly with a point being rejected 0, 1
+        #######
 
+        new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
+        new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
+        accepted_points = np.vstack((accepted_points, new_accepted_points))
+        rejected_points = np.vstack((rejected_points, new_rejected_points))
 
 ##################################################################################
 #                                   TASK D.ii   
 ##################################################################################
 
+######
+# While code implementation for this task is not a requirement, here is a basic implementation of creating a route graph using corner detection in SciPy
+######
 
+def generate_random_points(self, N_points):
+    #NOTE This corner detection method works best when the robot_mask from map.py is a square, not a circle, as the C-space map is produces has sharp corners
+    accepted_points = np.empty((1, 2)) # Initialise accepted points
+
+    bigger_map = binary_dilation(self.pixel_map, np.ones((3, 3))) # Slightly expand the C-space map to give some "breathing room" around obstacles (sometimes a valid path cannot be found otherwise)
+    bigger_map.astype(int) # Convert to ints for the corner detection function
+
+    ##### from skimage.feature import corner_harris, corner_subpix, corner_peaks
+    coords = corner_peaks(corner_harris(bigger_map), min_distance=1, threshold_rel=0.002) # Perform corner detection on the C-space map and return a list of points
+    #accepted_points = corner_subpix(bigger_map, coords, window_size=20)   # Optional subpixel corner detection, not used in the case of a rectangular map
+    accepted_points = np.flip(coords, axis=1) # The resulting points are in col, row form rather than x, y so we flip them around
+
+    world_points = self.world_position(accepted_points) # calculate the position of the accepted points in world coordinates
+    world_points = np.vstack((initial_position, world_points, goal)) # add DE NIRO's position to the beginning of these points, and the goal to the end
+
+    return world_points
 
 ##################################################################################
 #                                   TASK E.i  
 ##################################################################################
+def create_graph(self, points):
+    # Choose your minimum and maximum distances to produce a suitable graph
+    mindist = 0.2
+    maxdist = 3.8
 
+    # Calculate a distance matrix between every node to every other node
+    distances = cdist(points, points)
 
+    # Create two dictionaries
+    graph = {}  # dictionary of each node, and the nodes it connects to
+    distances_graph = {}    # dictionary of each node, and the distance to each node it connects to
+
+    plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')  # setup a plot of the map
+
+            
+    for i in range(points.shape[0]):    # loop through each node
+        points_in_range = points[(distances[i] >= mindist) & (distances[i] <= maxdist)]     # get nodes an acceptable distance of the current node
+        distances_in_range = distances[i, (distances[i] >= mindist) & (distances[i] <= maxdist)]    # get the corresponding distances to each of these nodes
+
+    if points_in_range.shape[0] > 0:    # if there are any nodes in an acceptable range
+        # set up arrays of nodes with edges that don't collide with obstacles, and their corresponding distances
+        collision_free_points = np.empty((1, 2))
+        collision_free_distances = np.empty((1, 1))
 
 ##################################################################################
 #                                   TASK E.ii   
 ##################################################################################
 
+def check_collisions(self, pointA, pointB):
+    ############################################################### TASK E ii     
+    # Calculate the distance between the two point
+    distanceVector = pointB - pointA
+    distance = np.linalg.norm(distanceVector)
+    # Calculate the UNIT direction vector pointing from pointA to pointB
+    direction = distanceVector / distance
+    # Choose a resolution for collision checking
+    resolution = 0.5   # resolution to check collision to in m
 
+    # Create an array of points to check collisions at
+    edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
+    # Convert the points to pixels
+    edge_pixels = self.map_position(edge_points)
 
-##################################################################################
-#                                   TASK E.iii   
-##################################################################################
-
-
+    for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
+        collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
+        if collision == 1:
+            return True     # if there's a collision, immediately return True
+    return False    # if it's got through every pixel as hasn't returned yet, return False
 
 ##################################################################################
 #                                   TASK F.i   
 ##################################################################################
 
+def dijkstra(self, graph, edges):
+    ############################################################### TASK F
+    goal_node = goal
+    nodes = list(graph.keys())
+    
+    initial_cost = 1000000.0  # This is set to a very high value so that the initial cost is never lower than the first time a node is visited
+    
+    unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
+    unvisited.set_index('Node', inplace=True)
+    unvisited.loc[[str(initial_position)], ['Cost']] = 0.0
+    
+    visited = pd.DataFrame({'Node':[''], 'Cost':[0.0], 'Previous':['']})
+    visited.set_index('Node', inplace=True)
+    
+    # Dijkstra's algorithm
+    # Theory is explained in depth in the report, comments here only highlight the lines we modified to complete the task
+    while str(goal_node) not in visited.index.values:
+        
+        current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
+        current_node_name = current_node.index.values[0]
+        current_cost = current_node['Cost'].values[0]
+        current_tree = current_node['Previous'].values[0]
+        
+        connected_nodes = graph[current_node.index.values[0]]
+        connected_edges = edges[current_node.index.values[0]]
+        
+        for next_node_name, edge_cost in zip(connected_nodes, connected_edges):
+            next_node_name = str(next_node_name)
+            
+            if next_node_name not in visited.index.values:
+                next_cost_trial = current_cost + edge_cost # This updates the cost by adding the current best path cost to the edge weight
+                next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0]
+                
+                if next_cost_trial < next_cost: # Should we update the value for the cost of the node?
+                    unvisited.loc[[next_node_name], ['Cost']] = next_cost_trial
+                    unvisited.loc[[next_node_name], ['Previous']] = current_tree + current_node_name
+        
+        unvisited.drop(current_node_name, axis=0, inplace=True)
 
-
-##################################################################################
-#                                   TASK F.ii   
-##################################################################################
+        visited.loc[current_node_name] = [current_cost, current_tree]
+        
+# ... 
