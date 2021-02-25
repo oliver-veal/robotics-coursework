@@ -295,7 +295,7 @@ In the video below, DE NIRO can be seen taking path 3
         <iframe src="https://drive.google.com/file/d/1cmUM8Awz4a6WJBK_ps9FwyYkRjAA53Ca/preview" width="640" height="480"></iframe>
     </div
 
-=====
+*Video 1: Robot DeNiro taking Path 3*
 
 ==========================
 Potential Field Algorithm
@@ -499,8 +499,7 @@ We could then run through the plots and choose the one with the best behaviour, 
         <iframe src="https://drive.google.com/file/d/1C0FReoqC88jh8Qm9eV_xRpVuDoknIFaz/preview" width="640" height="480"></iframe>
     </div
 
-=====
-
+*Video 2: Vector Field Iterations*
 
 Discussion
 ----------
@@ -641,7 +640,7 @@ The results illustrate perfectly how DeNiro follows the expected path and reache
         <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
     </div
 
-=====
+*Video 3: Overlaid Vector Plot on Gazebo and Robot DeNiro Path*
 
 Observations
 ------------
@@ -1067,7 +1066,7 @@ The path is clearly not as optimal as it relies on the random distribution of po
         <iframe src="https://drive.google.com/file/d/1xkdDy6k7mvBvuL7CXOmvn1GdD-2BU8Xg/preview" width="640" height="480"></iframe>
     </div
 
-=====
+*Video 4: PRM Dijkstra Algorithm Path*
 
 Optimising Dijkstra's Algorithm with Corner Detection
 -----------------------------------------------------
@@ -1114,7 +1113,7 @@ This implementation was useful for validating the combination of Dijakstra’s a
         <iframe src="https://drive.google.com/file/d/1aTEHT9rzB-BCMKe2YtuuixUtTVI1F9d5/preview" width="640" height="480"></iframe>
     </div
 
-=====
+*Video 5: Corner Detection Dijkstra Algorithm Path*
 
 ----------------------------------------------------
 Task F ii: Dijkstra's Algorithm, Planning Algorithms
@@ -1143,6 +1142,36 @@ A summary of A* pathfinding algorithm is provided here:
    * The heuristic is typically problem specific
    * A* will always find a solution if one exists
 
+-----------------
+Supporting Videos
+-----------------
+
+Short Video of Achievements
+---------------------------
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1K6aFzmTIcEtJk1uIpwosfEYtMwy4TYOz/preview" width="640" height="480"></iframe>
+    </div
+
+Full Simulations
+----------------
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1FKHNNQ953DjILROMgBm2bznpT5S7EpHU/preview" width="640" height="480"></iframe>
+    </div
+
+Detailed Step-by-step Code Explanation Video
+--------------------------------------------
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1S8u39y-hh95IlLO-t3of_ZcpE3gOOLmG/preview" width="640" height="480"></iframe>
+    </div
 
 ==========
 References
