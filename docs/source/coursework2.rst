@@ -654,7 +654,7 @@ The idea behind taking the average of the top n largest force contributions come
    :width: 340
    :alt: Tuning Avg1 Close-up
 
-.. image:: img/avg_5png
+.. image:: img/avg_5.png
    :width: 340
    :alt: Tuning Avg5
 
