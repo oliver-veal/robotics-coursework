@@ -1084,10 +1084,21 @@ A summary of A* pathfinding algorithm is provided here:
 References
 ==========
 
-.. [1] Kormushev, P. & Nanayakkara, T. (2020) \ *DESE96005 - Robotics 2020-2021 - Course Notes and Lectures* [Module Content] Imperial College London.
-.. [2] *Dilation (morphology).* [Online] Wikipedia. Wikimedia Foundation; Available from: https://en.wikipedia.org/wiki/Dilation_%28morphology%29 [Accessed: 24th February 2021] 
-.. [3] Brownlee J. *Gentle Introduction to Vector Norms in Machine Learning.* [Online] Machine Learning Mastery. Available from: https://machinelearningmastery.com/vector-norms-machine-learning/ [Accessed: 24th February 2021]
-.. [4] *Coding Games and Programming Challenges to Code Better.* [Online] CodinGame. Available from: https://www.codingame.com/playgrounds/1608/shortest-paths-with-dijkstras-algorithm/dijkstras-algorithm [Accessed: 24th February 2021] 
-.. [5] Sryheni S. *Dijkstra's vs Bellman-Ford Algorithm.* [Online] Baeldung on Computer Science. Available from: https://www.baeldung.com/cs/dijkstra-vs-bellman-ford#:~:text=The%20main%20advantage%20of%20Dijkstra’s,algorithm%20can’t%20be%20used.&amp;text=%2C%20if%20we%20need%20to%20calculate,is%20not%20a%20good%20option. [Accessed: 24th February 2021]
-.. [6] Isaac Computer Science. Available from: https://isaaccomputerscience.org/concepts/dsa_search_dijkstra [Accessed: 24th February 2021]
-.. [7] *Graph Data Structure 6. The A* Pathfinding Algorithm* [Online Video] Computer Science. Youtube. Available from: https://www.youtube.com/watch?v=eSOJ3ARN5FM&ab_channel=ComputerScience [Accessed: 24th February 2021]
+.. [1] | Kormushev, P. & Nanayakkara, T. (2020) \ *DESE96005 - Robotics 2020-2021 - Course Notes*
+       | *and Lectures* [Module Content] Imperial College London.
+.. [2] | *Dilation (morphology).* [Online] Wikipedia. Wikimedia Foundation; Available from: 
+       | https://en.wikipedia.org/wiki/Dilation_%28morphology%29 [Accessed: 24th February 2021] 
+.. [3] | Brownlee J. *Gentle Introduction to Vector Norms in Machine Learning.* [Online] Machine Learning 
+       | Mastery. Available from: https://machinelearningmastery.com/vector-norms-machine-learning/ 
+       | [Accessed: 24th February 2021]
+.. [4] | *Coding Games and Programming Challenges to Code Better.* [Online] CodinGame. Available from: 
+       | https://www.codingame.com/playgrounds/1608/shortest-paths-with-dijkstras-algorithm/dijkstras-algorithm
+       | [Accessed: 24th February 2021] 
+.. [5] | Sryheni S. *Dijkstra's vs Bellman-Ford Algorithm.* [Online] Baeldung on Computer Science. 
+       | Available from: https://www.baeldung.com/cs/dijkstra-vs-bellman-ford#:~:text=The%20main%20advantage%20of%20Dijkstra’s,algorithm%20can’t%20be%20used.&amp;text=%2C%20if%20we%20need%20to%20calculate,is%20not%20a%20good%20option. 
+       | [Accessed: 24th February 2021]
+.. [6] | Isaac Computer Science. Available from: https://isaaccomputerscience.org/concepts/dsa_search_dijkstra 
+       | [Accessed: 24th February 2021]
+.. [7] | *Graph Data Structure 6. The A* Pathfinding Algorithm* [Online Video] Computer Science. Youtube.
+       | Available from: https://www.youtube.com/watch?v=eSOJ3ARN5FM&ab_channel=ComputerScience 
+       | [Accessed: 24th February 2021]
