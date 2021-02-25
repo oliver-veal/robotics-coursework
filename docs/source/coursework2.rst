@@ -87,6 +87,7 @@ Scipy’s ``binary_dilation`` function expands the map using this array by traci
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR A PART I
+   :emphasize-lines: 1
 
    #insert final code
 
@@ -174,6 +175,7 @@ To compare the lengths of different routes, we used the following line of code w
 
 .. code-block:: python
    :caption: FINAL COMMENTED CODE FOR CALCULATING PATH LENGTHS
+   :emphasize-lines: 1
 
    distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
 
@@ -233,6 +235,7 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR TASK B COMBINED
+   :emphasize-lines: 1
    
     def setup_waypoints(self):
         ############################################################### TASK B
@@ -283,6 +286,7 @@ In the video below, DE NIRO can be seen taking path 3
         <iframe src="https://drive.google.com/file/d/1cmUM8Awz4a6WJBK_ps9FwyYkRjAA53Ca/preview" width="640" height="480"></iframe>
     </div
 
+=======
 *Video 1: Robot DeNiro taking Path 3*
 
 ==========================
@@ -487,6 +491,7 @@ We could then run through the plots and choose the one with the best behaviour, 
         <iframe src="https://drive.google.com/file/d/1C0FReoqC88jh8Qm9eV_xRpVuDoknIFaz/preview" width="640" height="480"></iframe>
     </div
 
+=======
 *Video 2: Vector Field Iterations*
 
 Discussion
@@ -628,6 +633,8 @@ The results illustrate perfectly how DeNiro follows the expected path and reache
         <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
     </div
 
+
+=========
 *Video 3: Overlaid Vector Plot on Gazebo and Robot DeNiro Path*
 
 Observations
@@ -1054,6 +1061,7 @@ The path is clearly not as optimal as it relies on the random distribution of po
         <iframe src="https://drive.google.com/file/d/1xkdDy6k7mvBvuL7CXOmvn1GdD-2BU8Xg/preview" width="640" height="480"></iframe>
     </div
 
+=======
 *Video 4: PRM Dijkstra Algorithm Path*
 
 Optimising Dijkstra's Algorithm with Corner Detection
@@ -1101,6 +1109,7 @@ This implementation was useful for validating the combination of Dijakstra’s a
         <iframe src="https://drive.google.com/file/d/1aTEHT9rzB-BCMKe2YtuuixUtTVI1F9d5/preview" width="640" height="480"></iframe>
     </div
 
+======
 *Video 5: Corner Detection Dijkstra Algorithm Path*
 
 ----------------------------------------------------
