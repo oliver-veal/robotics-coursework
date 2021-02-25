@@ -318,96 +318,40 @@ def dijkstra(self, graph, edges):
     goal_node = goal
     nodes = list(graph.keys())
     
-    # Create a dataframe of unvisited nodes
-    # Initialise each cost to a very high number
-    initial_cost = 1000000.0  # Set this to a suitable value
+    initial_cost = 1000000.0  # This is set to a very high value so that the initial cost is never lower than the first time a node is visited
     
     unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
     unvisited.set_index('Node', inplace=True)
-    # Set the first node's cost to zero
     unvisited.loc[[str(initial_position)], ['Cost']] = 0.0
     
-    # Create a dataframe of visited nodes (it's empty to begin with)
     visited = pd.DataFrame({'Node':[''], 'Cost':[0.0], 'Previous':['']})
     visited.set_index('Node', inplace=True)
     
-    # Take a look at the initial dataframes
-    print('--------------------------------')
-    print('Unvisited nodes')
-    print(unvisited.head())
-    print('--------------------------------')
-    print('Visited nodes')
-    print(visited.head())
-    print('--------------------------------')
-    print('Running Dijkstra')
-    
-    # Dijkstra's algorithm!
-    # Keep running until we get to the goal node
+    # Dijkstra's algorithm
+    # Theory is explained in depth in the report, comments here only highlight the lines we modified to complete the task
     while str(goal_node) not in visited.index.values:
         
-        # Go to the node that is the minimum distance from the starting node
         current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
-        current_node_name = current_node.index.values[0]    # the node's name (string)
-        current_cost = current_node['Cost'].values[0]       # the distance from the starting node to this node (float)
-        current_tree = current_node['Previous'].values[0]   # a list of the nodes visited on the way to this one (string)
+        current_node_name = current_node.index.values[0]
+        current_cost = current_node['Cost'].values[0]
+        current_tree = current_node['Previous'].values[0]
         
-        connected_nodes = graph[current_node.index.values[0]]   # get all of the connected nodes to the current node (array)
-        connected_edges = edges[current_node.index.values[0]]   # get the distance from each connected node to the current node   
+        connected_nodes = graph[current_node.index.values[0]]
+        connected_edges = edges[current_node.index.values[0]]
         
-        # Loop through all of the nodes connected to the current node
         for next_node_name, edge_cost in zip(connected_nodes, connected_edges):
-            next_node_name = str(next_node_name)    # the next node's name (string)
+            next_node_name = str(next_node_name)
             
-            if next_node_name not in visited.index.values:  # if we haven't visited this node before
+            if next_node_name not in visited.index.values:
+                next_cost_trial = current_cost + edge_cost # This updates the cost by adding the current best path cost to the edge weight
+                next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0]
                 
-                # update this to calculate the cost of going from the initial node to the next node via the current node
-                next_cost_trial = current_cost + edge_cost# set this to calculate the cost of going from the initial node to the next node via the current node
-                next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
-                
-                # if it costs less to go the next node from the current node, update then next node's cost and the path to get there
-                if next_cost_trial < next_cost:
+                if next_cost_trial < next_cost: # Should we update the value for the cost of the node?
                     unvisited.loc[[next_node_name], ['Cost']] = next_cost_trial
-                    unvisited.loc[[next_node_name], ['Previous']] = current_tree + current_node_name    # update the path to get to that node
+                    unvisited.loc[[next_node_name], ['Previous']] = current_tree + current_node_name
         
-        unvisited.drop(current_node_name, axis=0, inplace=True)     # remove current node from the unvisited list
+        unvisited.drop(current_node_name, axis=0, inplace=True)
 
-        visited.loc[current_node_name] = [current_cost, current_tree]   # add current node to the visited list
+        visited.loc[current_node_name] = [current_cost, current_tree]
         
-    print('--------------------------------')
-    print('Unvisited nodes')
-    print(unvisited.head())
-    print('--------------------------------')
-    print('Visited nodes')
-    print(visited.head())
-    print('--------------------------------')
-    
-    optimal_cost = visited.loc[[str(goal_node)], ['Cost']].values[0][0]  # Optimal cost (float)
-    optimal_path = visited.loc[[str(goal_node)], ['Previous']].values[0][0]  # Optimal path (string)
-    
-    # Convert the optimal path from a string to an actual array of waypoints to travel to
-    string_waypoints = optimal_path[1:-1].split('][')
-    optimal_waypoints = np.array([np.fromstring(waypoint, sep=' ') for waypoint in string_waypoints])
-    optimal_waypoints = np.vstack((optimal_waypoints, goal))    # add the goal as the final waypoint
-    
-    print('Results')
-    print('Goal node: ', str(goal_node))
-    print('Optimal cost: ', optimal_cost)
-    print('Optimal path:\n', optimal_waypoints)
-    print('--------------------------------')
-    
-    # Plotting
-    optimal_pixels = self.map_position(optimal_waypoints)
-    plt.plot(optimal_pixels[:, 0], optimal_pixels[:, 1], c='b')
-    
-    deniro_pixel = self.map_position(initial_position)
-    goal_pixel = self.map_position(goal)
-    
-    plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-    plt.scatter(deniro_pixel[0, 0], deniro_pixel[0, 1], c='w')
-    plt.scatter(goal_pixel[0, 0], goal_pixel[0, 1], c='g')
-    
-    plt.show()
-    
-    # Setup the waypoints for normal waypoint navigation
-    self.waypoints = optimal_waypoints
-    self.waypoint_index = 0
+# ... 
