@@ -37,40 +37,236 @@ Open Terminator to input commands and run different services or files.
 C-Space Map
 ==================
 
-----------------------------------------
-Task A i : C-Space Dilation, Square Mask
-----------------------------------------
+------------------------
+Task A: C-Space Dilation
+------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
-The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
-As the robot moves, the D-H table is updated.
-The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+.. image:: img/c_space_dilation_lecture_illustration.png
+   :width: 500
+   :alt: c_space_dilation_lecture_illustration
 
--------------------------------------------
-Task A ii : C-Space Dilation, Circular Mask
--------------------------------------------
+*Illustrations of the lattice/grid search method to expand obstacles in c-space.[course documentation]*
 
-To make the D-H table, the reference
+The simplest way to avoid collisions when planning a route, is to inflate work-space obstacles to account for the size of the robot, as it is not just a point, when converting to configuration space. This is done by increasing the dimensions of obstacles on all sides and corners by half the dimensions of the robot. This way, if we plan the midpoint of the robot to follow the boundaries of a c-space obstacle on it’s route, it will not collide with the real obstacle. In task A, we do this by using a lattice/grid search to add numpy arrays of the given width of DE NIRO to the edges of the obstacles to create a new c-space map which DE NIRO can subsequently follow. This is done first by approximating the robot to be a square (Part i) then a circle (Part ii).
+
+-------------------
+Part i: Square Mask
+-------------------
+A square array of "1"s is simply made using the numpy function ``np.ones``. The scale of pixels on the c-space map compared to the work-space is given by the brief to be 16, so the size of the square array can be defined as *robot width* x *scale*, which is expressed in the line:
+
+.. code:: python
+
+   robot_px = int(robot_width * scale)
+
+We then make robot_mask as a numpy array of ones of the right size using:
+
+.. code:: python
+
+   robot_mask = np.ones((robot_px, robot_px))
+
+Scipy’s ``binary_dilation`` function expands the map using this array by tracing the obstacles boundaries with the centre of the array similarly to what is shown below with a circle.
+
+.. image:: img/binary_dilation_illustration.png
+   :width: 250
+   :alt: binary_dilation_illustration
+
+*Figure X: Binary dilation illustration for a circle [https://en.wikipedia.org/wiki/Dilation_%28morphology%29]*
+
+[Final commented code for Ai]
+-----------------------------
+
+Result:
+-------
+
+.. image:: img/ai_results.png
+   :width: 500
+   :alt: ai_results
+
+*Original map (left), expanded c-space map for a square (right)*
+
+
+----------------------
+Part ii: Circular Mask
+----------------------
+To make the circle array of ones, we use the equation for a circle, *x*:sup:`2` + *y*:sup:`2` = *r*:sup:`2`. An array of ones the same size as the square array explained above is created and iterated through to check if each item is further from the centre point than the radius length (``DENIRO_width / 2``). If it is, it is changed to a zero. 
+
+The centre of the array is in between four items as the width of the array is 16 px. If a list where an odd length, there would be a single middle value:
+
+* Example: 1 2 3 **4** 5 6 7    <- middle value is 4
+
+However, this 16x16 array is an even width and height, so the middle value must be an average:
+
+* Example: 1 2 3 **4 5** 6 7 8  <- middle value is 4.5
+
+For this array, the center is at (8.5, 8.5).
+
+The array is visually displayed below:
+
+.. image:: img/aii_circle_array.png
+   :width: 250
+   :alt: aii_circle_array
+
+*Circle array approximation of DENIRO.*
+
+[Final commented code for Aii]
+------------------------------
+
+Result:
+-------
+
+.. image:: img/aii_result.png
+   :width: 250
+   :alt: aii_result
+
+*Expanded map for a circle approximation of DE NIRO.*
 
 ====================
 Waypoint Navigation
 ====================
 
------------------------------------------------------
-Task B i: Adding Waypoints by Hand, Creating the Path
------------------------------------------------------
+----------------------------------
+Task B: Adding Waypoints by Hand
+----------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
-The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
-As the robot moves, the D-H table is updated.
-The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+Manual waypoint planning enables quick visualizations of the shortest routes by visual inspection, looking at the expanded c-space map. It was quickly obvious that going from corner to corner of obstacles would be the shortest paths as this means going in direct, straight lines when in empty space between obstacles. 3 routes were tried with this method.
+Points were chosen on the pixel map and converted to world coordinates using the function ``self.world_position()``, as shown in the code below.
 
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 1,7
 
---------------------------------------------------------------
-Task B ii: Adding Waypoints by Hand, Shortest Path Calculation
---------------------------------------------------------------
+   p1 = self.world_position(np.array([191,104]))
+   p2 = self.world_position(np.array([265,141]))
+   p3 = self.world_position(np.array([292,237]))
+       
+   waypoints = np.array([
+   [0,-6],
+   p1[0],
+   p2[0],
+   p3[0],
+   [8,8]
+   ])
 
-This task initialises the Denavit-Hartenberg, D-H, table.
+[Replace with final, commented code]
+------------------------------------
+
+The coordinates of DE NIRO’s starting position and destination were given as (0,-6) and (8,8) respectively (or (162,66) and (290,290) in pixel coordinates).
+
+To compare the lengths of different routes, we used the following line of code which calculates the hypotenuse from one point to the other then sums:
+
+.. code:: python
+
+   distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
+
+Results:
+--------
+
+Path 1
+======
+
+* P1 = (194, 121), or (2.03, -2.53) in world coordinates
+* P2 = (210, 278), or (3.03, 7.28) in world coordinates
+
+.. image:: img/b_path_1.png
+   :width: 250
+   :alt: b_path_1
+
+*Output of path 1*
+
+Total length of path 1: **18.9m**
+
+Path 2
+======
+
+* P1 = (194, 121), or (2.03, -2.53) in world coordinates
+* P2 = (223, 211), or (3.84, 3.09) in world coordinates
+* P3 = (286, 235), or (7.78, 4.59) in world coordinates
+
+.. image:: img/b_path_2.png
+   :width: 250
+   :alt: b_path_2
+
+*Output of path 2*
+
+Total length of path 2: **17.6m**
+
+Path 3
+======
+
+* P1 = (193,101), or (1.97, -3.78) in world coordinates
+* P2 = (257,141), or (5.97, -1.28) in world coordinates
+* P3 = (286,235), or (7.78, 4.59) in world coordinates
+
+.. image:: img/b_path_3.png
+   :width: 250
+   :alt: b_path_3
+
+*Output of path 3*
+
+Total length of path 3: **17.2m**
+
+Path 3 gave the shortest distance.
+
+All code used to implement it is shown below, using the mentioned ``self.world_position()`` function and the distance calculation we wrote.
+
+.. code-block:: python
+   :linenos:
+   
+    def setup_waypoints(self):
+        ############################################################### TASK B
+        # Create an array of waypoints for the robot to navigate via to reach the goal
+        
+        #196, 118
+        #219, 216
+        #294, 232
+        
+        #191,104
+        #265,141
+        #292,237
+        
+        #185, 103
+        #202, 123
+        #205, 285
+        
+        p1 = self.world_position(np.array([191,104]))
+        p2 = self.world_position(np.array([265,141]))
+        p3 = self.world_position(np.array([292,237]))
+       
+        waypoints = np.array([
+        
+        [0,-6],
+        p1[0],
+        p2[0],
+        p3[0],
+        [8,8]
+        ])  # fill this in with your waypoints
+        
+        print(self.world_position(np.array([191,104])))
+                                  
+        distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
+        
+        print(distance)
+
+        waypoints = np.vstack([initial_position, waypoints, self.goal])
+        pixel_goal = self.map_position(self.goal)
+        pixel_waypoints = self.map_position(waypoints)
+        
+        print('Waypoints:\n', waypoints)
+        print('Waypoints in pixel coordinates:\n', pixel_waypoints)
+        
+        # PlottingS
+        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+        plt.scatter(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
+        plt.plot(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
+        plt.show()
+        
+        self.waypoints = waypoints
+        self.waypoint_index = 0
+
+[Replace with final, commented code]
+------------------------------------
+
+In the video below, DE NIRO can be seen taking path 3 *Insert video*
 
 ==========================
 Potential Field Algorithm
