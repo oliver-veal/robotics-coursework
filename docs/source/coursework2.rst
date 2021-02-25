@@ -553,7 +553,6 @@ Dijakstra’s algorithm can then be used to find the shortest path (discussed la
    :width: 500
    :alt: methods_comp_annot
 
-
 -------------------------------------------------
 Task F i: Dijkstra's Algorithm, Creating the Path
 -------------------------------------------------
