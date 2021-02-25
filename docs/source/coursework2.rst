@@ -646,8 +646,23 @@ The idea behind taking the average of the top n largest force contributions come
 
 **Effects of Tuning the Top-N Average Parameters**
 
-... Diagrams and shit
----------------------
+.. image:: img/avg_1.png
+   :width: 340
+   :alt: Tuning Avg1
+
+.. image:: img/avg_1_zoom.png
+   :width: 340
+   :alt: Tuning Avg1 Close-up
+
+.. image:: img/avg_5png
+   :width: 340
+   :alt: Tuning Avg5
+
+.. image:: img/avg_5_zoom.png
+   :width: 340
+   :alt: Tuning Avg5 Close-up
+
+*Figure 16a, 16b, 16c, 16d: Effects of changing the Average parameter, smoothing out the field lines flow between obstacles*
 
 **Valid Paths Produced By This Method**
 
@@ -659,7 +674,7 @@ The idea behind taking the average of the top n largest force contributions come
    :width: 340
    :alt: hollow_search
 
-*Figure 16, 17: Hollow obstacle map (left) and Hollow obstacle map with vector field plot (right)*
+*Figure 17a, 17b: Hollow obstacle map (left) and Hollow obstacle map with vector field plot (right)*
 
 As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
 This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing DE NIRO onto the closest “path” which he then follows to the goal. This is a reliable model, and uses ``k_att`` and ``k_rep`` coefficients which are equal to each other; 20 was used in this test.
@@ -747,11 +762,6 @@ Parameters used below: ``K_att = 3  K_rep = 350``
 .. note::
    This method can be applied with hollow obstacles as well and provides similar results.
 
-<<<<<<< HEAD
-We then decided to test this route with DE NIRO in Gazebo.
-We recorded the DE NIRO simulation and overlaid the vector field plot to validate if DE NIRO follows the path as expected.
-The results illustrate perfectly how DE NIRO follows the expected path and reaches the goal.
-=======
 **Code Implementation of Method 3**
 
 .. code-block::
@@ -761,10 +771,9 @@ The results illustrate perfectly how DE NIRO follows the expected path and reach
 
 **Testing**
 
-We then decided to test this route with DeNiro in Gazebo.
-We recorded the DeNiro simulation and overlaid the vector field plot to validate if DeNiro follows the path as expected.
-The results illustrate perfectly how DeNiro follows the expected path and reaches the goal.
->>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
+We then decided to test this route with DE NIRO in Gazebo.
+We recorded the DE NIRO simulation and overlaid the vector field plot to validate if DE NIRO follows the path as expected.
+The results illustrate perfectly how DE NIRO follows the expected path and reaches the goal.
 
 .. raw:: html
 
@@ -1040,19 +1049,14 @@ The reason this is required is that distance and direction are evaluated in ``ed
    :linenos:
    :emphasize-lines: 1
    
-    resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
+   resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
 
    edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2)) # Creates points along direction vector to check for collisions
    # This creates an array of points from Point A till point B and utilises the unit direction vector specified and interpolates points along it in step sizes of variable resolution
    # as defined by np.arange. A value of 0.0625 specifies the smallest check possible in m which checks every pixel in the grid.
 
-<<<<<<< HEAD
 These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True``, thus causing it to be unsuitable for use in the map.
-Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effects, and results are shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however, given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
-=======
-These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
 Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
->>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
 
 **Resolutions Tested:**
 
@@ -1111,12 +1115,7 @@ A randomly generated graph is likely not the optimal route to the goal, and may 
 For example, the narrow passage between the central obstacle and the upper is often undiscovered, as well as other areas of the map.
 Increasing the number of points can help, but there are more optimal approaches.
 
-<<<<<<< HEAD
 From experimenting with manually placing waypoints, seeing the routes proposed by the potential fields, and from intuition, the shortest route to the goal is often found by traversing the corners of the obstacles.
-Some intuitive rules can be applied to justify this:
-=======
-From the experimenting in manually placing waypoints, seeing the routes proposed by the potential fields, and from intuition, the shortest route to the goal is often found by traversing the corners of the obstacles.
->>>>>>> dadf4626921ed86776ec144421c113d35e3d4568
 
 .. note::
    The reason why this is the case (for maps with convex polygons) is explain in the note in `Task D ii: Harris Corner Detection`_.
