@@ -287,6 +287,7 @@ In the video below, DE NIRO can be seen taking path 3
     </div
 
 =======
+
 *Video 1: Robot DeNiro taking Path 3*
 
 ==========================
@@ -492,6 +493,7 @@ We could then run through the plots and choose the one with the best behaviour, 
     </div
 
 =======
+
 *Video 2: Vector Field Iterations*
 
 Discussion
@@ -635,6 +637,7 @@ The results illustrate perfectly how DeNiro follows the expected path and reache
 
 
 =========
+
 *Video 3: Overlaid Vector Plot on Gazebo and Robot DeNiro Path*
 
 Observations
@@ -1062,6 +1065,7 @@ The path is clearly not as optimal as it relies on the random distribution of po
     </div
 
 =======
+
 *Video 4: PRM Dijkstra Algorithm Path*
 
 Optimising Dijkstra's Algorithm with Corner Detection
@@ -1110,6 +1114,7 @@ This implementation was useful for validating the combination of Dijakstra’s a
     </div
 
 ======
+
 *Video 5: Corner Detection Dijkstra Algorithm Path*
 
 ----------------------------------------------------
