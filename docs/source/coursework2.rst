@@ -226,18 +226,6 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
         ############################################################### TASK B
         # Create an array of waypoints for the robot to navigate via to reach the goal
         
-        #196, 118
-        #219, 216
-        #294, 232
-        
-        #191,104
-        #265,141
-        #292,237
-        
-        #185, 103
-        #202, 123
-        #205, 285
-        
         p1 = self.world_position(np.array([191,104]))
         p2 = self.world_position(np.array([265,141]))
         p3 = self.world_position(np.array([292,237]))
