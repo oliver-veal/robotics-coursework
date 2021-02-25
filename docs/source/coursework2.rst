@@ -45,7 +45,7 @@ Task A: C-Space Dilation
    :width: 500
    :alt: c_space_dilation_lecture_illustration
 
-*Illustrations of the lattice/grid search method to expand obstacles in c-space.[course documentation]*
+*Illustrations of the lattice/grid search method to expand obstacles in c-space.* [1]_
 
 The simplest way to avoid collisions when planning a route, is to inflate work-space obstacles to account for the size of the robot, as it is not just a point, when converting to configuration space. This is done by increasing the dimensions of obstacles on all sides and corners by half the dimensions of the robot. This way, if we plan the midpoint of the robot to follow the boundaries of a c-space obstacle on it’s route, it will not collide with the real obstacle. In task A, we do this by using a lattice/grid search to add numpy arrays of the given width of DE NIRO to the edges of the obstacles to create a new c-space map which DE NIRO can subsequently follow. This is done first by approximating the robot to be a square (Part i) then a circle (Part ii).
 
@@ -70,10 +70,13 @@ Scipy’s ``binary_dilation`` function expands the map using this array by traci
    :width: 250
    :alt: binary_dilation_illustration
 
-*Figure X: Binary dilation illustration for a circle [https://en.wikipedia.org/wiki/Dilation_%28morphology%29]*
+*Figure X: Binary dilation illustration for a circle.* [2]_
 
-[Final commented code for Ai]
------------------------------
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR A PART I
+
+   #insert final code
 
 Result:
 -------
@@ -108,8 +111,11 @@ The array is visually displayed below:
 
 *Circle array approximation of DENIRO.*
 
-[Final commented code for Aii]
-------------------------------
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR A PART II
+
+   #insert final code
 
 Result:
 -------
@@ -134,6 +140,7 @@ Points were chosen on the pixel map and converted to world coordinates using the
 .. code-block:: python
    :linenos:
    :emphasize-lines: 1,7
+   :caption: FINAL COMMENTED CODE FOR CONVERTING COORDINATES
 
    p1 = self.world_position(np.array([191,104]))
    p2 = self.world_position(np.array([265,141]))
@@ -147,16 +154,18 @@ Points were chosen on the pixel map and converted to world coordinates using the
    [8,8]
    ])
 
-[Replace with final, commented code]
-------------------------------------
+   #UPDATE WITH FINAL, COMMENTED CODE
 
 The coordinates of DE NIRO’s starting position and destination were given as (0,-6) and (8,8) respectively (or (162,66) and (290,290) in pixel coordinates).
 
 To compare the lengths of different routes, we used the following line of code which calculates the hypotenuse from one point to the other then sums:
 
-.. code:: python
+.. code-block:: python
+   :caption: FINAL COMMENTED CODE FOR CALCULATING PATH LENGTHS
 
    distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
+
+   #UPDATE WITH FINAL, COMMENTED CODE
 
 Results:
 --------
@@ -211,6 +220,7 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
 
 .. code-block:: python
    :linenos:
+   :caption: FINAL COMMENTED CODE FOR TASK B COMBINED
    
     def setup_waypoints(self):
         ############################################################### TASK B
@@ -263,9 +273,11 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
         self.waypoints = waypoints
         self.waypoint_index = 0
 
-[Replace with final, commented code]
-------------------------------------
+   #UPDATE WITH FINAL, COMMENTED CODE
 
+In the video below, DE NIRO can be seen taking path 3
+
+<<<<<<< HEAD
 In the video below, DE NIRO can be seen taking path 3
 
 .. raw:: html
@@ -275,6 +287,10 @@ In the video below, DE NIRO can be seen taking path 3
     </div
 
 =====
+=======
+[Insert Task B result video]
+----------------------------
+>>>>>>> 048220cf8f8eb61bfd47c7f39a3a1e808fa8e9a4
 
 ==========================
 Potential Field Algorithm
@@ -478,12 +494,12 @@ We could then run through the plots and choose the one with the best behaviour, 
 Discussion
 ----------
 
-This exercise ended up showing that no combination of the parameters produced a valid path for deniro to reach the target.
-The trend was that increasing the attractive force was necessary to have the final vectors point to the goal, but this led deniro into obstacles.
-Increasing the negative force to help deniro avoid obstacles ended up pushing deniro away from the centre of mass of the obstacles, i.e away from the middle of the room.
+This exercise ended up showing that no combination of the parameters produced a valid path for DeNiro to reach the target.
+The trend was that increasing the attractive force was necessary to have the final vectors point to the goal, but this led DeNiro into obstacles.
+Increasing the negative force to help DeNiro avoid obstacles ended up pushing denDeNiroiro away from the centre of mass of the obstacles, i.e away from the middle of the room.
 This makes intuitive sense, as the sum function is adding ALL the obstacle pixels, even those in the middle of the obstacles. This gave large obstacles a disproportionately large influence over smaller, equally close obstacles.
 This also highlights that the inverse fall off was not steep enough to neglect far away points.
-Deniro was either pushed away from the centre of the room, or pulled in a straight line towards the goal, regardless of his position in the room.
+DeNiro was either pushed away from the centre of the room, or pulled in a straight line towards the goal, regardless of his position in the room.
 This could suggest that the influence of the negative force was felt almost equally to the attractive force, with both fields have wide influences and summing uniformly over the map, instead of having different levels of influences dependant on position.
 
 Additional
@@ -502,108 +518,8 @@ Paramters used below: ``K_att = 1.5   K_rep = -16``
 Task C ii: Custom Implementation of the Potential Field Algorithm
 -----------------------------------------------------------------
 
-Method 1: Hollow obstacles
---------------------------
-
-We developed an approach to use the given equations, but modify the map to give deniro more of a chance to make it to the goal.
-We created a copy of the map with a slightly smaller dilation size, and then subtracted this from the map to leave only the obstacle walls.
-This method on it’s own was still not enough to produce a path to the goal.
-Paramters used below: ``K_att = 20   K_rep = 20``
-
-.. image:: img/outlines.png
-   :width: 340
-   :alt: outlines
-
-.. image:: img/ollie_method_linear_no_local.png
-   :width: 340
-   :alt: outlines
-
-.. note::
-   The vector lines in this plot have been normalised as their magnitudes vary greatly. This would also be implemented in the robot control.
-
-While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and deniro is still pushed away from the centre of the room, with the same issues as in part i.
-
-Method 2: Search area
----------------------
-Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around deniro.
-This was implemented by sorting the influence of each pixel and summing only the greatest x number.
-Using this method, deniro had much better success in making it to the goal.
-
-.. image:: img/ollie_method_full_normalised.png
-   :width: 340
-   :alt: hollow_search
-
-.. image:: img/ollie_method_full_normalised_path.jpg
-   :width: 340
-   :alt: hollow_search
-
-As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
-This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing deniro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses ``k_att`` and ``k_rep`` coefficients which are equal to each other; 20 was used in this test.
-This approach introduces another parameter; the number of nearby obstacle pixels to sum.
-A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
-
-Method 3: Square Inverse Square Fall-off
-----------------------------------------
-An intuitive next step is to raise the power of the falloff of the repulsive force.
-This helps the robot by ignoring far away points and only providing repulsion when it is very close to obstacles.
-This avoids the issue of preventing the robot from moving through gaps, and allows the attractive force to be predominant in most spaces, only when very close to an obstacle does the repulsive force take effect.
-We implemented a simple square fall off by squaring the distance_to_obstacle variable.
-Using the same for loop iterative field plot testing approach, we found these coefficients to provide a clear path:
-Paramters used below: ``K_att = 3  K_rep = 350``
-
-.. image:: img/sqr_12_350.png
-   :width: 340
-   :alt: hollow_search
-
-.. image:: img/sqr_12_350_path.jpg
-   :width: 340
-   :alt: hollow_search
-
-We then decided to test this route with Deniro in Gazebo.
-We recorded the deniro simulation and overlaid the vector field plot to validate if deniro follows the path as expected.
-The results show perfectly how deniro follows the expected path and reaches the goal.
-
-.. raw:: html
-
-    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
-    </div
-
-=====
-
-
-Observations
-------------
-
-While this method provided a valid solution, it is worth discussing the optimality.
-As we observed by manually plotting waypoints, this route is not the shortest.
-Deniro should have turned right around the table and two chairs instead of left.
-We can see from the potential fields however, that in this position the goal is more vertically than horizontally distant from deniro (i.e the direction vector is greater than 45 degrees).
-This might be the reason that deniro chose the up-most path instead of turning right, as the direction vector pointed more up than right.
-In such a case, it is difficult for the potential fields algorithm to know which route will be shorter.
-
-However, comparing the solution in part (i) to (ii), we can see that the (ii) solution is more optimal for shortest distance.
-The part (i) solution pushes deniro to the nearest path before continuing to the goal, even if that means going backwards.
-The (ii) solution does not do this, but does instead push deniro towards the goal right up until obstacles, which he then follows around the edge.
-
-See the figures below, where the (i) solution takes deniro left, and then right along the path, whereas (ii) takes deniro straight up towards the opening to the goal.
-
-.. image:: img/methods_comp_annot.png
-   :width: 500
-   :alt: methods_comp_annot
-
-..
-   Part ii
-   As mentioned, sometimes we require more complex potential fields to achieve better performance from
-   our motion planner. Design and implement your own potential functions (different from equations (1-3).
-   Discuss your reasoning behind your proposed potential function, and how you implemented it in your report.
-   On an image of the map, draw the path that DE NIRO takes, and include this in your report. Is
-   this the optimal path? Comment on any interesting features of the path taken.
-   Estimate the length of the path taken by DE NIRO - is it better or worse than the length of the
-   path taken when following your own waypoints? If it is better, why do you think it is better? If it is worse,
-   why do you think it is worse?
-
-**Observations from using linear falloff of repulsive forces:**
+Observations from using linear falloff of repulsive forces
+----------------------------------------------------------
 
 - In order to gain sufficient repulsion from nearby objects, a large ``K_rep`` value is needed, which overwhelms any effect of the positive force. It is extremely difficult or impossible to balance the two forces with a linear falloff.
 - The linear falloff means that distant objects that should have a small contribution to the negative force experienced in a given location actually contribute a much larger force than would be ideal. This can result in being pushed away from the centre of mass (the centre of the map in this roughly symmetrical case) rather than pushed away from local obstacles only.
@@ -620,28 +536,157 @@ If we could create a more ideal algorithm that could get around the limitations 
    **As such, we propose the following modifications to the Potential Fields Algorithm:**
 
    #. Normalise the "mass" of each object by only considering the edges of the obstacle to provide a repulsive force (Implementation of this is detailed below).
-   #. Take an average of the top 50 largest repulsive force contributions by magnitude.
+   #. Take an average of the top 50 largest repulsive force contributions by magnitude (only include nearby forces).
    #. Make the positive and negative scalar parameters equal.
 
-**1. Normalising the mass (edge detection):**
+Method 1: Hollow Obstacles
+--------------------------
 
-To consider only the edges of obstacles, run an edge detection algorithm over the expanded map. Or, equivalently, when creating the C-space map; create two maps, one dilating the obstacles using a mask 2px less wide than required, and another using the full width mask, then take the XOR of the two maps. XOR will only keep ``1`` values where they exist on the fully expanded map, but not on the less expanded map, i.e. the edges. An example of this process in action is shown below:
+We developed an approach to keep using the provided equations, but modify the C-space map to give DeNiro more of a chance to make it to the goal.
+To consider only the edges of obstacles, we ran an edge detection algorithm over the expanded map. Or, equivalently, when creating the C-space map; create two maps, one dilating the obstacles using a mask 2px less wide than required, and another using the full width mask, then take the XOR of the two maps. XOR will only keep ``1`` values where they exist on the fully expanded map, but not on the less expanded map, i.e. the edges.
+Paramters used below: ``K_att = 20   K_rep = 20``
 
-TODO Example of edge detection using XOR.
+.. image:: img/outlines.png
+   :width: 340
+   :alt: outlines
 
-The idea behind taking the average of the top n largest force contributions comes from this `this <https://medium.com/@rymshasiddiqui/path-planning-using-potential-field-algorithm-a30ad12bdb08>`_ article, in which the author describes their method as using a max function on the negative forces from each obstacle, essentially considering only the repulsive force from the most repulsive object. We improve on this idea by not just taking the largest value, but an average of the n largest values, where n is a tunable parameter. The reason for doing this becomes apparent when looking at a very narrow section. When only taking the max, the effect is to produce a force near the the central line between obstacles that "oscillates" very rapidly between pointing in one direction or the other, primarly because it can only consider repulsion from one obstacle pixel at a time, and as the force falloff is linear, this will always be the closest pixel. In this simple case, averaging the force from the objects on both sides produces a much smoother path for the robot to follow; the the effects of being repelled by two close-by but opposing forces "cancels out". The effects of changing this average parameter are shown below:
+.. image:: img/ollie_method_linear_no_local.png
+   :width: 340
+   :alt: outlines
+
+.. note::
+   The vector lines in this plot have been normalised as their magnitudes vary greatly. This would also be implemented in the robot control.
+
+While this approach does help normalise the influence of obstacles by mostly ignoring their volume, it does not help against the “centre of mass” effect, and DeNiro is still pushed away from the centre of the room, with the same issues as in part i.
+
+Method 2: Limited Search Area & Hollow Obstacles
+---------------------------------------------------------------
+Another approach which keeps the inverse falloff but may offer better results involves applying a “search window” around DeNiro.
+This was implemented by sorting the influence of each pixel and summing only the greatest x number.
+Using this method, DeNiro had much better success in making it to the goal.
+
+The idea behind taking the average of the top n largest force contributions comes from `this article <https://medium.com/@rymshasiddiqui/path-planning-using-potential-field-algorithm-a30ad12bdb08>`_, in which the author describes how their method uses a ``max`` function on the negative forces from each obstacle, essentially considering only the repulsive force from the nearest object. We improve on this idea by not just taking the largest value, but an average of the n largest values, where n is a tunable parameter. The reason for doing this becomes apparent when looking at a very narrow section. When only taking the max, the effect is to produce a force near the the central line between obstacles that "oscillates" very rapidly between pointing in one direction or the other, primarly because it can only consider repulsion from one obstacle pixel at a time, and as the force falloff is linear, this will always be the closest pixel. In this simple case, averaging the force from the objects on both sides produces a much smoother path for the robot to follow; the the effects of being repelled by two close-by but opposing forces "cancels out". The effects of changing this average parameter are shown below:
 
 **Effects of Tuning the Top-N Average Parameter**
 
-TODO
+... Diagrams and shit
 
-**Downsides and Considerations**
+**Valid Paths Produced By This Method**
+
+.. image:: img/ollie_method_full_normalised.png
+   :width: 340
+   :alt: hollow_search
+
+.. image:: img/ollie_method_full_normalised_path.jpg
+   :width: 340
+   :alt: hollow_search
+
+As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
+This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing DeNiro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses ``k_att`` and ``k_rep`` coefficients which are equal to each other; 20 was used in this test.
+This approach introduces another parameter; the number of nearby obstacle pixels to sum.
+A value of 40 was found to be optimal, with deviation either side not making much difference to the plotted paths.
+
+**Edge Case Considerations**
 
 Some consideration would need to be given to some edge cases with this algorithm, although they haven't neccessarily been explored here as this particular obstacle map is geometrically simple (rectangular, convex shapes for obstacles etc).
 
 Consider for example consider the case of a single point obstacle close to a "wall" (line) of obstacle pixels. It is possible in this case to encounter the same problem as when just taking a global average of all pixel forces, that is, the repulsive force from the single pixel does not contribute enough to the average to avoid the robot from crashing into it.
 
-Another case would be that of non-convex obstacles (for example a "bowl" or "banana" type shape). ------- TODO Expand on this
+To solve this issue, a more robust falloff function could be used that causes the repulsive force's magnitude to be extremely large when very close to an obstacle pixel, no matter the overall size of the obstacle:
+
+Method 3: Square Inverse Square Falloff
+----------------------------------------
+An intuitive next step is to raise the power of the falloff of the repulsive force.
+This helps the robot by ignoring points further away and only providing repulsion when it is very close to obstacles.
+This avoids the issue of preventing the robot from moving through gaps, and allows the attractive force to be predominant in most spaces, only when very close to an obstacle does the repulsive force take effect.
+We implemented a simple square fall off by squaring the distance_to_obstacle variable.
+Using the same for loop iterative field plot testing approach, we found these coefficients to provide a clear path:
+Paramters used below: ``K_att = 3  K_rep = 350``
+
+.. image:: img/sqr_12_350.png
+   :width: 340
+   :alt: hollow_search
+
+.. image:: img/sqr_12_350_path.jpg
+   :width: 340
+   :alt: hollow_search
+
+.. note::
+   This method can be applied with hollow obstacles as well and provides similar results.
+
+
+We then decided to test this route with DeNiro in Gazebo.
+We recorded the DeNiro simulation and overlaid the vector field plot to validate if DeNiro follows the path as expected.
+The results illustrate perfectly how DeNiro follows the expected path and reaches the goal.
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1KAyHLxf4C0JemxyRrHUbYp8yyowIDgl6/preview" width="640" height="480"></iframe>
+    </div
+
+=====
+
+
+Observations
+------------
+
+While Potential Field algorithms with well tuned parameters can provide a valid solution, it is worth discussing the optimality.
+When compared with manually plotting waypoints, we can see that this route is not the shortest.
+DeNiro should have turned right around the table and two chairs instead of left.
+We can see from the potential fields however, that in this position the goal is more vertically than horizontally distant from DeNiro (i.e the direction vector is greater than 45 degrees).
+This might be the reason that DeNiro chose the up-most path instead of turning right, as the direction vector pointed more up than right.
+In such a case, it is difficult for the potential fields algorithm to know which route will be shorter.
+
+However, comparing the solution from method **Method 2** to **Method 3**, we can see that the **Method 3** solution is more optimal for shortest distance.
+The **Method 2** solution pushes DeNiro to the centroid path before continuing to the goal, even if that means going backwards initially.
+The **Method 3** solution does not do this, but does instead push DeNiro towards the goal right up until obstacles, which he then follows around the edge.
+
+See the figures below, where the **Method 2** solution takes DeNiro left, and then right along the path, whereas **Method 3** takes DeNiro straight up towards the opening to the goal.
+
+.. image:: img/methods_comp_annot.png
+   :width: 500
+   :alt: methods_comp_annot
+
+Method Comparison
+-----------------
+
+**Method 2**: Linear Falloff with Mass Normalisation (Hollow Obstacles) and Top-N Force Average:
+
+Advantages:
+
+- Potentially a "smoother" path with fewer rapid turns (if the avg is tuned correctly).
+- Deals with narrow passages extremely smoothly.
+- Better at dealing with non-convex obstacles as forces from futher away can have more impact, giving some situations a wider perception of the environment.
+- Keeps the robots as far away from obstacles as possible while making good progress towards the goal.
+
+Disadvantages:
+
+- Usually a longer path, due to the path being more geometrically centered between obstacles (doesn't tend to "B-line" towards the goal, but remain between obstacles).
+
+Use cases:
+
+- If you need to keep the robot further away from obstacles.
+- For example an RC boat where the water becomes shallow near obstacles (shores of islands for instance) so the ideal path should be more centrered.
+
+**Method 3**: Inverse Square Falloff (With or Without Hollow Obstacles, Average of All Pixels)
+
+Advantages:
+
+- When far from any obstacles, almost no repulsive force is experienced.
+- This means that when in free space, the robot will make a "B-line" towards the goal.
+- When encountering an object, the obstacle essentially has a thin "force-field" around it, preventing collisions while maintaining close to the optimal path.
+
+Disadvantages:
+
+- Does not handle non-convex obstacles well; easy to get stuck inside them as the repulsive force is very local and doesn't take into account the wider surroundings.
+- Essentially a "greedy" algorithm therefore (although not exactly in the traditional sense). Can product close to an optimal path but can be confounded easily as well.
+
+Use cases:
+
+- When you need a shorter path.
+- When all or most of your important obstacles are convex shapes.
+- When you don't care how close the robot comes to the obstacles.
 
 ==========================
 Probabilistic Road Map
@@ -651,56 +696,51 @@ Probabilistic Road Map
 Task D i: Randomly Sampling from the Map
 ----------------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
-The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
-As the robot moves, the D-H table is updated.
-The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+To generate a probabilistic roadmap, we first sample the whole map area randomly for points. This creates a set of random coordinates that then need to be verified as reachable by DE NIRO (i.e. if they are within the bounds of the expanded obstacles, they can not be reached and must be deleted).
 
-.. image:: img/prm_1m.png
+.. image:: img/di_prm_illustration.png
    :width: 500
-   :alt: prm_1m
+   :alt: di_prm_illustration
 
+*Example of randomly sampled points on a map before and after being marked as viable.* [1]_
+
+The random points are generated by the code below:
+
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR RANDOM GENERATION OF POINTS
+
+   #insert final code
+
+They are then iterated through and marked as a "1" in the rejection array by the code below:
+
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR REJECTING POINTS
+
+   i=0
+   for point in pixel_points:
+      if self.pixel_map[int(point[1]),int(point[0])] == 1:
+         print("rejected")
+         rejected[i] = 1
+      i += 1
+   
+   #UPDATE WITH FINAL, COMMENTED CODE
+
+
+With 100 points, here is how the distribution turned out, which can be visually confirmed to have marked rejected points correctly.
+
+.. image:: img/prm_1m_Crop.png
+   :width: 250
+   :alt: prm_1m_Crop
+
+*Randomly distributed points for PRM marked as rejected or not*
 
 ----------------------------------
 Task D ii: Harris Corner Detection
 ----------------------------------
 
-(Stuff for Cii to avoid merge conflicts)
-Method 1: Inverse Square falloff
-Adv:
-- When far from any obstacles, almost no repulsive force is experienced.
-- This means that when in free space, the robot will make a "B-line" towards the goal.
-- When encountering an object, the obstacle essentially has a thin "force-field" around it, preventing collisions while maintaining close to the optimal path.
-
-Disadv:
-- Does not handle non-convex obstacles well; easy to get stuck inside them as the repulsive force is very local and doesn't take into account the wider surroundings.
-- Essentially a "greedy" algorithm therefore (although not exactly in the traditional sense). Can product close to an optimal path but can be confounded easily as well.
-
-Use cases:
-- When you need a shorter path
-- When all or most of your important obstacles are convex hulls
-- When you don't care how close the robot comes to the obstacles
-
-Method 2: Linear Falloff with Mass Normalisation and Top-N Average
-Adv:
-- Potentially a "smoother" path with fewer rapid turns (if the avg is tuned correctly)
-- Deals with narrow passages extremely smoothly
-- Better at dealing with non-convex obstacles as forces from futher away can have more impact, giving some situations a wider perception of the environment
-- Keeps the robots as far away from obstacles as possible while making good progress towards the goal.
-
-Disadv:
-- Usually a longer path, due to the path being more geometrically centered between obstacles (doesn't tend to "B-line" towards the goal, but remain between obstacles)
-
-
-Use cases:
-- If you need to keep the robot further away from obstacles
-- For example an RC boat where the water becomes shallow near obstacles (shores of islands for instance) so the ideal path should be more centrered.
-
-**Discussion**
-
-
-
-**Method 1: Pseudo Edge Detection**
+**Method 1a: Pseudo Edge Detection**
 
 One method would be to loop over every pixel in the map (or to save some computation time, some step size e.g. every 5 pixels) and take a sample of N points around the pixel in some shape (e.g. a loose grid with 2px spacing). Then take an average of the sampled values (e.g. 20 nearby pixels sampled, 8 of the are obstacle pixels, ``1``, and 12 of them are not, ``0``, giving an average value of 8/20 = 0.4), and multiply by some global probablity of placing a point at a given pixel (e.g. we want around ``N=100`` sampled points in total, and there are 320 * 320 = 102'400 pixels, so at each pixel the probabilty of placing a point there is 100 / 102'400). In total we will have fewer than our chosen number of sample points due to the obstacle probabilty multiplier, but we can account for this by increasing ``N``. Overall this method will have the effect of sampling more points near to the edges of obstacles, and especially if there is a small gap, given that we choose an appropriate sampling kernel.
 
@@ -709,7 +749,7 @@ What we have essentially done with this method is perform a convolution of the C
 .. note::
    **The optimal (shortest) path will always lie along the visiblity graph of the C-space map:**
 
-**Method 1a: Edge Detection**
+**Method 1b: Edge Detection**
 
 Alternatively, using an equavalent probabilistic sampling method by iterating over all the pixels in the map, but using the output of an edge detection filter implemented using SciPy or OpenCV would achieve slightly more optimal results, perhaps even more efficiently due the the optimisation of the functions in the mentioned libraries. You could also skip many iterations early by not bothering to probabilistically sample any points if they are a ``0`` in the output of the edge detection (i.e. not an edge).
 
@@ -725,13 +765,142 @@ As a result of the observation that for a map consisting of convex polygons (or 
 Task E i: Creating the Graph, Tuning Distances for Creating Edges
 -----------------------------------------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
+With the generated points completed in the previous task, the next step required is to create edges between neighbouring nodes. The task requires tuning of 2 parameters, ``mindist`` and ``maxdist``. These two variables define the minimum distance required before connecting neighbouring nodes, and the maximum allowable distance that nodes can connect to respectively. The reason these are critical to creating a graph is for the following:
+
+Minimum Distance
+   * Too High - Most neighbouring nodes will not be connected to leading to edges crossing over obstacles (which would be removed in the next part of the task) or a sparsity in the edges causing an incomplete path. 
+   * Too Low - Nodes that may have been generated directly next to each other will be connected to each other, even though they offer no major advantage in getting further to the goal. It will likely make the path more jagged and less optimal. This is typically not a major issue, but should be tuned, such that unnecessary nearby connections are not made.
+
+Maximum Distance
+   * Too High - The main issue of this is an extremely and unnecessarily dense graph. In the code shown below, a distance matrix is created between every node and then this is evaluated by distances between the nodes to produce a list of acceptable nodes - relating to the process of tuning min/max distance. The edges between these acceptable nodes are then evaluated for collisions between obstacles and set as untraversable if True. If the graph is very dense, it means that an unnecessary amount of nodes are being evaluated for collisions, which results in excessive computational time for no reason. The end result of generating such a dense graph is that most edges will be rejected in the collision check they will likely cross-over obstacles. This is quite wasteful and highly unoptimised, therefore this parameter should be tuned as low as possible without making the graph incomplete. Furthermore, when the motion plan is being created, e.g. through Dijkstra's Algorithm, it creates excessive edges to evaluate, even after removing those colliding with objects.
+   * Too Low - If this value is excessively low, then the graph will miss nodes to connect to that would be effective for travelling large distances and instead lead to discontinuity in the graph. This creates an issue for producing a complete motion plan, but can be easily resolved by increasing incrementally.
+
+In summary, too few edges and the algorithm will fail to create a complete path that can be traversed from the starting point to the goal, too many edges and the number of edges to evaluate for collision increases resulting in unnecessary computation as most edges would be rejected anyway and visualizing the graph becomes far more difficult. Hence correctly tuning  min/max distances for creating edges is crucial for creating a graph suitable for evaluating to create a motion plan.
+
+An iterative method was used to choose the values until a suitable graph was generated. 
+
+Method:
+   1. Start with any values, e.g. starting values in code, 0 for ``mindist`` and 20 for ``maxdist``.
+   2. Check graph output visually and determine if edges create sufficient connection between starting node and goal node.
+   
+      a. If too many edges, either reduce ``maxdist`` or increase ``mindist``.
+
+      b. If too few edges and graph is disconnected, increase ``maxdist`` or decrease ``mindist``
+   3. If graph output is complete between starting node and goal node and density is inexcessive, finish iterations.
+
+The following values were tested:
+
+.. image:: img/C2TE_MIN0MAX20.png
+   :width: 250
+   :alt: C2TE_MIN0MAX20
+
+*Default Min 0 Max 20 - overly dense graph, completely unusable*
+
+.. image:: img/C2TE_MIN2MAX3.png
+   :width: 250
+   :alt: C2TE_MIN2MAX3
+
+*Min 2 Max 3 - Graph has good density but sparse in some areas as minimum distance is likely too high*
+
+.. image:: img/C2TE_MIN1MAX3.png
+   :width: 250
+   :alt: C2TE_MIN1MAX3
+
+*Min 1 Max 3 - Improved graph but density could be increased by reducing* ``mindist`` *and increasing* ``maxdist``.
+
+.. image:: img/C2TE_MIN0_5MAX3_5.png
+   :width: 250
+   :alt: C2TE_MIN0_5MAX3_5
+
+*Min 0.5 Max 3.5 - Improved graph, but density could be increased, therefore increase* ``maxdist``.
+
+.. image:: img/C2TE_MIN0_5MAX3_8.png
+   :width: 250
+   :alt: C2TE_MIN0_5MAX3_8
+
+*Min 0.5 Max 3.8 - Ideal max value selected, good density of edges for long distances, but short distances between nodes could still be improved for more edge options when creating motion plan, decrease* ``mindist``.
+
+.. image:: img/C2TE_MIN0_2MAX3_8.png
+   :width: 250
+   :alt: C2TE_MIN0_2MAX3_8
+
+*Min 0.2 Max 3.8 - Ideal graph with good overall edge density.*
+
 
 ----------------------------------------------------------
 Task E ii: Creating the Graph, Tuning Edge Collision Check
 ----------------------------------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
+With a graph, all invalid edges must be removed before creating a motion plan. To do this, every edge is checked for collisions. Simple vector algebra is used to determine the distance and direction between two nodes. In the function, two arguments, ``pointA`` and ``pointB`` define the nodes to be evaluated. These are both in vector form, so to find the vector from ``pointA`` to ``pointB``, you simply take away ``pointB`` from ``pointA``. Then to evaluate distance, the ``linalg.norm`` method is used from the NumPy library where it calculates *vector norm*. This is defined as the Euclidean length of the vector or vector magnitude [3]_ , and is a neat, efficient way of calculating this information. Finally, the unit direction of the vector from A to B can be calculated by dividing the vector from A to B by the total distance. The following code implements this:
+
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR CALCULATING UNIT DIRECTION OF VECTOR
+
+   vector_B_to_A = pointB - pointA
+   distance = np.linalg.norm(vector_B_to_A)
+   direction = vector_B_to_A / distance
+
+   #UPDATE WITH FINAL, COMMENTED CODE
+
+The reason this is required is that distance and direction are evaluated in ``edge_points``. This variable creates an array of points to check collisions at from ``pointA`` in the direction to ``pointB``, until it reaches the end distance, and the number of points it checks in between is dictated by ``resolution`` - which is the next parameter to tune. The number of points along the direction is given by ``arrange(start, stop, step)`` with the starting value at 0 and the end as ``distance`` to ``pointB``, and values interpolated between these are defined by a step size named ``resolution``. This is why ``resolution`` is important to tune, as if it is too large, then there will not be enough points along the edge to measure for collision, meaning that it may skip past obstacles along the edge. Ideally this value is numerically low thus providing a *high* resolution. The ``reshape`` allows the variables to be multiplied and added in a suitable array form.
+
+.. code-block:: python
+   :linenos:
+   :caption: FINAL COMMENTED CODE FOR EDGE_POINTS
+
+   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2))
+
+   #UPDATE WITH FINAL, COMMENTED CODE
+
+These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
+Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
+
+**Resolutions tested:**
+
+.. image:: img/C2TE_RES5.png
+   :width: 250
+   :alt: C2TE_RES5
+
+*5 - Does not capture any information along the edge as the step is larger than the maximum distance, therefore all edges colliding with objects still present.*
+
+.. image:: img/C2TE_RES3.png
+   :width: 250
+   :alt: C2TE_RES3
+
+*3 - Detects very few obstacles but not all, likely due to the step size being close to* ``maxdist`` *value.*
+
+.. image:: img/C2TE_RES2.png
+   :width: 250
+   :alt: C2TE_RES2
+
+*2 - Captures more edges, but still not suitable step size (resolution) for shorter distances.*
+
+.. image:: img/C2TE_RES1.png
+   :width: 250
+   :alt: C2TE_RES1
+
+*1 - Majority of edges detected in this, but would not be suitable for shorter distances which may occur in a different iteration (given that points are generated randomly).*
+
+.. image:: img/C2TE_RES0_5.png
+   :width: 250
+   :alt: C2TE_RES0_5
+
+*0.5 - Improved result from previous iteration, but would be more robust to decrease to hypothesised value of 0.16m.*
+
+.. image:: img/C2TE_RES0_16.png
+   :width: 250
+   :alt: C2TE_RES0_16
+
+*0.0625 - Highest possible resolution to check along a line by checking across each pixel.*
+
+.. image:: img/C2TE_RES0_16_2.png
+   :width: 250
+   :alt: C2TE_RES0_16_2
+
+*0.0625, zoomed in - taking a closer look at one of the edges, it is clear that the resolution is highly effective and has now produced a suitable graph with no collision with obstacles.*
+
+Another parameter that could be used to remove edges or potentially create edges in the first place, such as in the first task, would be to optimise the path for Robot DeNiro. The robot is non-holonomic and must rotate its wheels in opposite directions to spin on the spot. Therefore, one potential option that could be used to improve the motion plan would be to reject any edges with large changes in direction. This could be implemented by comparing unit direction vectors and defining a maximum allowable change in direction. Although this may not be the shortest distance, it could potentially be more efficient for Robot DeNiro to traverse. Once the suitable graph would be created based on this, the same process of Djikstra’s algorithm to find the shortest path would be implemented. This process could be likened to implementing *motion primitives* that limit the allowable angles that can be used.
 
 --------------------------------------------------------------
 Task E iii: Creating the Graph, Completing an Incomplete Graph
@@ -768,6 +937,92 @@ Task F i: Dijkstra's Algorithm, Creating the Path
 
 Shafae first section:
 
+With a completed graph with all edges validated where they do not collide with obstacles, it is now possible to evaluate the graph and find the shortest distance from the start node to the goal node that can be traversed by the robot. One of the methods used to find the shortest distance of a weighted graph is Djikstra’s Algorithm. To begin, the task requires that each initial cost of all unvisited nodes is set to a large value under ``initial_cost`` - e.g. 1,000,000. This means that it will be guaranteed that the value is updated with an actual cost if the node is visited as it will definitely be lower than 1,000,000, and that solutions for nodes that weren’t visited are not implemented to produce incorrect results.
+
+Before starting the second part of the task, an overview of Djikstra’s to understand the theory behind the method is beneficial for understanding how the shortest distance motion plan is generated. Once provided with a graph, the algorithm requires a starting node. The starting node will be used to begin the algorithm and mark all the shortest distances to get to each node. Then a goal node is specified and the algorithm will output a single shortest distance graph which defines the motion plan.
+
+General algorithm for Djikstra’s [4]_:
+
+.. image:: img/Fi_DL.png
+   :width: 200
+   :alt: Fi_DL
+
+.. image:: img/Fi_D0.png
+   :width: 300
+   :alt: Fi_D0
+
+1. Mark the initial node costs from the starting node, e.g. A has a distance of 0. The rest are unvisited so set them with an extremely high value, e.g. 1,000,000 or 1e6. This has been marked in the example. Also establish a list of all visited and unvisited nodes. 
+
+   .. image:: img/Fi_D1.png
+      :width: 300
+      :alt: Fi_D1
+
+2. Visit the node which has the lowest cost from the start and update the visited nodes dataframe. Mark the previous node from which the cost was calculated from to get to the visited node. In the example, A has the lowest cost, so it is added as a visited node. 
+
+   .. image:: img/Fi_D2.png
+      :width: 300
+      :alt: Fi_D2
+
+3. Examine the unvisited neighbours of the current node and mark the cost to go to them from the starting node, including the node's traversed to get to them. If the new cost is less than the previous cost, update it with the new cost, if it is greater than the previous cost, then leave the value unchanged. In the example, it is the edge cost from A to B, C and D respectively with all values updated. 
+
+   .. image:: img/Fi_D3.png
+      :width: 300
+      :alt: Fi_D3
+
+4. Repeat steps 2 - 3 until all unvisited nodes have been visited. In the example, B has the lowest cost so is marked as visited. Its unvisited neighbours are C and E, with the value of C lower than before, therefore updated from 4 to 3. 
+
+   .. image:: img/Fi_D4.png
+      :width: 300
+      :alt: Fi_D4
+
+5. The smallest cost is now C, so it is marked as a visited node. The neighbouring nodes are evaluated, F, and it is found that the cost from the starting node is 8, i.e. 3 + 5 = 8. 
+
+   .. image:: img/Fi_D5.png
+      :width: 300
+      :alt: Fi_D5
+
+6. The smallest cost is E, so i marked as a visite dnode. Its neighbouring node F, has an updated cost from 8 to 7. 
+
+   .. image:: img/Fi_D6.png
+      :width: 300
+      :alt: Fi_D6
+
+7. D has the smallest cost so is visited next and the visited nodes list is updated. The neighbouring nodes are evaluated and it is found that no cost is lowered. 
+
+   .. image:: img/Fi_D7.png
+      :width: 300
+      :alt: Fi_D7
+
+8. The final node left to visit is F. This means all nodes have now been visited and the **ALGORITHM IS COMPLETE**. The number of steps required will depend on the number of nodes to evaluate. 
+
+   .. image:: img/Fi_D8.png
+      :width: 300
+      :alt: Fi_D8
+
+This is the general theory and can vary slightly depending on implementation. The Python implementation for this in ``motion_planning.py`` is explained in the code block below.
+
+.. code-block:: python
+   :linenos:
+   :caption: CODE?
+
+   #UPDATE WITH FINAL, COMMENTED CODE
+
+The second part of the task is straightforward as it asks to find the cost of going from the initial node to the next node via the current node. This is the equivalent of in the general explanation which is to keep track and update the cost from the starting node to the neighbouring nodes through the current node, only if the cost is lower. Initial to current node is defined by ``current_cost`` and neighbouring node cost between current node is defined by ``edge cost``, therefore the total cost is stated as:
+
+.. code-block:: python
+
+   next_cost_trial = current_cost + edge_cost
+
+This is iterated from every neighbouring point until the graph is complete and a motion plan is generated.
+
+The plan generated appears to be very similar to the Path 3 route generated in Task B. The method used to produce this was to connect the vertices of each obstacle together (essentially a partial visibility graph), in an attempt to find the shortest distance. It is clear that the manual method where we rationalised our shortest route and calculated it, has a very similar output to the randomly distributed points of PRM with Djikstra’s shortest path, meaning the tuning of our ``mindist``, ``maxdist`` and ``resolution`` is fairly good. There are some key differences however. There are far greater waypoints in between, meaning that RobotDeNiro will have to perform turns more often which is not ideal given he is non-holonomic and steering is slow. When viewing the completion of this path, the more turns and longer distance was confirmed as the simulation took longer.
+Although Djikstra’s did provide the optimal shortest path, it only did this with the graph that was provided, which was generated from the random points. Therefore the path is clearly not as optimised as it could be. The total distance was 19.2m compared to 17.2m.
+
+.. image:: img/C2TE_DJIKSTRA_1.png
+      :width: 250
+      :alt: C2TE_DJIKSTRA_1
+
+The path is clearly not as optimal as it relies on the random distribution of points generated by the PRM algorithm implemented. Djikstra provides locally optimal choices at each stage to find the global optimum. Although close in this case, it could’ve been complete if the points generated were different and hence the path. To generate a more optimal route using Djikstra’s, we instead used corner detection to produce the points.
 
 .. raw:: html
 
@@ -776,8 +1031,6 @@ Shafae first section:
     </div
 
 =====
-
-Oscar extra:
 
 Optimising Dijkstra's Algorithm with Corner Detection
 -----------------------------------------------------
@@ -829,7 +1082,49 @@ This implementation was useful for validating the combination of Dijakstra’s a
 Task F ii: Dijkstra's Algorithm, Planning Algorithms
 ----------------------------------------------------
 
-This task initialises the Denavit-Hartenberg, D-H, table.
-The table contains all the necessary information to orientate each link of the robot in a consistent manner so that the position of each link can be found relative to the other.
-As the robot moves, the D-H table is updated.
-The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
+Djikstra’s algorithm is defined as a one-to-many planning algorithm or a SSSP (Single Source Shortest Path) where it is able to find the shortest distance from the starting node to every other node in the graph. This is clearly seen in the example run through of a general use of Djikstra’s.
+
+The advantages of a one-to-many planning algorithm is that:
+If all desired nodes are added from the start, then the algorithm only needs to be run once to find the shortest distance to them from a starting point. However if a new node is added, the values would have to be recalculated for the whole graph, or if the starting node was changed.
+
+The main advantage of Dijkstra’s algorithm is the relatively low complexity that makes it close to linear. It has a complexity of O(V + E . log(V)), where V is the number of nodes and E is the number of edges. [5]_ Given that E equals close to V^2, the complexity is O (V +V^2 . log(V)). There are however motion planning algorithms with even lower complexity than this.
+
+It is fairly straightforward to implement and a common algorithm for motion planning.
+
+The issue comes in when changing the start point, so if from the goal node, you want to calculate a new goal node, the entire graph would need to be recalculated. This means that with changing starting points, the entire graph needs to be recalculated. In most motion planning problems, it is unlikely that Djikstra will be beneficial as the starting node rarely stays the same. Djikstra’s algorithm is not optimal and actually quite inefficient if the starting node is changing frequently. To find the shortest distance from two specific points only (starting node and goal node), A* is a better algorithm to utilise. [6]_
+
+A* is a one-to-one planning algorithm that is more efficient than Djikstra’s when focusing on the path between two specific nodes. It utilises an admissible heuristic that provides an estimate of the distance between nodes in the graph and the goal node. A particular example of this is to use Manhattan distances which uses grid coordinates for each node. There are however multiple heuristics that can be adopted. The benefit of this is that it favours nodes which get closer to the goal node, meaning that all nodes do not need to be evaluated. [7]_
+
+Each time moving from one node to another, an estimate of the distance remaining from the destination will help in informing the next move. If the graph was a map of the world, then the straight line distance can be calculated from the longitude and latitude of each point. A* is an enhancement of Djikstra’s algorithm, except it has added heuristics to inform the next move. For example if the Euclidean distance is provided between each node and the goal node, and this is stated as Heuristic distance H. Then a second value of cost from the starting node is given, where cost is G (the same as in Djikstra’s). Then a simple heuristic would be f = G + H. Instead of choosing the node with the lowest cost, like in Djikstra’s, instead the node with the lowest f value would be selected. This is iterated further similar to Djikstra’s but the end result is that every vertex need not be visited. As the graph scales up, the saving in time and computation is more pronounced, which is why A* is the desired motion plan when using one-to-one planning (starting node and goal node). Again, the heuristic is arbitrary and can be adapted for the situation accordingly.
+
+A summary of A* pathfinding algorithm is provided here:
+   * A* finds the shortest path between two vertices
+   * A* does not typically have to visit all vertices
+   * A* selects the node with the lowest f value where f = G + H. The cost, G, is the same as Djikstra’s Algorithm, whereas H is a heuristic relevant to A* that can be defined in many ways, e.g. Euclidean Distance. The node with the lowest f value is selected until the goal node is reached.
+   * The better the heuristic, the quicker the path can be found without visiting all nodes
+   * The heuristic is typically problem specific
+   * A* will always find a solution if one exists
+
+
+==========
+References
+==========
+
+.. [1] | Kormushev, P. & Nanayakkara, T. (2020) \ *DESE96005 - Robotics 2020-2021 - Course Notes*
+       | *and Lectures* [Module Content] Imperial College London.
+.. [2] | *Dilation (morphology).* [Online] Wikipedia. Wikimedia Foundation; Available from: 
+       | https://en.wikipedia.org/wiki/Dilation_%28morphology%29 [Accessed: 24th February 2021] 
+.. [3] | Brownlee J. *Gentle Introduction to Vector Norms in Machine Learning.* [Online] Machine Learning 
+       | Mastery. Available from: https://machinelearningmastery.com/vector-norms-machine-learning/ 
+       | [Accessed: 24th February 2021]
+.. [4] | *Coding Games and Programming Challenges to Code Better.* [Online] CodinGame. Available from: 
+       | https://www.codingame.com/playgrounds/1608/shortest-paths-with-dijkstras-algorithm/dijkstras-algorithm
+       | [Accessed: 24th February 2021] 
+.. [5] | Sryheni S. *Dijkstra's vs Bellman-Ford Algorithm.* [Online] Baeldung on Computer Science. 
+       | Available from: https://www.baeldung.com/cs/dijkstra-vs-bellman-ford#:~:text=The%20main%20advantage%20of%20Dijkstra’s,algorithm%20can’t%20be%20used.&amp;text=%2C%20if%20we%20need%20to%20calculate,is%20not%20a%20good%20option. 
+       | [Accessed: 24th February 2021]
+.. [6] | Isaac Computer Science. Available from: https://isaaccomputerscience.org/concepts/dsa_search_dijkstra 
+       | [Accessed: 24th February 2021]
+.. [7] | *Graph Data Structure 6. The A* Pathfinding Algorithm* [Online Video] Computer Science. Youtube.
+       | Available from: https://www.youtube.com/watch?v=eSOJ3ARN5FM&ab_channel=ComputerScience 
+       | [Accessed: 24th February 2021]
