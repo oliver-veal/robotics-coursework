@@ -207,13 +207,19 @@ The coordinates of DE NIRO’s starting position and destination were given as (
 To compare the lengths of different routes, we used the following line of code which calculates the hypotenuse from one point to the other then sums:
 
 .. code-block:: python
-   :caption: FINAL COMMENTED CODE FOR CALCULATING PATH LENGTHS
    :linenos:
-   :emphasize-lines: 1
+   :emphasize-lines: 5-8
 
-   distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
+   def setup_waypoints(self):
+   ... 
 
-   #UPDATE WITH FINAL, COMMENTED CODE
+    # A quick function to calculate the length of the path
+    total_len = 0 # Initilise a counter variable
+    for i in range(len(waypoints) - 1): # For each waypoint (we don't include the last waypoint here because in the next line we take to the distance to the next waypoint, so we would get an IndexOutOfBounds exception)
+        total_len += sqrt((waypoints[i + 1][0] - waypoints[i][0])**2 + (waypoints[i + 1][1] - waypoints[i][1])**2) # Add the distance from this waypoint to the next waypoint to the total
+    print(total_len)
+    
+    ...
 
 Results:
 --------
@@ -263,54 +269,6 @@ Path 3
 Total length of path 3: **17.2m**
 
 Path 3 gave the shortest distance.
-
-All code used to implement it is shown below, using the mentioned ``self.world_position()`` function and the distance calculation we wrote.
-
-.. code-block:: python
-   :linenos:
-   :caption: FINAL COMMENTED CODE FOR TASK B COMBINED
-   :emphasize-lines: 1
-   
-    def setup_waypoints(self):
-        ############################################################### TASK B
-        # Create an array of waypoints for the robot to navigate via to reach the goal
-        
-        p1 = self.world_position(np.array([191,104]))
-        p2 = self.world_position(np.array([265,141]))
-        p3 = self.world_position(np.array([292,237]))
-       
-        waypoints = np.array([
-        
-        [0,-6],
-        p1[0],
-        p2[0],
-        p3[0],
-        [8,8]
-        ])  # fill this in with your waypoints
-        
-        print(self.world_position(np.array([191,104])))
-                                  
-        distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
-        
-        print(distance)
-
-        waypoints = np.vstack([initial_position, waypoints, self.goal])
-        pixel_goal = self.map_position(self.goal)
-        pixel_waypoints = self.map_position(waypoints)
-        
-        print('Waypoints:\n', waypoints)
-        print('Waypoints in pixel coordinates:\n', pixel_waypoints)
-        
-        # PlottingS
-        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-        plt.scatter(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
-        plt.plot(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
-        plt.show()
-        
-        self.waypoints = waypoints
-        self.waypoint_index = 0
-
-   #UPDATE WITH FINAL, COMMENTED CODE
 
 In the video below, DE NIRO can be seen taking path 3
 
