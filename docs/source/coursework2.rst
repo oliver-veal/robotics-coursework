@@ -743,7 +743,14 @@ As a result of the observation that for a map consisting of convex polygons (or 
 Task E i: Creating the Graph, Tuning Distances for Creating Edges
 -----------------------------------------------------------------
 
-With the generated points completed in the previous task, the next step required is to create edges between neighbouring nodes. The task requires tuning of 2 parameters, ``mindist`` and ``maxdist’’. These two variables define the minimum distance required before connecting neighbouring nodes, and the maximum allowable distance that nodes can connect to respectively. The reason these are critical to creating a graph is for the following.
+With the generated points completed in the previous task, the next step required is to create edges between neighbouring nodes. The task requires tuning of 2 parameters, ``mindist`` and ``maxdist``. These two variables define the minimum distance required before connecting neighbouring nodes, and the maximum allowable distance that nodes can connect to respectively. The reason these are critical to creating a graph is for the following:
+
+Minimum Distance
+----------------
+
+* Too High - Most neighbouring nodes will not be connected to leading to edges crossing over obstacles (which would be removed in the next part of the task) or a sparsity in the edges causing an incomplete path. 
+* Too Low - Nodes that may have been generated directly next to each other will be connected to each other, even though they offer no major advantage in getting further to the goal. It will likely make the path more jagged and less optimal. This is typically not a major issue, but should be tuned, such that unnecessary nearby connections are not made.
+
 
 ----------------------------------------------------------
 Task E ii: Creating the Graph, Tuning Edge Collision Check
