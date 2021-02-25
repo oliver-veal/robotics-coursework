@@ -266,7 +266,15 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
 [Replace with final, commented code]
 ------------------------------------
 
-In the video below, DE NIRO can be seen taking path 3 *Insert video*
+In the video below, DE NIRO can be seen taking path 3
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1cmUM8Awz4a6WJBK_ps9FwyYkRjAA53Ca/preview" width="640" height="480"></iframe>
+    </div
+
+=====
 
 ==========================
 Potential Field Algorithm
@@ -760,6 +768,15 @@ Task F i: Dijkstra's Algorithm, Creating the Path
 
 Shafae first section:
 
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1xkdDy6k7mvBvuL7CXOmvn1GdD-2BU8Xg/preview" width="640" height="480"></iframe>
+    </div
+
+=====
+
 Oscar extra:
 
 Optimising Dijkstra's Algorithm with Corner Detection
@@ -799,6 +816,14 @@ This implementation produced the following result, with path length 17.17m, slig
    [ 8.       8.     ]]
 
 This implementation was useful for validating the combination of Dijakstra’s algorithm with our corner detection, as it agrees with our manual waypoints optimal route.
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://drive.google.com/file/d/1aTEHT9rzB-BCMKe2YtuuixUtTVI1F9d5/preview" width="640" height="480"></iframe>
+    </div
+
+=====
 
 ----------------------------------------------------
 Task F ii: Dijkstra's Algorithm, Planning Algorithms
