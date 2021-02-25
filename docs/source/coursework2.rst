@@ -308,9 +308,9 @@ To complete the code, we can compare the definitions of the forces to the equati
    pos_force_direction = goal_vector / distance_to_goal
       
    # potential function
-   pos_force_magnitude =     # your code here!
+   pos_force_magnitude = 1  ### By inspection, this part of equation (3) is just a constant
    # tuning parameter
-   K_att =      # tune this parameter to achieve desired results
+   K_att =      # This parameter is tuned in the Parameter Tuning section
       
    # positive force
    positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
@@ -363,9 +363,9 @@ A similar method to above can be used for the negative force.
    force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
       
    # potential function
-   force_magnitude =   # your code here!
+   force_magnitude = -(1/distance_to_obstacle)   # By inspection, this is the part of equation (2), or p(x) = -1/x. 
    # tuning parameter
-   K_rep =   # tune this parameter to achieve desired results
+   K_rep =   # This parameter is tuned in the Parameter Tuning section
       
    # force from an individual obstacle pixel
    obstacle_force = force_direction * force_magnitude
@@ -668,6 +668,57 @@ Consider for example consider the case of a single point obstacle close to a "wa
 
 To solve this issue, a more robust falloff function could be used that causes the repulsive force's magnitude to be extremely large when very close to an obstacle pixel, no matter the overall size of the obstacle:
 
+**Code Implementation of Method 1 + 2**
+
+.. code-block:: python
+   :linenos:
+
+   def potential_field(self): 
+    ############################################################### TASK C
+    complete = False
+
+    goal_vector = goal - deniro_position
+    distance_to_goal = np.linalg.norm(goal_vector)
+    pos_force_direction = goal_vector / distance_to_goal
+    
+    pos_force_magnitude = 1 # By inspection, this part of equation (3) is just a constant
+    K_att = 1 # For the method it seems the best results are when the K params are equal, and because we normalise the output force, it may as well be 1
+    
+    positive_force = K_att * pos_force_direction * pos_force_magnitude
+    
+    obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
+    obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
+    obstacle_positions = self.world_position(obstacle_pixel_coordinates)
+    
+    obstacle_vector = obstacle_positions - deniro_position
+    distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))
+    force_direction = obstacle_vector / distance_to_obstacle
+    
+    force_magnitude = -1 / (distance_to_obstacle) # By inspection, this is the part of equation (2), or p(x) = -1/x. 
+    # NOTE To implement Method 3 this line would be: force_magnitude = -1 / (distance_to_obstacle ** 2)
+    K_rep = 1 # For the method it seems the best results are when the K params are equal, and because we normalise the output force, it may as well be 1
+    
+    obstacle_force = force_direction * force_magnitude
+
+    #################################################### Implementation of Methods 1 and 2
+    mags = np.linalg.norm(obstacle_force, axis=1) # Get all the magnitudes of the negative forces
+    avg = 40                                      # How many of the largest magnitudes should we average over? Top-N Avg, this is the N
+    ind = np.argpartition(mags, -avg)[-avg:]      # argpartition gives you the top N values from a list, without sorting the whole list, so it is slightly faster than sorting first then sampling with array indices
+
+    negative_force = K_rep * np.sum(obstacle_force[ind], axis=0) / avg # Implementation of Top-N Avg, sum up the top 40 obstacles forces, then divide by 40
+    ####################################################
+    
+    vref = positive_force + negative_force
+    vref = vref / np.linalg.norm(vref)
+
+    if distance_to_goal < 0.05:
+        vref = np.array([[0, 0]])
+        complete = True
+
+    vref = np.reshape(vref, (-1, 2)) # Sometime there was a weird error where the vref array was the wrong shape so this is a bodge fix
+
+    return vref, complete
+
 Method 3: Square Inverse Falloff
 ----------------------------------------
 An intuitive next step is to raise the power of the falloff of the repulsive force.
@@ -689,6 +740,15 @@ Paramters used below: ``K_att = 3  K_rep = 350``
 
 .. note::
    This method can be applied with hollow obstacles as well and provides similar results.
+
+**Code Implementation of Method 3**
+
+.. code-block::
+   :linenos:
+
+   force_magnitude = -1 / (distance_to_obstacle ** 2) # Inverse square falloff
+
+**Testing**
 
 We then decided to test this route with DeNiro in Gazebo.
 We recorded the DeNiro simulation and overlaid the vector field plot to validate if DeNiro follows the path as expected.
