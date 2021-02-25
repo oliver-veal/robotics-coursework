@@ -290,16 +290,16 @@ def create_graph(self, points):
 
 def check_collisions(self, pointA, pointB):
     ############################################################### TASK E ii     
-    # Calculate the distance between the two point
-    distanceVector = pointB - pointA
-    distance = np.linalg.norm(distanceVector)
-    # Calculate the UNIT direction vector pointing from pointA to pointB
-    direction = distanceVector / distance
-    # Choose a resolution for collision checking
-    resolution = 0.5   # resolution to check collision to in m
+   
+   vector_A_to_B = pointB - pointA # Calculate the direction vector from point A to point B
+   distance = np.linalg.norm(vector_A_to_B) # Calculate the vector norm which is the Euclidean distance from A to B 
+   direction = vector_A_to_B / distance # Divide the direction by the distance to find the unit direction vector
+   
+   resolution = 0.0625 # Checks along the direction vector in a step size defined by this variable
+   edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2)) # Creates points along direction vector to check for collisions
+   # This creates an array of points from Point A till point B and utilises the unit direction vector specified and interpolates points along it in step sizes of variable resolution
+   # as defined by np.arange. A value of 0.0625 specifies the smallest check possible in m which checks every pixel in the grid.
 
-    # Create an array of points to check collisions at
-    edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
     # Convert the points to pixels
     edge_pixels = self.map_position(edge_points)
 
@@ -320,11 +320,11 @@ def dijkstra(self, graph, edges):
     
     initial_cost = 1000000.0  # This is set to a very high value so that the initial cost is never lower than the first time a node is visited
     
-    unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
+    unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]}) # Uses the Pandas DataFrame to create the list of unvisited nodes, recording the nodes, cost to get there from the start and the previous node to get there
     unvisited.set_index('Node', inplace=True)
     unvisited.loc[[str(initial_position)], ['Cost']] = 0.0
     
-    visited = pd.DataFrame({'Node':[''], 'Cost':[0.0], 'Previous':['']})
+    visited = pd.DataFrame({'Node':[''], 'Cost':[0.0], 'Previous':['']})# Uses the Pandas DataFrame to create the list of visited nodes, recording the nodes, cost to get there from the start and the previous node to get there. Takes nodes from the unvisited list.
     visited.set_index('Node', inplace=True)
     
     # Dijkstra's algorithm
@@ -333,20 +333,20 @@ def dijkstra(self, graph, edges):
         
         current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
         current_node_name = current_node.index.values[0]
-        current_cost = current_node['Cost'].values[0]
+        current_cost = current_node['Cost'].values[0] # Value used to determine cost to get from starting node to the current node for which the algorithm is on
         current_tree = current_node['Previous'].values[0]
         
         connected_nodes = graph[current_node.index.values[0]]
         connected_edges = edges[current_node.index.values[0]]
         
-        for next_node_name, edge_cost in zip(connected_nodes, connected_edges):
+        for next_node_name, edge_cost in zip(connected_nodes, connected_edges): # Edge cost and next node is iterated through, this is the unvisited neighbours in the algorithm, trying to update the nodes with lower costs if possible, to find the next node to visit
             next_node_name = str(next_node_name)
             
             if next_node_name not in visited.index.values:
                 next_cost_trial = current_cost + edge_cost # This updates the cost by adding the current best path cost to the edge weight
                 next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0]
                 
-                if next_cost_trial < next_cost: # Should we update the value for the cost of the node?
+                if next_cost_trial < next_cost: # Checks if we update the value for the cost of the node with a lower cost as mentioned in report example Step 3 - 4
                     unvisited.loc[[next_node_name], ['Cost']] = next_cost_trial
                     unvisited.loc[[next_node_name], ['Previous']] = current_tree + current_node_name
         
