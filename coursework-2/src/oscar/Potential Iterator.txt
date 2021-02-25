@@ -1,0 +1,162 @@
+    def potential_field(self):
+        ############################################################### TASK C ELITE VERISON
+        
+        for i in range(1,50,2):                     # Iterate through k_att values
+            for j in range(50,1000,50):             # Iterate through k_rep values
+                
+                print(i,j)                          # Show status in terminal
+        
+                complete = False
+                deniro_position = np.array([0, 0])
+
+                map_array_x_negative = []           # Set up the arrays to store the negative forces in x direction
+                map_array_y_negative = []           # Set up the arrays to store the negative forces in y direction
+                
+                map_array_x_positive = []           # Set up the arrays to store the positive forces in x direction
+                map_array_y_positive = []           # Set up the arrays to store the positive forces in y direction
+                
+                map_array_x_combined = []           # Set up the arrays to store the combined forces in x direction
+                map_array_y_combined = []           # Set up the arrays to store the combined forces in y direction
+                
+                ### The first four arrays are used for the heat map components, can be ignored for the quiver plot ###
+                
+                resolution = 10                     # Number of pixels per vector to plot
+                
+                #2,4,8,10,16
+                
+                window = int(320/resolution)        # Size of the vector plot (a fraction of the size of the map)
+                
+                start = -window                     # Using the map coordinates, start of map space to iterate over to find vectors
+                end = window                        # Using the map coordinates, end of map space to iterate over to find vectors
+                
+                factor = end/8                      # Used for converting to map coordinates (half of the 16 factor to account for -8 to +8 distance)
+                
+                for y in range(start,end):
+                
+                    map_array_x_negative_x = []     # Arrays which will store one line (row) of the final plot arrays defined above
+                    map_array_y_negative_x = []
+                    
+                    map_array_x_positive_x = []
+                    map_array_y_positive_x = []
+                    
+                    map_array_x_combined_x = []
+                    map_array_y_combined_x = []
+                    
+                    map_array_x = []
+                    
+                    for x in range(start,end):
+                        deniro_position = np.array([x/factor,y/factor])                                     # Set deniro position to be our current iterated coordinates
+                
+                        # compute the positive force attracting the robot towards the goal
+                        # vector to goal position from DE NIRO
+                        goal_vector = goal - deniro_position
+                        # distance to goal position from DE NIRO
+                        distance_to_goal = np.linalg.norm(goal_vector)
+                        # unit vector in direction of goal from DE NIRO
+                        pos_force_direction = goal_vector / distance_to_goal
+                        
+                        # potential function
+                        pos_force_magnitude = 1     # your code here!
+                        # tuning parameter
+                        K_att = i     # tune this parameter to achieve desired results
+                        
+                        # positive force
+                        positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
+                        
+                        # compute the negative force repelling the robot away from the obstacles
+                        obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
+                        # coordinates of every obstacle pixel
+                        obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
+                        # coordinates of every obstacle pixel converted to world coordinates
+                        obstacle_positions = self.world_position(obstacle_pixel_coordinates)
+                        
+                        # vector to each obstacle from DE NIRO
+                        obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
+                        # distance to obstacle from DE NIRO
+                        distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
+                        # unit vector in direction of obstacle from DE NIRO
+                        force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
+                        
+                        # potential function
+                        force_magnitude = -(1/distance_to_obstacle)   # your code here!
+                        # tuning parameter
+                        K_rep = j    # tune this parameter to achieve desired results
+                        
+                        # force from an individual obstacle pixel
+                        obstacle_force = force_direction * force_magnitude
+                        # total negative force on DE NIRO
+                        negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
+
+                        # Uncomment these lines to visualise the repulsive force from each obstacle pixel
+                        # Make sure to comment it out again when you run the motion planner fully
+                #        plotskip = 10   # only plots every 10 pixels (looks cleaner on the plot)S
+                #        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+                #        plt.quiver(obstacle_pixel_coordinates[::plotskip, 0], obstacle_pixel_coordinates[::plotskip, 1],
+                #                   obstacle_force[::plotskip, 0] * self.xscale, obstacle_force[::plotskip, 1] * self.yscale)
+                #        plt.show()
+
+                        
+                        map_array_x_negative_x.append(negative_force[0])                    # Append force results to relevant arrays
+                        map_array_y_negative_x.append(negative_force[1])
+                        
+                        map_array_x_positive_x.append(positive_force[0])
+                        map_array_y_positive_x.append(positive_force[1])
+                        
+                        map_array_x_combined_x.append(negative_force[0] + positive_force[0])
+                        map_array_y_combined_x.append(negative_force[1] + positive_force[1])
+
+                        
+                    map_array_x_negative.append(map_array_x_negative_x)                     # Append the row to the overall map
+                    map_array_y_negative.append(map_array_y_negative_x)
+                    
+                    map_array_x_positive.append(map_array_x_positive_x)
+                    map_array_y_positive.append(map_array_y_positive_x)
+                    
+                    map_array_x_combined.append(map_array_x_combined_x)
+                    map_array_y_combined.append(map_array_y_combined_x)
+
+                neg_map_x = np.array(map_array_x_negative)                                 # Convert to np array for later processing
+                neg_map_y = np.array(map_array_y_negative)
+                
+                pos_map_x = np.array(map_array_x_positive)
+                pos_map_y = np.array(map_array_y_positive)
+                
+                com_map_x = np.array(map_array_x_combined)
+                com_map_y = np.array(map_array_y_combined) 
+
+                
+                #X = np.arange(0, 320)
+                #Y = np.arange(0, 320)
+                
+                #X,Y = np.meshgrid(X,Y)     # Create meshgrid on which to plot the quiver vectors (heatmap)
+                
+                U = com_map_x               # Vertical component of vectors on quiver plot
+                V = com_map_y               # Horizontal component of vectors on quiver plot
+
+                
+                plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower', cmap='Greys')        # Plot the background in black and white
+                
+                res_over_2 = resolution/2                                                       # Half the set resolution to suit plotting parameters
+                
+                X, Y = np.meshgrid(np.arange(0, 320, res_over_2), np.arange(0,320, res_over_2)) # Create meshgrid on which to plot the quiver vectors
+                
+                print(com_map_x.shape)                                                          # Check resolution of the quiver plot
+                print(U.shape)                                                                  # Check this is the same resolution for debugging
+
+                plt.quiver(X,Y,U,V,angles='xy', scale_units='xy', scale=0.2)                    # Plot the quiver
+                 
+                plt.savefig("linear_K_att:"+ str(K_att) + " K_rep:" + str(K_rep) + ".png", dpi=300)     # Save the plot instead of showing it, use the K paramters in the file name
+                
+                plt.clf()       # Clear the plots for next time
+       
+        # if need to stop loop
+        #input("enter to continue")
+        
+        # Reference velocity is the resultant force
+        vref = positive_force + negative_force
+        
+        # If the goal has been reached, stop
+        if distance_to_goal < 0.05:
+            vref = np.array([0, 0])
+            complete = True
+        return vref, complete
