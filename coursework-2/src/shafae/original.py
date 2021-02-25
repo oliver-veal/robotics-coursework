@@ -141,6 +141,14 @@ def expand_map(img, robot_width):
         
         plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')  # setup a plot of the map
         
+        for i in range(points.shape[0]):    # loop through each node
+            points_in_range = points[(distances[i] >= mindist) & (distances[i] <= maxdist)]     # get nodes an acceptable distance of the current node
+            distances_in_range = distances[i, (distances[i] >= mindist) & (distances[i] <= maxdist)]    # get the corresponding distances to each of these nodes
+        
+        if points_in_range.shape[0] > 0:    # if there are any nodes in an acceptable range
+            # set up arrays of nodes with edges that don't collide with obstacles, and their corresponding distances
+            collision_free_points = np.empty((1, 2))
+            collision_free_distances = np.empty((1, 1))
 #####################################################################################################
         
 #######################################TASK E ii#####################################################

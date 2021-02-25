@@ -86,10 +86,18 @@ Scipy’s ``binary_dilation`` function expands the map using this array by traci
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR A PART I
-   :emphasize-lines: 1
+   :emphasize-lines: 6
 
-   #insert final code
+   def expand_map(img, robot_width):
+    robot_px = int(robot_width * scale)   # size of the robot in pixels x axis
+    ############################################################### TASK A
+    # SQUARE MASK
+    # create a square array of ones of the size of the robot
+    robot_mask = np.ones((robot_px, robot_px)) # Creates a 2D array of size robot_px * robot_px of ones
+
+    expanded_map = binary_dilation(img, robot_mask) # Dilate the obstacle map by the square mask and return the result.
+    
+    return expanded_map
 
 Result:
 -------
@@ -126,9 +134,29 @@ The array is visually displayed below:
 
 .. code-block:: python
    :linenos:
-   :caption: FINAL COMMENTED CODE FOR A PART II
+   :emphasize-lines: 3, 5-9, 18
 
-   #insert final code
+   def circle_array(arr, r): # Basic implementation of a quantised "circle"
+      width = len(arr) # What dimension is our square input array?
+      offset = math.ceil(-(width / 2)) + (0.5 if width % 2 == 0 else 0) # This offset value accounts for i, j coords ranging from 0 -> i 
+                                                                        # and the circle having its origin at 0, 0 and ranging from -r, r
+      r2 = r**2 
+      for i in range(width):
+         for j in range(width): # Loop over the 2D array
+               if (i+offset)**2 + (j+offset)**2 > r2: # Circle equation x^2 + y^2 = r^2. If left > right, then we are in an array element outside of the circle, so set it's value to 0.
+                  arr[i][j] = 0
+
+   def expand_map(img, robot_width):
+      robot_px = int(robot_width * scale)   # size of the robot in pixels x axis
+      ############################################################### TASK A
+      # SQUARE MASK
+      robot_mask = np.ones((robot_px, robot_px))
+      
+      # CIRCULAR MASK
+      circle_array(robot_mask, robot_px / 2) # Since circle_array modifies its input array in-place, we simply run it through the function
+      expanded_map = binary_dilation(img, robot_mask) # Dilate the map using the circular mask.
+      
+      return expanded_map 
 
 Result:
 -------
@@ -143,31 +171,36 @@ Result:
 Waypoint Navigation
 ====================
 
-----------------------------------
-Task B: Adding Waypoints by Hand
-----------------------------------
+-------------------------------------------------------------------
+Task Bi & Task Bii: Adding Waypoints by Hand & Calculating Distance
+-------------------------------------------------------------------
 
 Manual waypoint planning enables quick visualizations of the shortest routes by visual inspection, looking at the expanded c-space map. It was quickly obvious that going from corner to corner of obstacles would be the shortest paths as this means going in direct, straight lines when in empty space between obstacles. 3 routes were tried with this method.
 Points were chosen on the pixel map and converted to world coordinates using the function ``self.world_position()``, as shown in the code below.
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 1,7
-   :caption: FINAL COMMENTED CODE FOR CONVERTING COORDINATES
+   :emphasize-lines: 4, 7-9
 
-   p1 = self.world_position(np.array([191,104]))
-   p2 = self.world_position(np.array([265,141]))
-   p3 = self.world_position(np.array([292,237]))
-       
-   waypoints = np.array([
-   [0,-6],
-   p1[0],
-   p2[0],
-   p3[0],
-   [8,8]
-   ])
+   def setup_waypoints(self):
+      ############################################################### TASK B
+      # Create an array of waypoints for the robot to navigate via to reach the goal    
+      waypoints = np.array([[1.97, -3.78], [5.97, -1.28],  [7.78, 4.59]]) # Waypoints were converted manually to world coords an listed in this array
 
-   #UPDATE WITH FINAL, COMMENTED CODE
+      # Automatic conversion with the world_position function is also possible and would be as follows:
+      #p1 = self.world_position(np.array([191,104]))
+      #p2 = self.world_position(np.array([265,141]))
+      #p3 = self.world_position(np.array([292,237]))
+      #waypoints = np.array([p1[0],p2[0],p3[0]])
+
+      waypoints = np.vstack([initial_position, waypoints, self.goal]) # Add in the start position and goal to the list of waypoints to make a complete path
+      pixel_waypoints = self.map_position(waypoints) # Convert the waypoints to map coords
+      
+      print('Waypoints:\n', waypoints) # Print for convenience in testing
+      print('Waypoints in pixel coordinates:\n', pixel_waypoints)
+      
+      self.waypoints = waypoints # Sets the global values for Gazebo to access
+      self.waypoint_index = 0
 
 The coordinates of DE NIRO’s starting position and destination were given as (0,-6) and (8,8) respectively (or (162,66) and (290,290) in pixel coordinates).
 
@@ -175,6 +208,7 @@ To compare the lengths of different routes, we used the following line of code w
 
 .. code-block:: python
    :caption: FINAL COMMENTED CODE FOR CALCULATING PATH LENGTHS
+   :linenos:
    :emphasize-lines: 1
 
    distance = sum([sqrt((waypoints[i][0] - waypoints[i+1][0])**2 + (waypoints[i][1] - waypoints[i+1][1])**2) for i in range(len(waypoints)-1)])
@@ -329,7 +363,7 @@ To complete the code, we can compare the definitions of the forces to the equati
 
 *Equation 1: Definition for force of attraction*
 
-Line 15 in the above code corresponds to equation 1. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
+Line 15 in the above code corresponds to Equation 1. We can compare the terms to the variables to deduce the definition of ``pos_force_magnitude`` which needs to be completed.
 
 +--------+---------------------------+-----------------------------+
 | Term   | Variable                  | Description                 |
@@ -466,7 +500,7 @@ Starting at the start, you can follow the vectors and see that deniro would be d
 
 These maps are much faster to generate than watching deniro run in the simulation, and provide much more insightful ideas on how the parameters affect the potential fields.
 
-Parameter tuning
+Parameter Tuning
 ----------------
 After running a few sets of parameters to gain some intuition, we saw that the repulsive force would need to be much greater than the attractive.
 We also had an idea for the orders of magnitude to test.
@@ -723,6 +757,7 @@ The random points are generated by the code below:
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR RANDOM GENERATION OF POINTS
+   :emphasize-lines: 1
 
    #insert final code
 
@@ -731,6 +766,7 @@ They are then iterated through and marked as a "1" in the rejection array by the
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR REJECTING POINTS
+   :emphasize-lines: 1
 
    i=0
    for point in pixel_points:
@@ -850,6 +886,7 @@ With a graph, all invalid edges must be removed before creating a motion plan. T
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR CALCULATING UNIT DIRECTION OF VECTOR
+   :emphasize-lines: 1
 
    vector_B_to_A = pointB - pointA
    distance = np.linalg.norm(vector_B_to_A)
@@ -862,6 +899,7 @@ The reason this is required is that distance and direction are evaluated in ``ed
 .. code-block:: python
    :linenos:
    :caption: FINAL COMMENTED CODE FOR EDGE_POINTS
+   :emphasize-lines: 1
 
    edge_points = pointA.reshape((1,2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1,2))
 
@@ -870,7 +908,7 @@ The reason this is required is that distance and direction are evaluated in ``ed
 These points are then converted to pixel form such that they can be evaluated for collision with objects on the pixel map. If there is a collision with the object, the point is returned as ``True`` thus causing it to be unsuitable for use in the map.
 Different resolutions were tested to see their effectiveness for removing edges. The default value in the code was used as a starting point to explore the effective and results shown below. Based on the logic of the code, it is expected that resolution should be defined as less than half the value of ``mindist`` so that it is able to check for obstacles along the shortest possible path - given than ``mindist`` is not zero. As a result it is expected that a value of 0.1m would be suitable, however given that the size of a pixel on the map is defined by 0.0.0625m, the lowest possible value to set it at is this. Therefore it is predicted 0.0625m will provide the best solution.
 
-**Resolutions tested:**
+**Resolutions Tested:**
 
 .. image:: img/C2TE_RES5.png
    :width: 250
@@ -1035,6 +1073,7 @@ This is the general theory and can vary slightly depending on implementation. Th
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 1
    :caption: CODE?
 
    #UPDATE WITH FINAL, COMMENTED CODE
@@ -1042,6 +1081,8 @@ This is the general theory and can vary slightly depending on implementation. Th
 The second part of the task is straightforward as it asks to find the cost of going from the initial node to the next node via the current node. This is the equivalent of in the general explanation which is to keep track and update the cost from the starting node to the neighbouring nodes through the current node, only if the cost is lower. Initial to current node is defined by ``current_cost`` and neighbouring node cost between current node is defined by ``edge cost``, therefore the total cost is stated as:
 
 .. code-block:: python
+   :linenos:
+   :emphasize-lines: 1
 
    next_cost_trial = current_cost + edge_cost
 
@@ -1084,8 +1125,10 @@ This implementation produced the following result, with path length 17.17m, slig
 
 *Figure 48, 49: Graph generated with corner detection (left) and Corner Detection with Dijkstra shortest path (right)* 
 
-.. code-block::
-   
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 1
+
    Visited nodes
                            Cost   Previous
    Node                                    
