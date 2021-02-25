@@ -277,9 +277,6 @@ All code used to implement it is shown below, using the mentioned ``self.world_p
 
 In the video below, DE NIRO can be seen taking path 3
 
-<<<<<<< HEAD
-In the video below, DE NIRO can be seen taking path 3
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 10%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
@@ -287,10 +284,6 @@ In the video below, DE NIRO can be seen taking path 3
     </div
 
 =====
-=======
-[Insert Task B result video]
-----------------------------
->>>>>>> 048220cf8f8eb61bfd47c7f39a3a1e808fa8e9a4
 
 ==========================
 Potential Field Algorithm
