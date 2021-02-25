@@ -648,6 +648,11 @@ The table contains all the necessary information to orientate each link of the r
 As the robot moves, the D-H table is updated.
 The D-H table is a convenient way to store this information as the transformation matrix for each link can be evaluated using the corresponding row in the table.
 
+.. image:: img/prm_1m.png
+   :width: 500
+   :alt: prm_1m
+
+
 ----------------------------------
 Task D ii: Harris Corner Detection
 ----------------------------------
