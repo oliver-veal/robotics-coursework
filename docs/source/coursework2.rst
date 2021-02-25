@@ -641,7 +641,23 @@ The idea behind taking the average of the top n largest force contributions come
 
 **Effects of Tuning the Top-N Average Parameter**
 
-... Diagrams and shit
+.. image:: img/avg_1.png
+   :width: 340
+   :alt: Tuning Avg1
+
+.. image:: img/avg_1_zoom.png
+   :width: 340
+   :alt: Tuning Avg1 Close-up
+
+.. image:: img/avg_5png
+   :width: 340
+   :alt: Tuning Avg5
+
+.. image:: img/avg_5_zoom.png
+   :width: 340
+   :alt: Tuning Avg5 Close-up
+
+*Figure 16a, 16b, 16c, 16d: Effects of changing the Average parameter, smoothing out the field lines flow between obstacles*
 
 **Valid Paths Produced By This Method**
 
@@ -653,7 +669,7 @@ The idea behind taking the average of the top n largest force contributions come
    :width: 340
    :alt: hollow_search
 
-*Figure 16, 17: Hollow obstacle map (left) and Hollow obstacle map with vector field plot (right)*
+*Figure 17a, 17b: Hollow obstacle map (left) and Hollow obstacle map with vector field plot (right)*
 
 As the plot shows, the vector field lines all point away from the nearest obstacle, until the boundary at which they meet the next obstacle.
 This boundary is almost equidistant between obstacles, and at which point is where the vectors sum to point towards the goal. This has the effect of pushing DeNiro onto the closest “path” which he then follows to the goal. This is a reliable model, and uses ``k_att`` and ``k_rep`` coefficients which are equal to each other; 20 was used in this test.
