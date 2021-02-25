@@ -209,14 +209,53 @@ def potential_field(self):
 ##################################################################################
 #                                   TASK D.i   
 ##################################################################################
+def generate_random_points(self, N_points):
+    N_accepted = 0  # number of accepted samples
+    accepted_points = np.empty((1, 2))  # empty array to store accepted samples
+    rejected_points = np.empty((1, 2))  # empty array to store rejected samples
+    
+    while N_accepted < N_points:    # keep generating points until N_points have been accepted
+    
+        points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
+        pixel_points = self.map_position(points)    # get the point locations on our map
 
+        ########
+        rejected = np.array([self.pixel_map[point[1], point[0]] for point in pixel_points])
+        # This task can be done in a one-liner:
+        # Define the rejected array as either 1 if the corresponding point is rejected, or 0 if the point is accepted.
+        # A point is accepted if it's corresponding location in the pixel map is not an obstacle.
+        # What's nice is that the obstacle values 0, 1 correspond directly with a point being rejected 0, 1
+        #######
 
+        new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
+        new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
+        accepted_points = np.vstack((accepted_points, new_accepted_points))
+        rejected_points = np.vstack((rejected_points, new_rejected_points))
 
 ##################################################################################
 #                                   TASK D.ii   
 ##################################################################################
 
+######
+# While code implementation for this task is not a requirement, here is a basic implementation of creating a route graph using corner detection in SciPy
+######
 
+def generate_random_points(self, N_points):
+    #NOTE This corner detection method works best when the robot_mask from map.py is a square, not a circle, as the C-space map is produces has sharp corners
+    accepted_points = np.empty((1, 2)) # Initialise accepted points
+
+    bigger_map = binary_dilation(self.pixel_map, np.ones((3, 3))) # Slightly expand the C-space map to give some "breathing room" around obstacles (sometimes a valid path cannot be found otherwise)
+    bigger_map.astype(int) # Convert to ints for the corner detection function
+
+    ##### from skimage.feature import corner_harris, corner_subpix, corner_peaks
+    coords = corner_peaks(corner_harris(bigger_map), min_distance=1, threshold_rel=0.002) # Perform corner detection on the C-space map and return a list of points
+    #accepted_points = corner_subpix(bigger_map, coords, window_size=20)   # Optional subpixel corner detection, not used in the case of a rectangular map
+    accepted_points = np.flip(coords, axis=1) # The resulting points are in col, row form rather than x, y so we flip them around
+
+    world_points = self.world_position(accepted_points) # calculate the position of the accepted points in world coordinates
+    world_points = np.vstack((initial_position, world_points, goal)) # add DE NIRO's position to the beginning of these points, and the goal to the end
+
+    return world_points
 
 ##################################################################################
 #                                   TASK E.i  
