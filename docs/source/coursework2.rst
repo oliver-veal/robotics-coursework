@@ -673,9 +673,9 @@ They are then iterated through and marked as a "1" in the rejection array by the
 
 With 100 points, here is how the distribution turned out, which can be visually confirmed to have marked rejected points correctly.
 
-.. image:: img/prm_1m.png
+.. image:: img/prm_1m_Crop.png
    :width: 250
-   :alt: prm_1m
+   :alt: prm_1m_Crop
 
 *Randomly distributed points for PRM marked as rejected or not*
 
